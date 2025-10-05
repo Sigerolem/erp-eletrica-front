@@ -1,0 +1,42 @@
+---
+const routes = [
+  { name: "Compras", path: "purchases" },
+  { name: "Ordens", path: "orders" },
+  { name: "Materiais", path: "materials" },
+  { name: "Orçamentos", path: "quotations" },
+  { name: "Clientes", path: "customers" },
+  { name: "Fornecedores", path: "suppliers" },
+];
+---
+
+<aside class="bg-red-600 p-4 w-[15%] gap-2 flex flex-col">
+  <div id="idCard" class="p-2 bg-blue-400">
+    <p>Olá</p>
+    <span id="userName">...</span>
+  </div>
+  {
+    routes.map((route) => (
+      <nav
+        id={route.path}
+        class="bg-green-400 h-6 cursor-pointer hover:bg-green-600"
+      >
+        {route.name}
+      </nav>
+    ))
+  }
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const role = localStorage.getItem("apiRole");
+      const name = localStorage.getItem("apiName");
+      if (role == undefined) {
+        document.location.href = "/login";
+      }
+      const userNameSpan = document.getElementById(
+        "userName"
+      ) as HTMLSpanElement;
+      userNameSpan.innerText = name || "";
+      const idCard = document.getElementById("idCard") as HTMLDivElement;
+      idCard.removeAttribute("hidden");
+    });
+  </script>
+</aside>

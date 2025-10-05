@@ -1,0 +1,11 @@
+---
+import { Materials } from "@comp/Materials";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Materiais">
+  <header class="bg-red-400 flex-1">
+    <h1 class="text-4xl p-2 font-semibold mb-4">Materiais no Estoque</h1>
+    <Materials client:load />
+  </header>
+</DefaultLayout>

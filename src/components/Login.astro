@@ -1,0 +1,80 @@
+---
+import "../styles/global.css";
+
+const isButtonDisabled = false;
+---
+
+<body>
+  <main class="w-full h-full p-4 flex items-center justify-center bg-amber-400">
+    <div
+      class="w-md bg-amber-800 flex flex-col items-center min-h-28 p-4 rounded-lg"
+    >
+      <div class="min-h-6 bg-gray-700 p-4">
+        <label for="">login</label>
+        <input id="login" class="ml-8 bg-white p-1 rounded-lg" type="text" />
+      </div>
+      <div class="min-h-6 bg-gray-700 p-4">
+        <label for="">senha</label>
+        <input
+          id="password"
+          class="ml-8 bg-white p-1 rounded-lg"
+          type="password"
+        />
+      </div>
+      <button
+        id="loginButton"
+        onclick=""
+        class="bg-blue-700 p-4 m-2 cursor-pointer disabled:cursor-not-allowed"
+        >Login</button
+      >
+    </div>
+  </main>
+</body>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const loginButton = document.getElementById("loginButton");
+    const loginInput = document.getElementById("login") as HTMLInputElement;
+    const passInput = document.getElementById("password") as HTMLInputElement;
+    if (loginButton) {
+      loginButton.addEventListener("click", () => {
+        const login = loginInput.value;
+        const password = passInput.value;
+        if (!login || !password) {
+          alert("preencha login e senha corrretamente");
+          return;
+        }
+        loginButton.setAttribute("disabled", "true");
+
+        loginFetch(login, password);
+
+        loginButton.removeAttribute("disabled");
+      });
+    }
+  });
+
+  async function loginFetch(login: string, password: string) {
+    fetch("http://localhost:3000/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ login, password }),
+    })
+      .then((response) => {
+        if (response.status == 400) {
+          throw new Error();
+        }
+        return response.json();
+      })
+      .then((data: { token: string; name: string; role: string }) => {
+        localStorage.setItem("apiToken", data.token);
+        localStorage.setItem("apiName", data.name);
+        localStorage.setItem("apiRole", data.role);
+        window.location.href = "/";
+      })
+      .catch((error: Error) => {
+        alert("Login failed!");
+      });
+  }
+</script>
