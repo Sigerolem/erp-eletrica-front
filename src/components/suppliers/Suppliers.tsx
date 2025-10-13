@@ -22,14 +22,16 @@ export function Suppliers() {
   }
 
   useEffect(() => {
-    fetchWithToken<SuppliersType[]>({ path: "/suppliers" }).then((result) => {
-      if (result.code == 200 || result.code == 201) {
-        setSuppliers(result.data);
-      } else {
-        window.alert("Erro ao buscar fornecedores.");
-        console.error(result.data);
+    fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
+      (result) => {
+        if (result.code == 200 || result.code == 201) {
+          setSuppliers(result.data.suppliers);
+        } else {
+          window.alert("Erro ao buscar fornecedores.");
+          console.error(result.data);
+        }
       }
-    });
+    );
   }, []);
 
   return (

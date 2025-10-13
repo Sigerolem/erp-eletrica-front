@@ -1,16 +1,24 @@
 import type { TargetedEvent, TargetedSubmitEvent } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type StateUpdater,
+} from "preact/hooks";
 import { Input } from "src/elements/Input";
 import { SelectSupplierModal } from "./SelectSupplierModal";
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { validateDecimalInput } from "@utils/validateDecimalInput";
+import type { MaterialsType } from "./Materials";
 
 export function CreateMaterialModal({
   closeModal,
   suppliersList,
+  setMaterials,
 }: {
   closeModal: () => void;
   suppliersList: { id: string; name: string }[];
+  setMaterials: Dispatch<StateUpdater<MaterialsType[]>>;
 }) {
   const [pkgSize, setPkgSize] = useState("1");
   const [profit, setProfit] = useState("0,0 %");
@@ -138,8 +146,9 @@ export function CreateMaterialModal({
     }
   }
 
-  function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
+  async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
     const formData = Object.fromEntries(
       new FormData(e.currentTarget).entries()
     ) as {
@@ -170,17 +179,17 @@ export function CreateMaterialModal({
       delete newErrors.barcode;
     }
 
-    if (supplierSelected == null) {
-      newErrors.supplier = "Selecione um fornecedor";
-    } else {
-      delete newErrors.supplier;
-    }
+    // if (supplierSelected == null) {
+    //   newErrors.supplier = "Selecione um fornecedor";
+    // } else {
+    //   delete newErrors.supplier;
+    // }
 
     if (Object.keys(newErrors).length > 0) {
       setValidationErrors((prev) => ({ ...prev, ...newErrors }));
     } else {
       setValidationErrors({ ...newErrors });
-      fetchWithToken({
+      const { data, code } = await fetchWithToken<{ material: MaterialsType }>({
         path: "/materials/create",
         method: "POST",
         body: JSON.stringify({
@@ -196,16 +205,22 @@ export function CreateMaterialModal({
             parseFloat(cost.replaceAll(".", "").replace(",", ".")) * 100,
           value: parseFloat(value.replaceAll(".", "").replace(",", ".")) * 100,
         }),
-      })
-        .then((response) => {
-          if (response.status == 401) {
-            localStorage.removeItem("apiToken");
-          }
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log("deu ruim", error);
-        });
+      });
+      if (code == 201) {
+        const material = data.material;
+        if (supplierSelected) {
+          material.supplier = {
+            name: supplierSelected.name,
+            id: supplierSelected.id,
+          };
+          material.supplier_id = supplierSelected.id;
+        }
+        setMaterials((prev) => [material, ...prev]);
+        form.reset();
+        closeModal();
+      } else {
+        console.error(code, data);
+      }
     }
   }
 

@@ -1,14 +1,14 @@
 ---
-const { pathname } = Astro.url;
+import { NavButton } from "src/elements/NavButton";
 
 const routes = [
-  { name: "Dashboard", path: "" },
-  { name: "Materiais", path: "materiais" },
-  { name: "Fornecedores", path: "fornecedores" },
-  { name: "Clientes", path: "clientes" },
-  { name: "Compras", path: "compras" },
-  { name: "Ordens", path: "ordens" },
-  { name: "Orçamentos", path: "orcamentos" },
+  { name: "Dashboard", path: "/" },
+  { name: "Materiais", path: "/materiais" },
+  { name: "Fornecedores", path: "/fornecedores" },
+  { name: "Clientes", path: "/clientes" },
+  { name: "Compras", path: "/compras" },
+  { name: "Ordens", path: "/ordens" },
+  { name: "Orçamentos", path: "/orcamentos" },
 ];
 ---
 
@@ -19,19 +19,7 @@ const routes = [
   </div>
   {
     routes.map((route) => {
-      const href = `/${route.path}`;
-
-      return (
-        <a href={href}>
-          <span
-            class={`block text-white ${
-              href.endsWith("/clientes") ? "bg-slate-600" : ""
-            } cursor-pointer py-2 px-1 text-lg rounded-md hover:brightness-80`}
-          >
-            {route.name}
-          </span>
-        </a>
-      );
+      return <NavButton name={route.name} path={route.path} client:load />;
     })
   }
   <script>

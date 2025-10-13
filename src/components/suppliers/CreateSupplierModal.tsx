@@ -114,7 +114,7 @@ export function CreateSupplierModal({
       setValidationErrors({ ...newErrors });
     } else {
       setValidationErrors({ ...newErrors });
-      const { code, data } = await fetchWithToken<SuppliersType>({
+      const { code, data } = await fetchWithToken<{ supplier: SuppliersType }>({
         path: "/suppliers/create",
         method: "POST",
         body: JSON.stringify({
@@ -143,7 +143,7 @@ export function CreateSupplierModal({
       }
 
       if (code == 201) {
-        setSupplier((prev) => [data, ...prev]);
+        setSupplier((prev) => [data.supplier, ...prev]);
         closeModal();
       } else {
         console.error(code, data);

@@ -5,7 +5,7 @@ import { fetchWithToken } from "src/utils/fetchWithToken";
 import { Table, Td, THead, Tr } from "src/elements/Table";
 import { BrlStringFromCents } from "@utils/formating";
 
-type MaterialsType = {
+export type MaterialsType = {
   id: string;
   name: string;
   current_amount: number;
@@ -14,7 +14,7 @@ type MaterialsType = {
   reserved_amount: number;
   avg_cost: number;
   value: number;
-  supplier?: SuppliersType;
+  supplier?: Pick<SuppliersType, "id" | "name">;
   supplier_id?: string;
 };
 
@@ -27,11 +27,11 @@ export function Materials() {
 
   function handleNewMaterial() {
     setIsModalOpen(true);
-    fetchWithToken<SuppliersType[]>({ path: "/suppliers" }).then(
+    fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
       ({ code, data }) => {
         if (code === 200) {
           setSuppliersList([
-            ...data.map((supplier) => ({
+            ...data.suppliers.map((supplier) => ({
               id: supplier.id,
               name: supplier.name,
             })),
@@ -42,10 +42,10 @@ export function Materials() {
   }
 
   useEffect(() => {
-    fetchWithToken<MaterialsType[]>({ path: "/materials" }).then(
+    fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }).then(
       ({ code, data }) => {
         if (code == 200) {
-          setMaterials(data);
+          setMaterials(data.materials);
         } else {
           window.alert("Erro ao buscar a lista de materiais");
           console.error(data);
@@ -58,6 +58,7 @@ export function Materials() {
     <>
       {isModalOpen ? (
         <CreateMaterialModal
+          setMaterials={setMaterials}
           closeModal={() => {
             setIsModalOpen(false);
           }}
