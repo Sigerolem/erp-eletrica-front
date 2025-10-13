@@ -40,9 +40,20 @@ export function Tr({
 
 export function Td({
   children,
+  link,
 }: {
   children: JSX.Element[] | string | JSX.Element;
+  link?: string;
 }) {
+  if (link) {
+    return (
+      <td className={""}>
+        <a href={link}>
+          <div className={"p-1 py-2 min-w-full min-h-full"}>{children}</div>
+        </a>
+      </td>
+    );
+  }
   return <td className={"p-1"}>{children}</td>;
 }
 

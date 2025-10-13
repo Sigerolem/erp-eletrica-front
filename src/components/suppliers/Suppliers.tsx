@@ -46,7 +46,7 @@ export function Suppliers() {
       ) : null}
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-2xl font-semibold"}>Lista de fornecedores</h3>
+          <h3 className={"text-xl font-semibold"}>Lista de fornecedores</h3>
           <button
             className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
             onClick={handleNewSupplier}
@@ -61,14 +61,14 @@ export function Suppliers() {
           <tbody>
             {suppliers.map((supplier) => (
               <Tr key={supplier.id}>
-                <Td>
+                <Td link={`/fornecedores/id#${supplier.id}`}>
                   <p>{supplier.name}</p>
                   <p className={"text-green-700"}>{supplier.cnpj ?? ""}</p>
                 </Td>
-                <Td>
+                <Td link={`/fornecedores/id#${supplier.id}`}>
                   <p>{supplier.email}</p>
                 </Td>
-                <Td>
+                <Td link={`/fornecedores/id#${supplier.id}`}>
                   <p>{supplier.phone_number}</p>
                   <p>{supplier.mobile_number}</p>
                 </Td>

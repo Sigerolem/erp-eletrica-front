@@ -1,0 +1,10 @@
+---
+import { SupplierDetails } from "@comp/suppliers/SupplierDetails";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+import Header from "@comp/Header.astro";
+---
+
+<DefaultLayout title="Detalhes do Fornecedor">
+  <Header title="Detalhes do fornecedor" />
+  <SupplierDetails client:only />
+</DefaultLayout>

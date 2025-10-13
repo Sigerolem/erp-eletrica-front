@@ -67,7 +67,7 @@ export function Materials() {
       ) : null}
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-2xl font-semibold"}>Lista de materiais</h3>
+          <h3 className={"text-xl font-semibold"}>Lista de materiais</h3>
           <button
             className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
             onClick={handleNewMaterial}
