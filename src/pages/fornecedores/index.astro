@@ -1,11 +1,12 @@
 ---
 import { Materials } from "@comp/materials/Materials";
 import DefaultLayout from "@layouts/DefaultLayout.astro";
+import { Suppliers } from "@comp/suppliers/Suppliers";
 ---
 
 <DefaultLayout title="Materiais">
   <header class="bg-slate-200 flex-1">
-    <h1 class="text-4xl p-2 font-semibold mb-4">Materiais no Estoque</h1>
-    <Materials client:load />
+    <h1 class="text-4xl p-2 font-semibold mb-4">Fornecedores cadastrados</h1>
+    <Suppliers client:load />
   </header>
 </DefaultLayout>
