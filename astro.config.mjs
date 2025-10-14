@@ -12,6 +12,7 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
   base: "",
+  trailingSlash: 'ignore',
 
   integrations: [preact()]
 });

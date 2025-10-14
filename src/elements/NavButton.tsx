@@ -3,8 +3,9 @@ import { useEffect, useState } from "preact/hooks";
 export function NavButton({ name, path }: { name: string; path: string }) {
   const [isSelected, setIsSelected] = useState(false);
   useEffect(() => {
-    const { pathname } = new URL(window.location.href);
-    if (pathname.endsWith(path)) {
+    const url = new URL(window.location.href);
+    console.log(url, "\n", path);
+    if (url.pathname.endsWith(path)) {
       setIsSelected(true);
     }
   });
