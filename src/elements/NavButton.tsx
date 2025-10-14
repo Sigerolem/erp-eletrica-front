@@ -4,7 +4,6 @@ export function NavButton({ name, path }: { name: string; path: string }) {
   const [isSelected, setIsSelected] = useState(false);
   useEffect(() => {
     const { pathname } = new URL(window.location.href);
-    console.log(pathname);
     if (pathname.endsWith(path)) {
       setIsSelected(true);
     }

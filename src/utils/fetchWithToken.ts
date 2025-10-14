@@ -16,7 +16,7 @@ export async function fetchWithToken<T>({
   body,
 }: {
   path: string;
-  method?: string;
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: string;
 }): Promise<FetchResult<T>> {
   let response: Response;

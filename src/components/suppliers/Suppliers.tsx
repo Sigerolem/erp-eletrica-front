@@ -7,10 +7,11 @@ export type SuppliersType = {
   id: string;
   name: string;
   cnpj: string;
-  email: string;
-  address: string;
-  mobile_number: string;
-  phone_number: string;
+  email?: string | null;
+  address?: string | null;
+  salesperson?: string | null;
+  mobile_number?: string | null;
+  phone_number?: string | null;
 };
 
 export function Suppliers() {

@@ -16,7 +16,7 @@ export function Th({ children }: { children: JSX.Element | string }) {
   return (
     <th
       className={
-        "py-2 text-start align-top bg-slate-700 text-white px-2 first:rounded-tl-md last:rounded-tr-md"
+        "py-2 text-start bg-slate-700 text-white px-2 first:rounded-tl-md last:rounded-tr-md"
       }
     >
       {children}
@@ -49,7 +49,7 @@ export function Td({
     return (
       <td className={""}>
         <a href={link}>
-          <div className={"p-1 py-2 min-w-full min-h-full"}>{children}</div>
+          <div className={"p-1 py-1 min-w-full min-h-full"}>{children}</div>
         </a>
       </td>
     );

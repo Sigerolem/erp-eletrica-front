@@ -9,6 +9,10 @@ button, nav {
   cursor: pointer;
 }
 
+button:disabled, button:disabled {
+  cursor:not-allowed
+}
+
 button:hover, nav:hover {
   filter: brightness(75%);
 }
