@@ -7,6 +7,7 @@ import {
   type StateUpdater,
 } from "preact/hooks";
 import type { SuppliersType } from "./Suppliers";
+import { validateStringFieldOnBlur } from "@utils/inputValidation";
 
 interface SupplierDataFormProps {
   supplierData?: SuppliersType;
@@ -14,12 +15,6 @@ interface SupplierDataFormProps {
     supplierData: Omit<SuppliersType, "id">
   ) => Promise<{ [key: string]: string } | undefined>;
 }
-
-type stringFieldValidationOptions = {
-  min?: number;
-  max?: number;
-  required?: boolean;
-};
 
 export function SupplierDataForm({
   supplierData,
@@ -48,44 +43,6 @@ export function SupplierDataForm({
       setSalesperson(supplierData.salesperson || "");
     }
   }, [supplierData]);
-
-  function validateStringFieldOnBlur(
-    e: TargetedFocusEvent<HTMLInputElement>,
-    setValue: Dispatch<StateUpdater<string>>,
-    options: stringFieldValidationOptions
-  ) {
-    const { min, max, required } = options;
-    const value = e.currentTarget.value;
-    const name = e.currentTarget.name;
-
-    setValue(value);
-
-    if (required && value.length == 0) {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: "Esse campo é obrigatório",
-      }));
-      return;
-    }
-
-    const minError = !min ? false : value.length < min;
-    const maxError = !max ? false : value.length > max;
-
-    if (maxError || minError) {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: `Esse campo deve ter no ${maxError ? "máximo" : "mínimo"} ${
-          maxError ? max : min
-        } caracteres`,
-      }));
-      return;
-    }
-
-    setValidationErrors((prev) => {
-      delete prev[name];
-      return prev;
-    });
-  }
 
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -133,7 +90,7 @@ export function SupplierDataForm({
         errors={validationErrors}
         value={name}
         onBlur={(e) => {
-          validateStringFieldOnBlur(e, setName, {
+          validateStringFieldOnBlur(e, setName, setValidationErrors, {
             min: 4,
             max: 100,
             required: true,
@@ -147,7 +104,7 @@ export function SupplierDataForm({
           errors={validationErrors}
           value={cnpj}
           onBlur={(e) => {
-            validateStringFieldOnBlur(e, setCnpj, {
+            validateStringFieldOnBlur(e, setCnpj, setValidationErrors, {
               min: 4,
               max: 20,
               required: true,
@@ -160,7 +117,7 @@ export function SupplierDataForm({
           errors={validationErrors}
           value={email}
           onBlur={(e) => {
-            validateStringFieldOnBlur(e, setEmail, {
+            validateStringFieldOnBlur(e, setEmail, setValidationErrors, {
               min: 0,
               max: 50,
               required: false,
@@ -175,7 +132,7 @@ export function SupplierDataForm({
           errors={validationErrors}
           value={phoneNumber}
           onBlur={(e) => {
-            validateStringFieldOnBlur(e, setPhoneNumber, {
+            validateStringFieldOnBlur(e, setPhoneNumber, setValidationErrors, {
               min: 0,
               max: 15,
               required: false,
@@ -188,7 +145,7 @@ export function SupplierDataForm({
           errors={validationErrors}
           value={mobileNumber}
           onBlur={(e) => {
-            validateStringFieldOnBlur(e, setMobileNumber, {
+            validateStringFieldOnBlur(e, setMobileNumber, setValidationErrors, {
               min: 0,
               max: 15,
               required: false,
@@ -203,7 +160,7 @@ export function SupplierDataForm({
         errors={validationErrors}
         value={address}
         onBlur={(e) => {
-          validateStringFieldOnBlur(e, setAddress, {
+          validateStringFieldOnBlur(e, setAddress, setValidationErrors, {
             min: 0,
             max: 150,
             required: false,
@@ -217,7 +174,7 @@ export function SupplierDataForm({
         errors={validationErrors}
         value={salesperson}
         onBlur={(e) => {
-          validateStringFieldOnBlur(e, setSalesperson, {
+          validateStringFieldOnBlur(e, setSalesperson, setValidationErrors, {
             min: 0,
             max: 80,
             required: false,
