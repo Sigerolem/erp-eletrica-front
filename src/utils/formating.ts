@@ -10,3 +10,19 @@ export function BrlStringFromCents(cents: number) {
 
   return formatter.format(cents / 100);
 }
+
+export function formatFloatWithDecimalDigits(
+  value: number,
+  numOfDigits: 0 | 1 | 2 | 3
+) {
+  const formatter = new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: numOfDigits,
+    maximumFractionDigits: numOfDigits,
+    // roundingMode: "trunc",
+  });
+  const stringValue = formatter.format(value);
+  const floatValue = parseFloat(
+    stringValue.replaceAll(".", "").replaceAll(",", ".")
+  );
+  return floatValue;
+}

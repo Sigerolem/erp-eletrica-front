@@ -1,4 +1,5 @@
 import { type InputHTMLAttributes } from "preact";
+import { useEffect } from "preact/hooks";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;

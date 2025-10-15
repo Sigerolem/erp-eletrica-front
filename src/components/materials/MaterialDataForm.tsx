@@ -1,47 +1,150 @@
+import { SelectSupplierModal } from "@comp/materials/SelectSupplierModal";
 import { Input } from "@elements/Input";
+import { formatFloatWithDecimalDigits } from "@utils/formating";
+import {
+  validateFloatFieldOnBlur,
+  validateIntFieldOnBlur,
+  validateStringFieldOnBlur,
+} from "@utils/inputValidation";
+import type { TargetedSubmitEvent } from "preact";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type StateUpdater,
+} from "preact/hooks";
 
-export function MaterialDataForm() {
+interface MaterialDataFormProps {
+  suppliersList: { id: string; name: string }[];
+  // isSupModalOpen: boolean;
+  setIsSupModalOpen?: Dispatch<StateUpdater<boolean>>;
+}
+
+export function MaterialDataForm({
+  suppliersList,
+  setIsSupModalOpen: reportIsModalOpen,
+}: MaterialDataFormProps) {
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
+  const [isSupModalOpen, setIsSupModalOpen] = useState(false);
+
+  const [name, setName] = useState("");
+  const [barcode, setBarcode] = useState("");
+  const [minAmount, setMinAmount] = useState(0);
+  const [idealAmount, setIdealAmount] = useState(0);
+  const [pkgSize, setPkgSize] = useState(1);
+  const [profit, setProfit] = useState(0);
+  const [cost, setCost] = useState(0);
+  const [value, setValue] = useState(0);
+  const [lastField, setLastField] = useState<string | null>(null);
+  const [supplierSelected, setSupplierSelected] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (reportIsModalOpen !== undefined) {
+      reportIsModalOpen(isSupModalOpen);
+    }
+  }, [isSupModalOpen, reportIsModalOpen]);
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key == "Escape") {
+        setIsSupModalOpen(false);
+      }
+    };
+
+    if (isSupModalOpen) {
+      document.addEventListener("keydown", handleKeyPress);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  });
+
+  useEffect(() => {
+    if (lastField == null) {
+      return;
+    }
+
+    if (lastField == "profit" || lastField == "cost") {
+      const newValue = (cost * 100) / (100 - profit);
+      setValue(formatFloatWithDecimalDigits(newValue, 2));
+    }
+
+    if (lastField == "value") {
+      const newProfit = (1 - cost / value) * 100;
+      setProfit(formatFloatWithDecimalDigits(newProfit, 1));
+    }
+
+    setLastField(null);
+  }, [cost, value, profit]);
+
+  async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const materialData = {
+      name,
+      barcode: barcode || null,
+      minAmount,
+      idealAmount,
+      pkgSize,
+      profit: profit * 100,
+      cost: cost * 100,
+      value: value * 100,
+      supplier_id: supplierSelected?.id || null,
+    };
+  }
+
   return (
     <form onSubmit={onFormSubmit} className={"flex flex-col gap-2 w-ful"}>
       <Input
         label="Nome do material"
         name="name"
+        value={name}
         onBlur={(e) => {
-          if (
-            e.currentTarget.value.length > 3 &&
-            e.currentTarget.value.length <= 100
-          ) {
-            setValidationErrors((prev) => {
-              delete prev.name;
-              return { ...prev };
-            });
-          }
+          validateStringFieldOnBlur(e, setName, setValidationErrors, {
+            min: 4,
+            max: 100,
+            required: true,
+          });
         }}
         errors={validationErrors}
       />
       <Input
-        label="Codigo de barras"
+        label="Código de barras"
         name="barcode"
+        value={barcode}
         onBlur={(e) => {
-          if (e.currentTarget.value.length <= 100) {
-            setValidationErrors((prev) => {
-              delete prev.barcode;
-              return { ...prev };
-            });
-          }
+          validateStringFieldOnBlur(e, setBarcode, setValidationErrors, {
+            min: 4,
+            max: 100,
+          });
         }}
+        errors={validationErrors}
       />
       <div className={"flex gap-4"}>
         <Input
           label="Quantidade mínima"
           name="minAmount"
-          onBlur={handleChangeAmount}
+          value={minAmount}
+          onBlur={(e) => {
+            validateIntFieldOnBlur(e, setMinAmount, setValidationErrors, {});
+          }}
           errors={validationErrors}
         />
         <Input
           label="Quantidade ideal"
           name="idealAmount"
-          onBlur={handleChangeAmount}
+          value={idealAmount}
+          onBlur={(e) => {
+            validateIntFieldOnBlur(e, setIdealAmount, setValidationErrors, {
+              min: minAmount,
+            });
+          }}
           errors={validationErrors}
         />
       </div>
@@ -50,25 +153,62 @@ export function MaterialDataForm() {
           label="Tamanho da embalagem"
           name="pkgSize"
           value={pkgSize}
-          onBlur={handleChangePkgSize}
+          onBlur={(e) => {
+            validateIntFieldOnBlur(e, setPkgSize, setValidationErrors, {
+              min: 1,
+            });
+          }}
           errors={validationErrors}
         />
         <Input
           label="Lucro"
           name="profit"
-          value={profit}
-          onBlur={handleChangeProfit}
+          value={`${profit.toLocaleString("pt-Br")} %`}
+          onBlur={(e) => {
+            setLastField("profit");
+            validateFloatFieldOnBlur(e, setProfit, setValidationErrors, {
+              decimalDigits: 1,
+              removeFromString: " %",
+            });
+          }}
+          errors={validationErrors}
         />
       </div>
       <div className={"flex gap-4"}>
         <Input
           label="Custo [R$]"
           name="cost"
-          value={cost}
-          onBlur={handleChangeCost}
+          value={cost.toLocaleString("pt-Br", {
+            currency: "BRL",
+            style: "currency",
+          })}
+          onBlur={(e) => {
+            setLastField("cost");
+            validateFloatFieldOnBlur(e, setCost, setValidationErrors, {
+              decimalDigits: 2,
+              removeFromString: "R$",
+              min: 0,
+            });
+          }}
           errors={validationErrors}
         />
-        <Input label="Valor [R$]" name="value" value={value} disabled />
+        <Input
+          label="Valor [R$]"
+          name="value"
+          value={value.toLocaleString("pt-Br", {
+            currency: "BRL",
+            style: "currency",
+          })}
+          onBlur={(e) => {
+            setLastField("value");
+            validateFloatFieldOnBlur(e, setValue, setValidationErrors, {
+              decimalDigits: 2,
+              removeFromString: "R$",
+              min: 0,
+            });
+          }}
+          errors={validationErrors}
+        />
       </div>
       <div className={"flex gap-4 justify-between items-end"}>
         <div>
@@ -93,6 +233,21 @@ export function MaterialDataForm() {
           Salvar
         </button>
       </div>
+      {isSupModalOpen ? (
+        <SelectSupplierModal
+          suppliers={suppliersList}
+          closeModal={() => {
+            setIsSupModalOpen(false);
+          }}
+          selectSupplier={setSupplierSelected}
+          cleanError={() => {
+            setValidationErrors((prev) => {
+              delete prev.supplier;
+              return { ...prev };
+            });
+          }}
+        />
+      ) : null}
     </form>
   );
 }

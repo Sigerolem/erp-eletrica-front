@@ -1,11 +1,15 @@
+import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
+
 export function SelectSupplierModal({
   suppliers,
   selectSupplier,
   closeModal,
+  cleanError,
 }: {
   suppliers: { id: string; name: string }[];
-  selectSupplier: ({}: { id: string; name: string }) => void;
+  selectSupplier: Dispatch<StateUpdater<{ id: string; name: string } | null>>;
   closeModal: () => void;
+  cleanError: () => void;
 }) {
   return (
     <div
@@ -23,6 +27,7 @@ export function SelectSupplierModal({
             className={"flex cursor-pointer hover:brightness-90 rounded-md"}
             onClick={() => {
               selectSupplier({ name: supplier.name, id: supplier.id });
+              cleanError();
               closeModal();
             }}
           >

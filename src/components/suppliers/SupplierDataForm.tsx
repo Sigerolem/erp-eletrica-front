@@ -78,6 +78,7 @@ export function SupplierDataForm({
     });
 
     if (errors) {
+      console.log(errors);
       setValidationErrors((prev) => ({ ...prev, ...errors }));
     }
   }
@@ -105,9 +106,8 @@ export function SupplierDataForm({
           value={cnpj}
           onBlur={(e) => {
             validateStringFieldOnBlur(e, setCnpj, setValidationErrors, {
-              min: 4,
+              min: 9,
               max: 20,
-              required: true,
             });
           }}
         />

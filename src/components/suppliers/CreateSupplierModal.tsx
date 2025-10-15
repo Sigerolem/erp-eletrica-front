@@ -41,13 +41,18 @@ export function CreateSupplierModal({
     });
 
     if (code == 409) {
-      const errors = {} as { [key: string]: string };
+      let errors = {} as { [key: string]: string };
       if (data.error.includes("entity.name")) {
-        errors.name = "Esse nome já foi utilizado";
+        errors = { ...errors, name: "Esse nome já foi utilizado" };
       } else if (data.error.includes("entity.cnpj")) {
-        errors.cnpj = "Esse CNPJ já foi cadastrado";
+        errors = { ...errors, cnpj: "Esse CNPJ já foi cadastrado" };
       }
       return errors;
+    }
+
+    if (code == 400) {
+      window.alert("Requisição feita ao servidor é inválida.");
+      console.error(code, data);
     }
 
     if (code == 201) {
