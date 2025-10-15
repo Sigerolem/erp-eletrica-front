@@ -78,7 +78,6 @@ export function SupplierDataForm({
     });
 
     if (errors) {
-      console.log(errors);
       setValidationErrors((prev) => ({ ...prev, ...errors }));
     }
   }

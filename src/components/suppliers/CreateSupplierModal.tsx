@@ -33,7 +33,6 @@ export function CreateSupplierModal({
   }, []);
 
   async function handleDataSubmition(supplierData: Omit<SuppliersType, "id">) {
-    console.log(supplierData);
     const { code, data } = await fetchWithToken<{ supplier: SuppliersType }>({
       path: "/suppliers/create",
       method: "POST",
