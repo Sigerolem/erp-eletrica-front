@@ -8,6 +8,7 @@ import { BrlStringFromCents } from "@utils/formating";
 export type MaterialsType = {
   id: string;
   name: string;
+  barcode: string | null;
   current_amount: number;
   min_amount: number;
   ideal_amount: number;
@@ -15,7 +16,7 @@ export type MaterialsType = {
   avg_cost: number;
   value: number;
   supplier?: Pick<SuppliersType, "id" | "name">;
-  supplier_id?: string;
+  supplier_id: string | null;
 };
 
 export function Materials() {

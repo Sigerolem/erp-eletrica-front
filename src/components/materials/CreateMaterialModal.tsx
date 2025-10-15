@@ -37,52 +37,35 @@ export function CreateMaterialModal({
     };
   }, [isSupModalOpen]);
 
-  async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = Object.fromEntries(
-      new FormData(e.currentTarget).entries()
-    ) as {
-      name: string;
-      barcode: string;
-      minAmount: string;
-      idealAmount: string;
-      pkgSize: string;
-      profit: string;
-      cost: string;
-    };
+  async function onFormSubmit(materialData: Partial<MaterialsType>) {
+    const { data, code } = await fetchWithToken<{ material: MaterialsType }>({
+      path: "/materials/create",
+      method: "POST",
+      body: JSON.stringify(materialData),
+    });
 
-    // const { data, code } = await fetchWithToken<{ material: MaterialsType }>({
-    //   path: "/materials/create",
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     name,
-    //     barcode: barcode.length == 0 ? undefined : barcode,
-    //     supplier_id: supplierSelected?.id,
-    //     min_amount: minAmount.length == 0 ? undefined : parseInt(minAmount),
-    //     ideal_amount:
-    //       idealAmount.length == 0 ? undefined : parseInt(idealAmount),
-    //     pkg_size: parseInt(pkgSize),
-    //     profit: parseFloat(profit.replace(",", ".")),
-    //     avg_cost: parseFloat(cost.replaceAll(".", "").replace(",", ".")) * 100,
-    //     value: parseFloat(value.replaceAll(".", "").replace(",", ".")) * 100,
-    //   }),
-    // });
-    // if (code == 201) {
-    //   const material = data.material;
-    //   if (supplierSelected) {
-    //     material.supplier = {
-    //       name: supplierSelected.name,
-    //       id: supplierSelected.id,
-    //     };
-    //     material.supplier_id = supplierSelected.id;
-    //   }
-    //   setMaterials((prev) => [material, ...prev]);
-    //   form.reset();
-    //   closeModal();
-    // } else {
-    //   console.error(code, data);
-    // }
+    if (code == 201) {
+      const material = data.material;
+
+      setMaterials((prev) => [material, ...prev]);
+      closeModal();
+      return null;
+    }
+
+    if (code == 409) {
+      let erro = {} as { [key: string]: string };
+      if (data.error.includes("name")) {
+        erro = { ...erro, name: "Esse material já foi previamente cadastrado" };
+      }
+      if (data.error.includes("barcode")) {
+        erro = { ...erro, barcode: "Esse codigo de barras ja está cadastrado" };
+      }
+      return erro;
+    }
+
+    window.alert("Erro ao salvar o material");
+    console.error(code, data);
+    return { erro: "Algum problema ocorreu" };
   }
 
   return (
@@ -110,7 +93,7 @@ export function CreateMaterialModal({
         <div>
           <MaterialDataForm
             suppliersList={suppliersList}
-            // isSupModalOpen={isSupModalOpen}
+            doOnSubmit={onFormSubmit}
             setIsSupModalOpen={setIsSupModalOpen}
           />
         </div>

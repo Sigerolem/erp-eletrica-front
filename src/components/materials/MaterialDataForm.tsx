@@ -13,16 +13,20 @@ import {
   type Dispatch,
   type StateUpdater,
 } from "preact/hooks";
+import type { MaterialsType } from "./Materials";
 
 interface MaterialDataFormProps {
   suppliersList: { id: string; name: string }[];
-  // isSupModalOpen: boolean;
+  doOnSubmit: (
+    material: Partial<MaterialsType>
+  ) => Promise<{ [key: string]: string } | null>;
   setIsSupModalOpen?: Dispatch<StateUpdater<boolean>>;
 }
 
 export function MaterialDataForm({
   suppliersList,
   setIsSupModalOpen: reportIsModalOpen,
+  doOnSubmit,
 }: MaterialDataFormProps) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -93,10 +97,14 @@ export function MaterialDataForm({
       idealAmount,
       pkgSize,
       profit: profit * 100,
-      cost: cost * 100,
+      avg_cost: cost * 100,
       value: value * 100,
       supplier_id: supplierSelected?.id || null,
+      supplier: supplierSelected || undefined,
     };
+
+    const errors = await doOnSubmit(materialData);
+    setValidationErrors((prev) => ({ ...prev, ...errors }));
   }
 
   return (
