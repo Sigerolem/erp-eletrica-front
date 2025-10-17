@@ -12,6 +12,7 @@ export type SuppliersType = {
   salesperson?: string | null;
   mobile_number?: string | null;
   phone_number?: string | null;
+  material_count?: number;
 };
 
 export function Suppliers() {
@@ -57,7 +58,12 @@ export function Suppliers() {
         </header>
         <Table>
           <THead
-            collumns={[["Nome", "CNPJ"], ["Email"], ["Telefone", "Celular"]]}
+            collumns={[
+              ["Nome", "CNPJ"],
+              ["Email"],
+              ["Telefone", "Celular"],
+              ["Materiais", "atualmente"],
+            ]}
           />
           <tbody>
             {suppliers.map((supplier) => (
@@ -72,6 +78,9 @@ export function Suppliers() {
                 <Td link={`/fornecedores/id#${supplier.id}`}>
                   <p>{supplier.phone_number}</p>
                   <p>{supplier.mobile_number}</p>
+                </Td>
+                <Td link={`/fornecedores/id#${supplier.id}`}>
+                  <p>{supplier.material_count || 0}</p>
                 </Td>
               </Tr>
             ))}
