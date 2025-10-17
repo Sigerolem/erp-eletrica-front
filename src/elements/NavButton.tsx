@@ -9,7 +9,7 @@ export function NavButton({ name, path }: { name: string; path: string }) {
     }
   });
   return (
-    <a href={path}>
+    <a href={path} data-astro-prefetch>
       <span
         class={`block text-white ${
           isSelected ? "bg-slate-600" : ""

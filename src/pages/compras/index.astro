@@ -1,0 +1,10 @@
+---
+import Header from "@comp/Header.astro";
+import { Purchases } from "@comp/purchases/Purchases";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Compras">
+  <Header title="Compras" />
+  <Purchases client:only />
+</DefaultLayout>
