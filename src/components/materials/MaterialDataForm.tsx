@@ -14,9 +14,10 @@ import {
   type StateUpdater,
 } from "preact/hooks";
 import type { MaterialsType } from "./Materials";
+import { fetchWithToken } from "@utils/fetchWithToken";
+import type { SuppliersType } from "@comp/suppliers/Suppliers";
 
 interface MaterialDataFormProps {
-  suppliersList: { id: string; name: string }[];
   materialData?: MaterialsType;
   doOnSubmit: (
     material: Partial<MaterialsType>
@@ -25,7 +26,6 @@ interface MaterialDataFormProps {
 }
 
 export function MaterialDataForm({
-  suppliersList,
   materialData,
   setIsSupModalOpen: reportIsModalOpen,
   doOnSubmit,
@@ -34,7 +34,9 @@ export function MaterialDataForm({
     [key: string]: string;
   }>({});
   const [isSupModalOpen, setIsSupModalOpen] = useState(false);
-
+  const [suppliersList, setSuppliersList] = useState<
+    { id: string; name: string }[]
+  >([]);
   const [name, setName] = useState("");
   const [barcode, setBarcode] = useState("");
   const [currentAmount, setCurrentAmount] = useState(0);
@@ -74,9 +76,6 @@ export function MaterialDataForm({
     if (reportIsModalOpen !== undefined) {
       reportIsModalOpen(isSupModalOpen);
     }
-  }, [isSupModalOpen, reportIsModalOpen]);
-
-  useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key == "Escape") {
         setIsSupModalOpen(false);
@@ -90,6 +89,21 @@ export function MaterialDataForm({
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
+  }, [isSupModalOpen, reportIsModalOpen]);
+
+  useEffect(() => {
+    fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
+      ({ code, data }) => {
+        if (code === 200) {
+          setSuppliersList([
+            ...data.suppliers.map((supplier) => ({
+              id: supplier.id,
+              name: supplier.name,
+            })),
+          ]);
+        }
+      }
+    );
   }, []);
 
   useEffect(() => {
@@ -280,7 +294,6 @@ export function MaterialDataForm({
           <Input
             name="supplier"
             label="Fornecedor"
-            disabled={suppliersList.length == 0}
             onFocus={(e) => {
               e.currentTarget.blur();
               setIsSupModalOpen(true);

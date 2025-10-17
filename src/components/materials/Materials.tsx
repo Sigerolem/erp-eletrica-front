@@ -24,24 +24,9 @@ export type MaterialsType = {
 export function Materials() {
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [suppliersList, setSuppliersList] = useState<
-    { id: string; name: string }[]
-  >([]);
 
   function handleNewMaterial() {
     setIsModalOpen(true);
-    fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
-      ({ code, data }) => {
-        if (code === 200) {
-          setSuppliersList([
-            ...data.suppliers.map((supplier) => ({
-              id: supplier.id,
-              name: supplier.name,
-            })),
-          ]);
-        }
-      }
-    );
   }
 
   useEffect(() => {
@@ -65,7 +50,6 @@ export function Materials() {
           closeModal={() => {
             setIsModalOpen(false);
           }}
-          suppliersList={suppliersList}
         />
       ) : null}
       <div>

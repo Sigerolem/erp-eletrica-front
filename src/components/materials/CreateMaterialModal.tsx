@@ -12,11 +12,9 @@ import type { MaterialsType } from "./Materials";
 
 export function CreateMaterialModal({
   closeModal,
-  suppliersList,
   setMaterials,
 }: {
   closeModal: () => void;
-  suppliersList: { id: string; name: string }[];
   setMaterials: Dispatch<StateUpdater<MaterialsType[]>>;
 }) {
   const [isSupModalOpen, setIsSupModalOpen] = useState(false);
@@ -92,7 +90,6 @@ export function CreateMaterialModal({
         </header>
         <div>
           <MaterialDataForm
-            suppliersList={suppliersList}
             doOnSubmit={onFormSubmit}
             setIsSupModalOpen={setIsSupModalOpen}
           />

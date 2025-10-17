@@ -5,7 +5,6 @@ import { MaterialDataForm } from "./MaterialDataForm";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
 
 export function MaterialDetails() {
-  const [suppliersList, setSuppliersList] = useState<SuppliersType[]>([]);
   const [material, setMaterial] = useState<MaterialsType | null>(null);
 
   useEffect(() => {
@@ -50,7 +49,6 @@ export function MaterialDetails() {
       {material ? (
         <MaterialDataForm
           doOnSubmit={handleDataSubmition}
-          suppliersList={suppliersList}
           materialData={material}
         />
       ) : (
