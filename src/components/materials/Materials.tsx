@@ -10,10 +10,12 @@ export type MaterialsType = {
   name: string;
   barcode: string | null;
   current_amount: number;
+  pkg_size: number;
   min_amount: number;
   ideal_amount: number;
   reserved_amount: number;
   avg_cost: number;
+  profit: number;
   value: number;
   supplier?: Pick<SuppliersType, "id" | "name">;
   supplier_id: string | null;
@@ -88,20 +90,28 @@ export function Materials() {
           <tbody>
             {materials.map((material) => (
               <Tr key={material.id}>
-                <Td>
+                <Td link={`/materiais/id#${material.id}`}>
                   <p className={""}>{material.name}</p>
                   <p className={"text-sm font-semibold"}>
                     {material.supplier?.name ?? ""}
                   </p>
                 </Td>
-                <Td>
-                  <p>{material.current_amount}</p>
+                <Td link={`/materiais/id#${material.id}`}>
+                  <p
+                  // className={`${
+                  //   material.current_amount < material.min_amount
+                  //     ? "text-red-700 font-semibold text-lg"
+                  //     : ""
+                  // }`}
+                  >
+                    {material.current_amount}
+                  </p>
                   <p>{material.min_amount}</p>
                 </Td>
-                <Td>
+                <Td link={`/materiais/id#${material.id}`}>
                   <p>{material.reserved_amount}</p>
                 </Td>
-                <Td>
+                <Td link={`/materiais/id#${material.id}`}>
                   <p className={""}>
                     C: {BrlStringFromCents(material.avg_cost)}
                   </p>

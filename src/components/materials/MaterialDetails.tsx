@@ -1,28 +1,30 @@
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
-import type { SuppliersType } from "./Suppliers";
-import { SupplierDataForm } from "./SupplierDataForm";
+import type { MaterialsType } from "./Materials";
+import { MaterialDataForm } from "./MaterialDataForm";
+import type { SuppliersType } from "@comp/suppliers/Suppliers";
 
-export function SupplierDetails() {
-  const [supplier, setSupplier] = useState<SuppliersType | null>(null);
+export function MaterialDetails() {
+  const [suppliersList, setSuppliersList] = useState<SuppliersType[]>([]);
+  const [material, setMaterial] = useState<MaterialsType | null>(null);
 
   useEffect(() => {
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "");
-    fetchWithToken<{ supplier: SuppliersType }>({
-      path: `/suppliers/${id}`,
+    fetchWithToken<{ material: MaterialsType }>({
+      path: `/materials/${id}`,
     }).then((result) => {
       if (result.code == 200) {
-        setSupplier(result.data.supplier);
+        setMaterial(result.data.material);
       }
     });
   }, []);
 
-  async function handleDataSubmition(supplierData: Omit<SuppliersType, "id">) {
-    const { code, data } = await fetchWithToken<{ supplier: SuppliersType }>({
-      path: `/suppliers/${supplier?.id}`,
+  async function handleDataSubmition(materialData: Partial<MaterialsType>) {
+    const { code, data } = await fetchWithToken<{ supplier: MaterialsType }>({
+      path: `/materials/${material?.id}`,
       method: "PATCH",
-      body: JSON.stringify(supplierData),
+      body: JSON.stringify(materialData),
     });
 
     if (code == 409) {
@@ -37,16 +39,19 @@ export function SupplierDetails() {
 
     if (code == 200 || code == 201) {
       window.alert("Altterações salvas");
-      console.log(code, data);
+      return null;
     }
+
+    return { erro: "Alguma coisa" };
   }
 
   return (
     <main>
-      {supplier ? (
-        <SupplierDataForm
+      {material ? (
+        <MaterialDataForm
           doOnSubmit={handleDataSubmition}
-          supplierData={supplier ?? undefined}
+          suppliersList={suppliersList}
+          materialData={material}
         />
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>

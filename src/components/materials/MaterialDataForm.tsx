@@ -17,6 +17,7 @@ import type { MaterialsType } from "./Materials";
 
 interface MaterialDataFormProps {
   suppliersList: { id: string; name: string }[];
+  materialData?: MaterialsType;
   doOnSubmit: (
     material: Partial<MaterialsType>
   ) => Promise<{ [key: string]: string } | null>;
@@ -25,6 +26,7 @@ interface MaterialDataFormProps {
 
 export function MaterialDataForm({
   suppliersList,
+  materialData,
   setIsSupModalOpen: reportIsModalOpen,
   doOnSubmit,
 }: MaterialDataFormProps) {
@@ -35,6 +37,8 @@ export function MaterialDataForm({
 
   const [name, setName] = useState("");
   const [barcode, setBarcode] = useState("");
+  const [currentAmount, setCurrentAmount] = useState(0);
+  const [reservedAmount, setReservedAmount] = useState(0);
   const [minAmount, setMinAmount] = useState(0);
   const [idealAmount, setIdealAmount] = useState(0);
   const [pkgSize, setPkgSize] = useState(1);
@@ -46,6 +50,25 @@ export function MaterialDataForm({
     id: string;
     name: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (materialData) {
+      console.log(materialData);
+      setName(materialData.name);
+      setBarcode(materialData.barcode || "");
+      setCurrentAmount(materialData.current_amount);
+      setReservedAmount(materialData.reserved_amount);
+      setMinAmount(materialData.min_amount);
+      setIdealAmount(materialData.ideal_amount);
+      setPkgSize(materialData.pkg_size);
+      setProfit(materialData.profit / 100);
+      setCost(materialData.avg_cost / 100);
+      setValue(materialData.value / 100);
+      if (materialData.supplier) {
+        setSupplierSelected(materialData.supplier);
+      }
+    }
+  }, [materialData]);
 
   useEffect(() => {
     if (reportIsModalOpen !== undefined) {
@@ -90,20 +113,22 @@ export function MaterialDataForm({
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const materialData = {
+    const submitData = {
       name,
       barcode: barcode || null,
-      minAmount,
-      idealAmount,
-      pkgSize,
+      min_amount: minAmount,
+      ideal_amount: idealAmount,
+      pkg_size: pkgSize,
       profit: profit * 100,
       avg_cost: cost * 100,
       value: value * 100,
       supplier_id: supplierSelected?.id || null,
       supplier: supplierSelected || undefined,
+      current_amount: currentAmount || 0,
+      reserved_amount: reservedAmount || 0,
     };
 
-    const errors = await doOnSubmit(materialData);
+    const errors = await doOnSubmit(submitData);
     setValidationErrors((prev) => ({ ...prev, ...errors }));
   }
 
@@ -134,6 +159,38 @@ export function MaterialDataForm({
         }}
         errors={validationErrors}
       />
+      {materialData != undefined && (
+        <div className={"flex gap-4"}>
+          <Input
+            label="Quantidade atual"
+            name="currentAmount"
+            value={currentAmount}
+            onBlur={(e) => {
+              validateIntFieldOnBlur(
+                e,
+                setCurrentAmount,
+                setValidationErrors,
+                {}
+              );
+            }}
+            errors={validationErrors}
+          />
+          <Input
+            label="Quantidade reservada"
+            name="reservedAmount"
+            value={reservedAmount}
+            onBlur={(e) => {
+              validateIntFieldOnBlur(
+                e,
+                setReservedAmount,
+                setValidationErrors,
+                {}
+              );
+            }}
+            errors={validationErrors}
+          />
+        </div>
+      )}
       <div className={"flex gap-4"}>
         <Input
           label="Quantidade mínima"
@@ -223,6 +280,7 @@ export function MaterialDataForm({
           <Input
             name="supplier"
             label="Fornecedor"
+            disabled={suppliersList.length == 0}
             onFocus={(e) => {
               e.currentTarget.blur();
               setIsSupModalOpen(true);

@@ -1,0 +1,10 @@
+---
+import { MaterialDetails } from "@comp/materials/MaterialDetails";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+import Header from "@comp/Header.astro";
+---
+
+<DefaultLayout title="Detalhes do Material">
+  <Header title="Detalhes do material" />
+  <MaterialDetails client:load />
+</DefaultLayout>
