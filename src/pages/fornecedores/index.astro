@@ -5,8 +5,8 @@ import { Suppliers } from "@comp/suppliers/Suppliers";
 import Header from "@comp/Header.astro";
 ---
 
-<DefaultLayout title="Fornecedores">
+<DefaultLayout title="Fornecedores" transition:persist>
   <Header title="Fornecedores">
-    <Suppliers client:only />
+    <Suppliers client:only="preact" />
   </Header>
 </DefaultLayout>

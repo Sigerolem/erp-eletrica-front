@@ -26,9 +26,9 @@ const routes = [
     document.addEventListener("DOMContentLoaded", () => {
       const role = localStorage.getItem("apiRole");
       const name = localStorage.getItem("apiName");
-      if (role == undefined) {
-        document.location.href = "login/";
-      }
+      // if (role == undefined) {
+      //   document.location.href = "login/";
+      // }
       const userNameSpan = document.getElementById(
         "userName"
       ) as HTMLSpanElement;

@@ -4,7 +4,7 @@ import DefaultLayout from "@layouts/DefaultLayout.astro";
 import Header from "@comp/Header.astro";
 ---
 
-<DefaultLayout title="Detalhes do Fornecedor">
+<DefaultLayout title="Detalhes do Fornecedor" transition:persist>
   <Header title="Detalhes do fornecedor" />
-  <SupplierDetails client:only />
+  <SupplierDetails client:only="preact" />
 </DefaultLayout>

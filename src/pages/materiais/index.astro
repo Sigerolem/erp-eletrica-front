@@ -4,8 +4,8 @@ import { Materials } from "@comp/materials/Materials";
 import DefaultLayout from "@layouts/DefaultLayout.astro";
 ---
 
-<DefaultLayout title="Materiais">
+<DefaultLayout title="Materiais" transition:persist>
   <Header title="Materiais">
-    <Materials client:only />
+    <Materials client:only="preact" />
   </Header>
 </DefaultLayout>

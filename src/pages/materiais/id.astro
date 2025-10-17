@@ -4,7 +4,7 @@ import DefaultLayout from "@layouts/DefaultLayout.astro";
 import Header from "@comp/Header.astro";
 ---
 
-<DefaultLayout title="Detalhes do Material">
+<DefaultLayout title="Detalhes do Material" transition:persist>
   <Header title="Detalhes do material" />
-  <MaterialDetails client:load />
+  <MaterialDetails client:only="preact" />
 </DefaultLayout>

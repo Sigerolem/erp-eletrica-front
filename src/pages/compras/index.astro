@@ -4,7 +4,7 @@ import { Purchases } from "@comp/purchases/Purchases";
 import DefaultLayout from "@layouts/DefaultLayout.astro";
 ---
 
-<DefaultLayout title="Compras">
+<DefaultLayout title="Compras" transition:persist>
   <Header title="Compras" />
-  <Purchases client:only />
+  <Purchases client:only="preact" />
 </DefaultLayout>
