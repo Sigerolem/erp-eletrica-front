@@ -13,7 +13,6 @@ export default defineConfig({
   },
   base: "",
   trailingSlash: 'ignore',
-  prefetch: true,
 
   integrations: [preact()]
 });
