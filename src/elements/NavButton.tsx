@@ -7,9 +7,9 @@ export function NavButton({ name, path }: { name: string; path: string }) {
     if (url.pathname == path) {
       setIsSelected(true);
     }
-  });
+  }, []);
   return (
-    <a href={path} data-astro-prefetch>
+    <a href={path}>
       <span
         class={`block text-white ${
           isSelected ? "bg-slate-600" : ""

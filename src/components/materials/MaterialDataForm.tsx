@@ -90,7 +90,7 @@ export function MaterialDataForm({
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  });
+  }, []);
 
   useEffect(() => {
     if (lastField == null) {
