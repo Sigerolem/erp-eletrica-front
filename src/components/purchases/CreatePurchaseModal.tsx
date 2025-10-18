@@ -5,15 +5,15 @@ import {
   type StateUpdater,
 } from "preact/hooks";
 import { fetchWithToken } from "src/utils/fetchWithToken";
-import { MaterialDataForm } from "./MaterialDataForm";
-import type { MaterialsType } from "./Materials";
+import type { PurchasesType } from "./Purchases";
+import { PurchaseDataForm } from "./PurchaseDataForm";
 
-export function CreateMaterialModal({
+export function CreatePurchaseModal({
   closeModal,
-  setMaterials,
+  setPurchases,
 }: {
   closeModal: () => void;
-  setMaterials: Dispatch<StateUpdater<MaterialsType[]>>;
+  setPurchases: Dispatch<StateUpdater<PurchasesType[]>>;
 }) {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -21,7 +21,6 @@ export function CreateMaterialModal({
         closeModal();
       }
     };
-
     document.addEventListener("keydown", handleKeyPress);
 
     return () => {
@@ -29,33 +28,23 @@ export function CreateMaterialModal({
     };
   }, []);
 
-  async function onFormSubmit(materialData: Partial<MaterialsType>) {
-    const { data, code } = await fetchWithToken<{ material: MaterialsType }>({
-      path: "/materials/create",
+  async function onFormSubmit(purchaseData: Partial<PurchasesType>) {
+    console.log(purchaseData);
+    const { data, code } = await fetchWithToken<{ purchase: PurchasesType }>({
+      path: "/purchases/create",
       method: "POST",
-      body: JSON.stringify(materialData),
+      body: JSON.stringify(purchaseData),
     });
+    console.log(data, code);
 
     if (code == 201) {
-      const material = data.material;
-
-      setMaterials((prev) => [material, ...prev]);
+      const purchase = data.purchase;
+      setPurchases((prev) => [purchase, ...prev]);
       closeModal();
       return null;
     }
 
-    if (code == 409) {
-      let erro = {} as { [key: string]: string };
-      if (data.error.includes("name")) {
-        erro = { ...erro, name: "Esse material já foi previamente cadastrado" };
-      }
-      if (data.error.includes("barcode")) {
-        erro = { ...erro, barcode: "Esse codigo de barras ja está cadastrado" };
-      }
-      return erro;
-    }
-
-    window.alert("Erro ao salvar o material");
+    window.alert("Erro ao salvar a compra");
     console.error(code, data);
     return { erro: "Algum problema ocorreu" };
   }
@@ -72,7 +61,7 @@ export function CreateMaterialModal({
         onClick={(e) => e.stopPropagation()}
       >
         <header className={"flex justify-between mb-4"}>
-          <h2 className={"text-3xl font-semibold"}>Cadastrar novo material</h2>
+          <h2 className={"text-3xl font-semibold"}>Novo pedido de compra</h2>
           <button
             className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
             onClick={() => {
@@ -83,7 +72,7 @@ export function CreateMaterialModal({
           </button>
         </header>
         <div>
-          <MaterialDataForm doOnSubmit={onFormSubmit} />
+          <PurchaseDataForm doOnSubmit={onFormSubmit} />
         </div>
       </div>
     </section>

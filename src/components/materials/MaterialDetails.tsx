@@ -1,8 +1,7 @@
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
-import type { MaterialsType } from "./Materials";
 import { MaterialDataForm } from "./MaterialDataForm";
-import type { SuppliersType } from "@comp/suppliers/Suppliers";
+import type { MaterialsType } from "./Materials";
 
 export function MaterialDetails() {
   const [material, setMaterial] = useState<MaterialsType | null>(null);

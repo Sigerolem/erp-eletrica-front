@@ -1,4 +1,4 @@
-import { SelectSupplierModal } from "@comp/materials/SelectSupplierModal";
+import { SelectSupplierModal } from "@comp/suppliers/SelectSupplierModal";
 import { Input } from "@elements/Input";
 import { formatFloatWithDecimalDigits } from "@utils/formating";
 import {
@@ -22,12 +22,10 @@ interface MaterialDataFormProps {
   doOnSubmit: (
     material: Partial<MaterialsType>
   ) => Promise<{ [key: string]: string } | null>;
-  setIsSupModalOpen?: Dispatch<StateUpdater<boolean>>;
 }
 
 export function MaterialDataForm({
   materialData,
-  setIsSupModalOpen: reportIsModalOpen,
   doOnSubmit,
 }: MaterialDataFormProps) {
   const [validationErrors, setValidationErrors] = useState<{
@@ -73,23 +71,23 @@ export function MaterialDataForm({
   }, [materialData]);
 
   useEffect(() => {
-    if (reportIsModalOpen !== undefined) {
-      reportIsModalOpen(isSupModalOpen);
-    }
     const handleKeyPress = (e: KeyboardEvent) => {
+      e.stopPropagation();
       if (e.key == "Escape") {
         setIsSupModalOpen(false);
       }
     };
 
     if (isSupModalOpen) {
-      document.addEventListener("keydown", handleKeyPress);
-    }
+      document.addEventListener("keydown", handleKeyPress, { capture: true });
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [isSupModalOpen, reportIsModalOpen]);
+      return () => {
+        document.removeEventListener("keydown", handleKeyPress, {
+          capture: true,
+        });
+      };
+    }
+  }, [isSupModalOpen]);
 
   useEffect(() => {
     fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(

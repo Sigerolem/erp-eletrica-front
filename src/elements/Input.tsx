@@ -9,8 +9,10 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ label, errors, name, ...rest }: InputProps) {
   return (
-    <div className="flex flex-col mb-4 flex-1">
-      <label className="mb-0.5 font-semibold pl-1">{label}</label>
+    <div className="flex flex-col flex-1 relative min-w-20">
+      {label !== "" && (
+        <label className="mb-0.5 font-semibold pl-1">{label}</label>
+      )}
       <input
         onFocus={(e) => {
           e.currentTarget.select();
@@ -21,7 +23,11 @@ export function Input({ label, errors, name, ...rest }: InputProps) {
           rest.className || ""
         } ${errors?.[name] ? "border-red-500" : ""}`}
       />
-      <span className={"text-red-500 text-sm"}>{errors?.[name]}</span>
+      {errors?.[name] == undefined || (
+        <span className={"text-red-500 text-xs absolute -bottom-4 left-1"}>
+          {errors?.[name]}
+        </span>
+      )}
     </div>
   );
 }

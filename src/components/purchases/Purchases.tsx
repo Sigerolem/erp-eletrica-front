@@ -1,19 +1,33 @@
-import { useEffect, useState } from "preact/hooks";
-import { CreateMaterialModal } from "@comp/materials/CreateMaterialModal";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
-import { fetchWithToken } from "src/utils/fetchWithToken";
+import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
+import { useEffect, useState } from "preact/hooks";
 import { Table, Td, THead, Tr } from "src/elements/Table";
-import { BrlStringFromCents } from "@utils/formating";
+import { fetchWithToken } from "src/utils/fetchWithToken";
+import { CreatePurchaseModal } from "./CreatePurchaseModal";
+import type { MaterialsType } from "@comp/materials/Materials";
 
 export type PurchaseItemsType = {
   id: string;
+  material_id: string;
+  purchase_id: string;
+  material: MaterialsType;
+  amount_requested: number;
+  amount_delivered: number;
+  old_unit_cost: number;
+  new_unit_cost: number;
 };
 
 export type PurchasesType = {
   id: string;
-  profit: number;
-  value: number;
+  nf: string | null;
+  delivery_cost: number;
+  purchase_cost: number;
+  tax_cost: number;
+  status: string;
+  supplier: SuppliersType;
+  supplier_id: string;
   purchase_items?: PurchaseItemsType[];
+  updated_at: string;
 };
 
 export function Purchases() {
@@ -25,7 +39,6 @@ export function Purchases() {
       ({ code, data }) => {
         if (code == 200) {
           setPurchases(data.purchases);
-          console.log(data.purchases);
         } else {
           window.alert("Erro ao buscar a lista de materiais");
           console.error(data);
@@ -36,15 +49,14 @@ export function Purchases() {
 
   return (
     <>
-      {/* {isModalOpen ? (
-        <CreateMaterialModal
-          setMaterials={setMaterials}
+      {isModalOpen ? (
+        <CreatePurchaseModal
           closeModal={() => {
             setIsModalOpen(false);
           }}
-          suppliersList={suppliersList}
+          setPurchases={setPurchases}
         />
-      ) : null} */}
+      ) : null}
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de compras</h3>
@@ -54,7 +66,7 @@ export function Purchases() {
               setIsModalOpen(true);
             }}
           >
-            Novo material
+            Nova compra
           </button>
         </header>
         <Table>
@@ -67,37 +79,34 @@ export function Purchases() {
             ]}
           />
           <tbody>
-            {/* {materials.map((material) => (
-              <Tr key={material.id}>
-                <Td link={`/materiais/id#${material.id}`}>
-                  <p className={""}>{material.name}</p>
-                  <p className={"text-sm font-semibold"}>
-                    {material.supplier?.name ?? ""}
-                  </p>
-                </Td>
-                <Td link={`/materiais/id#${material.id}`}>
-                  <p
-                  // className={`${
-                  //   material.current_amount < material.min_amount
-                  //     ? "text-red-700 font-semibold text-lg"
-                  //     : ""
-                  // }`}
-                  >
-                    {material.current_amount}
-                  </p>
-                  <p>{material.min_amount}</p>
-                </Td>
-                <Td link={`/materiais/id#${material.id}`}>
-                  <p>{material.reserved_amount}</p>
-                </Td>
-                <Td link={`/materiais/id#${material.id}`}>
-                  <p className={""}>
-                    C: {BrlStringFromCents(material.avg_cost)}
-                  </p>
-                  <p className={""}>V: {BrlStringFromCents(material.value)}</p>
-                </Td>
-              </Tr>
-            ))} */}
+            {purchases.map((purchase) => {
+              const totalCost =
+                purchase.delivery_cost +
+                purchase.tax_cost +
+                purchase.purchase_cost;
+              const status = formatPurchaseStatusEnum(purchase.status);
+              return (
+                <Tr key={purchase.id}>
+                  <Td link={`/compras/id#${purchase.id}`}>
+                    <p className={""}>{purchase.supplier?.name || "null"}</p>
+                  </Td>
+                  <Td link={`/compras/id#${purchase.id}`}>
+                    <p>{status}</p>
+                    <p>
+                      {new Date(purchase.updated_at).toLocaleDateString(
+                        "pt-BR"
+                      )}
+                    </p>
+                  </Td>
+                  <Td link={`/compras/id#${purchase.id}`}>
+                    <p>{BrlStringFromCents(totalCost)}</p>
+                  </Td>
+                  <Td link={`/compras/id#${purchase.id}`}>
+                    <p className={""}>{purchase.purchase_items?.length || 0}</p>
+                  </Td>
+                </Tr>
+              );
+            })}
           </tbody>
         </Table>
       </div>

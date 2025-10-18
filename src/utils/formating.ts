@@ -26,3 +26,22 @@ export function formatFloatWithDecimalDigits(
   );
   return floatValue;
 }
+
+export function formatPurchaseStatusEnum(status: string) {
+  const purchaseStatus =
+    status == "draft"
+      ? "Rascunho"
+      : status == "requested"
+      ? "Realizada"
+      : status == "shipped"
+      ? "Em rota"
+      : status == "received"
+      ? "Recebida"
+      : status == "finished"
+      ? "Concluída"
+      : status == "cancelled"
+      ? "Cancelada"
+      : "Erro, verificar status no server";
+
+  return purchaseStatus;
+}
