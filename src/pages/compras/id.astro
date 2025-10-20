@@ -1,0 +1,11 @@
+---
+import { SupplierDetails } from "@comp/suppliers/SupplierDetails";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+import Header from "@comp/Header.astro";
+import { PurchaseDetails } from "@comp/purchases/PurchaseDetails";
+---
+
+<DefaultLayout title="Detalhes da compra" transition:persist>
+  <Header title="Detalhes da compra" />
+  <PurchaseDetails client:only="preact" />
+</DefaultLayout>

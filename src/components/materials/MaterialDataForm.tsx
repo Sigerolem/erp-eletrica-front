@@ -53,7 +53,6 @@ export function MaterialDataForm({
 
   useEffect(() => {
     if (materialData) {
-      console.log(materialData);
       setName(materialData.name);
       setBarcode(materialData.barcode || "");
       setCurrentAmount(materialData.current_amount);

@@ -7,16 +7,20 @@ import { SelectMaterialModal } from "@comp/materials/SelectMaterialModal";
 import { PurchaseItemsList } from "@comp/purchases/PurchaseItemsList";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { Input } from "@elements/Input";
-import type { TargetedSubmitEvent } from "preact";
+import type { JSX, TargetedSubmitEvent } from "preact";
+import { formatPurchaseStatusEnum } from "@utils/formating";
+import { Button } from "@elements/Button";
 
 export function PurchaseDataForm({
   purchaseData,
   doOnSubmit,
+  children,
 }: {
-  purchaseData?: Partial<PurchasesType>;
+  purchaseData?: PurchasesType;
   doOnSubmit: (purchaseData: Partial<PurchasesType>) => Promise<{
     [key: string]: string;
   } | null>;
+  children?: JSX.Element;
 }) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -33,6 +37,7 @@ export function PurchaseDataForm({
     name: string;
   } | null>(null);
 
+  const [id, setId] = useState("");
   const [nf, setNF] = useState("");
   const [status, setStatus] = useState("draft");
   const [purchaseCost, setPurchaseCost] = useState(0);
@@ -80,6 +85,19 @@ export function PurchaseDataForm({
     );
   }, []);
 
+  useEffect(() => {
+    if (purchaseData !== undefined) {
+      setId(purchaseData.id);
+      setNF(purchaseData.nf || "");
+      setStatus(purchaseData.status);
+      setPurchaseCost(purchaseData.purchase_cost);
+      setDeliveryCost(purchaseData.delivery_cost);
+      setTaxCost(purchaseData.tax_cost);
+      setSelectedSupplier(purchaseData.supplier);
+      setPurchaseItems(purchaseData.purchase_items || []);
+    }
+  }, [purchaseData]);
+
   function handleNewPurchaseMaterial(material: MaterialsType) {
     setPurchaseItems((prev) => [
       ...prev,
@@ -88,6 +106,9 @@ export function PurchaseDataForm({
         material_id: material.id,
         amount_requested: material.ideal_amount - material.current_amount,
         old_unit_cost: material.avg_cost,
+        purchase_id: purchaseData?.id || undefined,
+        amount_delivered: 0,
+        new_unit_cost: 0,
       },
     ]);
   }
@@ -114,6 +135,10 @@ export function PurchaseDataForm({
       delivery_cost: deliveryCost,
       tax_cost: taxCost,
       purchase_cost: purchaseCost,
+      supplier: {
+        id: selectedSupplier.id,
+        name: selectedSupplier.name,
+      } as SuppliersType,
       supplier_id: selectedSupplier?.id || "",
       purchase_items: purchaseItems as PurchaseItemsType[],
     };
@@ -125,30 +150,39 @@ export function PurchaseDataForm({
     }
   }
 
+  const showCostsBool = purchaseData !== undefined && status !== "draft";
   return (
     <form className={"flex flex-col gap-2 w-ful"} onSubmit={handleSubmit}>
-      {purchaseData == undefined || (
+      {showCostsBool && (
         <>
           <div className={"flex gap-4"}>
+            <Input label="NF" name="nf" />
             <Input label="Custo" name="purchaseCost" />
+          </div>
+          <div className={"flex gap-4"}>
             <Input label="Frete" name="deliveryCost" />
             <Input label="Impostos" name="taxCost" />
           </div>
-          <div className={"flex gap-4"}>
-            <Input label="NF" name="nf" />
-            <Input label="Status" name="status" />
-          </div>
         </>
       )}
-      <Input
-        label="Fornecedor"
-        name="supplier"
-        value={selectedSupplier?.name || ""}
-        onClick={() => {
-          setIsSupModalOpen(true);
-        }}
-        errors={validationErrors}
-      />
+      <div className={"flex gap-4"}>
+        <Input
+          label="Fornecedor"
+          name="supplier"
+          value={selectedSupplier?.name || ""}
+          onClick={() => {
+            setIsSupModalOpen(true);
+          }}
+          errors={validationErrors}
+        />
+        <Input
+          label="Status"
+          name="status"
+          value={formatPurchaseStatusEnum(status)}
+          disabled
+        />
+      </div>
+
       {isSupModalOpen && (
         <SelectSupplierModal
           suppliers={suppliers}
@@ -188,7 +222,9 @@ export function PurchaseDataForm({
           />
         )}
       </div>
-      <div className={"bg-slate-200 p-2 rounded-md"}>
+      <div
+        className={"bg-slate-100 border border-slate-400 py-1 rounded-md mb-4"}
+      >
         <div>
           <PurchaseItemsList
             purchaseItems={purchaseItems}
@@ -196,13 +232,7 @@ export function PurchaseDataForm({
           />
         </div>
       </div>
-      <button
-        className={
-          "bg-blue-700 ml-auto rounded-md text-white shadow-md font-semibold p-1"
-        }
-      >
-        Salvar
-      </button>
+      {children}
     </form>
   );
 }

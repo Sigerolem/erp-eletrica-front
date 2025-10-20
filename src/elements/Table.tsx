@@ -16,7 +16,7 @@ export function Th({ children }: { children: JSX.Element | string }) {
   return (
     <th
       className={
-        "py-2 text-start bg-slate-700 text-white px-2 first:rounded-tl-md last:rounded-tr-md"
+        "py-2 text-start bg-slate-600 text-white px-2 first:rounded-tl-md last:rounded-tr-md"
       }
     >
       {children}
@@ -32,7 +32,7 @@ export function Tr({
   key?: string;
 }) {
   return (
-    <tr key={key} className={"bg-slate-300 even:bg-slate-400"}>
+    <tr key={key} className={"bg-slate-100 even:bg-slate-200"}>
       {children}
     </tr>
   );

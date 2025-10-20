@@ -37,7 +37,7 @@ export function PurchaseItemsList({
   }
 
   return (
-    <div className={"px-4 flex flex-col gap-4 pb-3"}>
+    <div className={"px-2 flex flex-col gap-4 pb-3"}>
       <header className={"grid grid-cols-5 font-semibold"}>
         <span className={"col-span-2"}>Item</span>
         <span>Atual/Ideal</span>

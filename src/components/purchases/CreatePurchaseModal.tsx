@@ -7,6 +7,8 @@ import {
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import type { PurchasesType } from "./Purchases";
 import { PurchaseDataForm } from "./PurchaseDataForm";
+import { Button } from "@elements/Button";
+import type { SuppliersType } from "@comp/suppliers/Suppliers";
 
 export function CreatePurchaseModal({
   closeModal,
@@ -29,17 +31,23 @@ export function CreatePurchaseModal({
   }, []);
 
   async function onFormSubmit(purchaseData: Partial<PurchasesType>) {
-    console.log(purchaseData);
+    const basicSupplier = purchaseData.supplier as SuppliersType;
+    delete purchaseData.supplier;
     const { data, code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: "/purchases/create",
       method: "POST",
       body: JSON.stringify(purchaseData),
     });
-    console.log(data, code);
 
     if (code == 201) {
       const purchase = data.purchase;
-      setPurchases((prev) => [purchase, ...prev]);
+      setPurchases((prev) => [
+        {
+          ...purchase,
+          supplier: basicSupplier,
+        },
+        ...prev,
+      ]);
       closeModal();
       return null;
     }
@@ -72,7 +80,15 @@ export function CreatePurchaseModal({
           </button>
         </header>
         <div>
-          <PurchaseDataForm doOnSubmit={onFormSubmit} />
+          <PurchaseDataForm doOnSubmit={onFormSubmit}>
+            <div className={"w-full justify-stretch flex"}>
+              <Button
+                text={"salvar"}
+                type={"submit"}
+                className={"bg-blue-700 flex-1"}
+              />
+            </div>
+          </PurchaseDataForm>
         </div>
       </div>
     </section>
