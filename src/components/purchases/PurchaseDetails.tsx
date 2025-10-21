@@ -59,6 +59,24 @@ export function PurchaseDetails() {
     }
   }
 
+  async function handleConcludePurchase() {
+    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+      path: `/purchases/status/${id}`,
+      method: "PATCH",
+      body: JSON.stringify({ id, status: "finished" }),
+    });
+    if (code === 200) {
+      window.alert("Alterado com sucesso.");
+      setPurchase((prev) => {
+        if (prev) {
+          return { ...prev, status: data.purchase.status };
+        }
+        return prev;
+      });
+      window.location.href = "/compras";
+    }
+  }
+
   async function handleDataSubmition(purchaseData: Partial<PurchasesType>) {
     const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/${purchase?.id}`,
@@ -104,7 +122,7 @@ export function PurchaseDetails() {
                 text={"Finalizar compra"}
                 type={"button"}
                 className={"bg-slate-700 flex-1"}
-                onClick={handleConfirmPurchase}
+                onClick={handleConcludePurchase}
               />
             )}
             {purchase.status !== "shipped" ? (

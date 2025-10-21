@@ -32,7 +32,13 @@ export function PurchaseDelivery() {
       method: "PUT",
       body: JSON.stringify(purchaseData),
     });
-    console.log(result);
+    if (result.code == 200) {
+      window.alert("Compra recebida com sucesso");
+      window.location.href = "/compras";
+      return null;
+    }
+
+    console.error(result.code, result.data);
     return null;
   }
 
