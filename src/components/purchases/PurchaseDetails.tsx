@@ -33,7 +33,12 @@ export function PurchaseDetails() {
     });
     if (code === 200) {
       window.alert("Alterado com sucesso.");
-      setPurchase(data.purchase);
+      setPurchase((prev) => {
+        if (prev) {
+          return { ...prev, status: data.purchase.status };
+        }
+        return prev;
+      });
     }
   }
 
@@ -45,12 +50,16 @@ export function PurchaseDetails() {
     });
     if (code === 200) {
       window.alert("Alterado com sucesso.");
-      setPurchase(data.purchase);
+      setPurchase((prev) => {
+        if (prev) {
+          return { ...prev, status: data.purchase.status };
+        }
+        return prev;
+      });
     }
   }
 
   async function handleDataSubmition(purchaseData: Partial<PurchasesType>) {
-    console.log(purchaseData);
     const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/${purchase?.id}`,
       method: "PUT",
@@ -90,6 +99,14 @@ export function PurchaseDetails() {
                 onClick={handleConfirmPurchase}
               />
             )}
+            {purchase.id !== "" && purchase.status == "received" && (
+              <Button
+                text={"Finalizar compra"}
+                type={"button"}
+                className={"bg-slate-700 flex-1"}
+                onClick={handleConfirmPurchase}
+              />
+            )}
             {purchase.status !== "shipped" ? (
               <Button
                 text={"Salvar"}
@@ -97,11 +114,15 @@ export function PurchaseDetails() {
                 className={"bg-blue-700 flex-1"}
               />
             ) : (
-              <Button
-                text={"Receber compra"}
-                type={"submit"}
-                className={"bg-blue-700 flex-1"}
-              />
+              <a
+                href={`/compras/recebimento/id#${id}`}
+                className={"flex-1 flex"}
+              >
+                <Button
+                  text={"Receber compra"}
+                  className={"bg-blue-700 flex-1"}
+                />
+              </a>
             )}
           </div>
         </PurchaseDataForm>

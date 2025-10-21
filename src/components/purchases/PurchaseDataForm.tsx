@@ -8,8 +8,13 @@ import { PurchaseItemsList } from "@comp/purchases/PurchaseItemsList";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { Input } from "@elements/Input";
 import type { JSX, TargetedSubmitEvent } from "preact";
-import { formatPurchaseStatusEnum } from "@utils/formating";
+import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
 import { Button } from "@elements/Button";
+import { ReceivePurchaseItemsList } from "./ReceivePurchaseItemsList";
+import {
+  validateFloatFieldOnBlur,
+  validateStringFieldOnBlur,
+} from "@utils/inputValidation";
 
 export function PurchaseDataForm({
   purchaseData,
@@ -150,18 +155,83 @@ export function PurchaseDataForm({
     }
   }
 
-  const showCostsBool = purchaseData !== undefined && status !== "draft";
+  const showCostsBool =
+    purchaseData?.status == "finished" ||
+    purchaseData?.status == "received" ||
+    (purchaseData?.status == "shipped" &&
+      window.location.href.includes("recebimento"));
+  const isDeliveryList =
+    purchaseData?.status == "received" ||
+    purchaseData?.status == "finished" ||
+    (purchaseData?.status == "shipped" &&
+      window.location.href.includes("recebimento"));
   return (
     <form className={"flex flex-col gap-2 w-ful"} onSubmit={handleSubmit}>
       {showCostsBool && (
         <>
           <div className={"flex gap-4"}>
-            <Input label="NF" name="nf" />
-            <Input label="Custo" name="purchaseCost" />
+            <Input
+              label="NF"
+              name="nf"
+              value={nf}
+              onBlur={(e) => {
+                validateStringFieldOnBlur(e, setNF, setValidationErrors, {
+                  max: 50,
+                });
+              }}
+              errors={validationErrors}
+            />
+            <Input
+              label="Custo"
+              name="purchaseCost"
+              value={purchaseCost.toLocaleString("pt-Br", {
+                currency: "BRL",
+                style: "currency",
+              })}
+              onBlur={(e) => {
+                validateFloatFieldOnBlur(
+                  e,
+                  setPurchaseCost,
+                  setValidationErrors,
+                  { decimalDigits: 2, removeFromString: "R$" }
+                );
+              }}
+              errors={validationErrors}
+            />
           </div>
           <div className={"flex gap-4"}>
-            <Input label="Frete" name="deliveryCost" />
-            <Input label="Impostos" name="taxCost" />
+            <Input
+              label="Frete"
+              name="deliveryCost"
+              value={deliveryCost.toLocaleString("pt-Br", {
+                currency: "BRL",
+                style: "currency",
+              })}
+              onBlur={(e) => {
+                validateFloatFieldOnBlur(
+                  e,
+                  setDeliveryCost,
+                  setValidationErrors,
+                  { decimalDigits: 2, removeFromString: "R$" }
+                );
+              }}
+              errors={validationErrors}
+            />
+            <Input
+              label="Impostos"
+              name="taxCost"
+              value={taxCost.toLocaleString("pt-Br", {
+                currency: "BRL",
+                style: "currency",
+              })}
+              onBlur={(e) => {
+                validateFloatFieldOnBlur(e, setTaxCost, setValidationErrors, {
+                  decimalDigits: 2,
+                  removeFromString: "R$",
+                });
+              }}
+              errors={validationErrors}
+            />
           </div>
         </>
       )}
@@ -174,6 +244,12 @@ export function PurchaseDataForm({
             setIsSupModalOpen(true);
           }}
           errors={validationErrors}
+          disabled={
+            purchaseData?.status == "shipped" ||
+            purchaseData?.status == "received" ||
+            purchaseData?.status == "finished" ||
+            purchaseData?.status == "cancelled"
+          }
         />
         <Input
           label="Status"
@@ -226,10 +302,17 @@ export function PurchaseDataForm({
         className={"bg-slate-100 border border-slate-400 py-1 rounded-md mb-4"}
       >
         <div>
-          <PurchaseItemsList
-            purchaseItems={purchaseItems}
-            setPurchaseItems={setPurchaseItems}
-          />
+          {isDeliveryList ? (
+            <ReceivePurchaseItemsList
+              purchaseItems={purchaseItems}
+              setPurchaseItems={setPurchaseItems}
+            />
+          ) : (
+            <PurchaseItemsList
+              purchaseItems={purchaseItems}
+              setPurchaseItems={setPurchaseItems}
+            />
+          )}
         </div>
       </div>
       {children}

@@ -152,3 +152,54 @@ export function validateFloatFieldOnBlur(
     return { ...prev };
   });
 }
+
+export function parseFloatFromString({
+  value,
+  options: { decimalDigits, max, min, removeFromString },
+  name = "any",
+}: {
+  value: string;
+  options: FloatFieldValidationOptions;
+  setErrors?: Dispatch<StateUpdater<{ [key: string]: string }>>;
+  name?: string;
+}) {
+  console.log(value);
+  let erro: { [key: string]: string };
+
+  if (removeFromString) {
+    value = value.replaceAll(removeFromString, "").trim();
+  }
+
+  const floatValue =
+    value == ""
+      ? 0
+      : parseFloat(value.replaceAll(".", "").replaceAll(",", "."));
+
+  if (isNaN(floatValue)) {
+    erro = {
+      [name]: "Valor com formato inválido",
+    };
+    return { floatValue: NaN, erro };
+  }
+
+  if (min != undefined && floatValue < min) {
+    erro = {
+      [name]: `Valor não pode ser menor que ${min}`,
+    };
+    return { floatValue, erro };
+  } else if (max != undefined && floatValue > max) {
+    erro = {
+      [name]: `Valor não pode ser maior que ${max}`,
+    };
+    return { floatValue, erro };
+  }
+
+  console.log(
+    formatFloatWithDecimalDigits(floatValue, decimalDigits),
+    floatValue
+  );
+  return {
+    floatValue: formatFloatWithDecimalDigits(floatValue, decimalDigits),
+    erro: null,
+  };
+}

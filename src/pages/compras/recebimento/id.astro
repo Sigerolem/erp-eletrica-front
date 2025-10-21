@@ -1,0 +1,10 @@
+---
+import Header from "@comp/Header.astro";
+import { PurchaseDelivery } from "@comp/purchases/PurchaseDelivery";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Recebimento" transition:persist>
+  <Header title="Recebimento" />
+  <PurchaseDelivery client:only="preact" />
+</DefaultLayout>
