@@ -194,10 +194,6 @@ export function parseFloatFromString({
     return { floatValue, erro };
   }
 
-  console.log(
-    formatFloatWithDecimalDigits(floatValue, decimalDigits),
-    floatValue
-  );
   return {
     floatValue: formatFloatWithDecimalDigits(floatValue, decimalDigits),
     erro: null,

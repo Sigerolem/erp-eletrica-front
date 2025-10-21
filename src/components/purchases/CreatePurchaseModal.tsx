@@ -53,7 +53,7 @@ export function CreatePurchaseModal({
     }
 
     window.alert("Erro ao salvar a compra");
-    console.error(code, data);
+    console.error(code, data, purchaseData);
     return { erro: "Algum problema ocorreu" };
   }
 
