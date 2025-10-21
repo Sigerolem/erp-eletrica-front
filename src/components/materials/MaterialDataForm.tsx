@@ -60,7 +60,7 @@ export function MaterialDataForm({
       setMinAmount(materialData.min_amount);
       setIdealAmount(materialData.ideal_amount);
       setPkgSize(materialData.pkg_size);
-      setProfit(materialData.profit / 100);
+      setProfit(materialData.profit / 10);
       setCost(materialData.avg_cost / 100);
       setValue(materialData.value / 100);
       if (materialData.supplier) {
@@ -130,7 +130,7 @@ export function MaterialDataForm({
       min_amount: minAmount,
       ideal_amount: idealAmount,
       pkg_size: pkgSize,
-      profit: profit * 100,
+      profit: profit * 10,
       avg_cost: cost * 100,
       value: value * 100,
       supplier_id: supplierSelected?.id || null,
