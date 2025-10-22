@@ -184,16 +184,13 @@ export function PurchaseDataForm({
             <Input
               label="Custo"
               name="purchaseCost"
-              value={purchaseCost.toLocaleString("pt-Br", {
-                currency: "BRL",
-                style: "currency",
-              })}
+              value={BrlStringFromCents(purchaseCost)}
               onBlur={(e) => {
                 validateFloatFieldOnBlur(
                   e,
                   setPurchaseCost,
                   setValidationErrors,
-                  { decimalDigits: 2, removeFromString: "R$" }
+                  { removeFromString: "R$" }
                 );
               }}
               errors={validationErrors}
@@ -203,16 +200,13 @@ export function PurchaseDataForm({
             <Input
               label="Frete"
               name="deliveryCost"
-              value={deliveryCost.toLocaleString("pt-Br", {
-                currency: "BRL",
-                style: "currency",
-              })}
+              value={BrlStringFromCents(deliveryCost)}
               onBlur={(e) => {
                 validateFloatFieldOnBlur(
                   e,
                   setDeliveryCost,
                   setValidationErrors,
-                  { decimalDigits: 2, removeFromString: "R$" }
+                  { removeFromString: "R$" }
                 );
               }}
               errors={validationErrors}
@@ -220,13 +214,9 @@ export function PurchaseDataForm({
             <Input
               label="Impostos"
               name="taxCost"
-              value={taxCost.toLocaleString("pt-Br", {
-                currency: "BRL",
-                style: "currency",
-              })}
+              value={BrlStringFromCents(taxCost)}
               onBlur={(e) => {
                 validateFloatFieldOnBlur(e, setTaxCost, setValidationErrors, {
-                  decimalDigits: 2,
                   removeFromString: "R$",
                 });
               }}

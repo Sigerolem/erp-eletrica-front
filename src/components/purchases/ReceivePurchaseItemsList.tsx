@@ -44,7 +44,7 @@ export function ReceivePurchaseItemsList({
     setPurchaseItems((prev) =>
       prev.map((item) => {
         if (item.material_id == materialId) {
-          return { ...item, new_unit_cost: amount * 100 };
+          return { ...item, new_unit_cost: amount };
         } else {
           return { ...item };
         }
@@ -92,19 +92,16 @@ export function ReceivePurchaseItemsList({
                 value={item.amount_requested ?? 0}
                 onBlur={(e) => {
                   const value = e.currentTarget.value;
-                  const { floatValue, erro } = parseFloatFromString({
+                  const { erro, intValue } = parseFloatFromString({
                     value,
-                    options: { decimalDigits: 0 },
+                    options: {},
                     name: `amountRequested-${item.material_id}`,
                   });
                   setValidationErrors((prev) => {
                     delete prev[`amountRequested-${item.material_id}`];
                     return erro == null ? prev : { ...prev, ...erro };
                   });
-                  handleUpdateRequestedAmount(
-                    item.material_id || "",
-                    floatValue
-                  );
+                  handleUpdateRequestedAmount(item.material_id || "", intValue);
                 }}
                 errors={validationErrors}
                 className={"min-w-5"}
@@ -117,9 +114,9 @@ export function ReceivePurchaseItemsList({
                 value={item.amount_delivered ?? 0}
                 onBlur={(e) => {
                   const value = e.currentTarget.value;
-                  const { floatValue, erro } = parseFloatFromString({
+                  const { intValue, erro } = parseFloatFromString({
                     value,
-                    options: { decimalDigits: 0 },
+                    options: {},
                     name: `amountDelivered-${item.material_id}`,
                   });
                   setValidationErrors((prev) => {
@@ -128,7 +125,7 @@ export function ReceivePurchaseItemsList({
                   });
                   handleUpdateRequestedAmount(
                     item.material_id || "",
-                    floatValue,
+                    intValue,
                     true
                   );
                 }}
@@ -143,17 +140,16 @@ export function ReceivePurchaseItemsList({
               value={BrlStringFromCents(item.new_unit_cost || 0)}
               onBlur={(e) => {
                 const value = e.currentTarget.value;
-                const { floatValue, erro } = parseFloatFromString({
+                const { centsValue, erro } = parseFloatFromString({
                   value,
-                  options: { decimalDigits: 2, removeFromString: "R$" },
+                  options: { removeFromString: "R$" },
                   name: `newCost-${item.material_id}`,
                 });
-                console.log(floatValue);
                 setValidationErrors((prev) => {
                   delete prev[`newCost-${item.material_id}`];
                   return erro == null ? prev : { ...prev, ...erro };
                 });
-                handleUpdateNewCost(item.material_id || "", floatValue);
+                handleUpdateNewCost(item.material_id || "", centsValue);
               }}
               errors={validationErrors}
             />

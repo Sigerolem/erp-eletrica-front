@@ -104,7 +104,6 @@ export function validateIntFieldOnBlur(
 type FloatFieldValidationOptions = {
   min?: number;
   max?: number;
-  decimalDigits: 0 | 1 | 2 | 3;
   removeFromString?: string;
 };
 
@@ -112,7 +111,7 @@ export function validateFloatFieldOnBlur(
   e: TargetedFocusEvent<HTMLInputElement>,
   setValue: Dispatch<StateUpdater<number>>,
   setErrors: Dispatch<StateUpdater<{ [key: string]: string }>>,
-  { min, max, decimalDigits, removeFromString }: FloatFieldValidationOptions
+  { min, max, removeFromString }: FloatFieldValidationOptions
 ) {
   const { name } = e.currentTarget;
   let value = e.currentTarget.value;
@@ -121,7 +120,7 @@ export function validateFloatFieldOnBlur(
   }
 
   if (value == "") {
-    setValue(formatFloatWithDecimalDigits(0, decimalDigits));
+    setValue(0);
     return;
   }
 
@@ -131,14 +130,15 @@ export function validateFloatFieldOnBlur(
     setErrors((prev) => ({ ...prev, [name]: "Valor com formato inválido" }));
     return;
   }
+  const centsValue = Math.round(floatValue * 100);
 
-  if (min != undefined && floatValue < min) {
+  if (min != undefined && centsValue < min) {
     setErrors((prev) => ({
       ...prev,
       [name]: `Valor não pode ser menor que ${min}`,
     }));
     return;
-  } else if (max != undefined && floatValue > max) {
+  } else if (max != undefined && centsValue > max) {
     setErrors((prev) => ({
       ...prev,
       [name]: `Valor não pode ser maior que ${max}`,
@@ -146,7 +146,7 @@ export function validateFloatFieldOnBlur(
     return;
   }
 
-  setValue(formatFloatWithDecimalDigits(floatValue, decimalDigits));
+  setValue(centsValue);
   setErrors((prev) => {
     delete prev[name];
     return { ...prev };
@@ -155,7 +155,7 @@ export function validateFloatFieldOnBlur(
 
 export function parseFloatFromString({
   value,
-  options: { decimalDigits, max, min, removeFromString },
+  options: { max, min, removeFromString },
   name = "any",
 }: {
   value: string;
@@ -179,23 +179,26 @@ export function parseFloatFromString({
     erro = {
       [name]: "Valor com formato inválido",
     };
-    return { floatValue: NaN, erro };
+    return { centsValue: NaN, erro, intValue: NaN };
   }
 
-  if (min != undefined && floatValue < min) {
+  const centsValue = Math.round(floatValue * 100);
+
+  if (min != undefined && centsValue < min) {
     erro = {
       [name]: `Valor não pode ser menor que ${min}`,
     };
-    return { floatValue, erro };
-  } else if (max != undefined && floatValue > max) {
+    return { centsValue, erro, intValue: Math.round(centsValue / 100) };
+  } else if (max != undefined && centsValue > max) {
     erro = {
       [name]: `Valor não pode ser maior que ${max}`,
     };
-    return { floatValue, erro };
+    return { centsValue, erro, intValue: Math.round(centsValue / 100) };
   }
 
   return {
-    floatValue: formatFloatWithDecimalDigits(floatValue, decimalDigits),
+    centsValue,
+    intValue: Math.round(centsValue / 100),
     erro: null,
   };
 }

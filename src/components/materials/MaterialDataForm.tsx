@@ -1,6 +1,9 @@
 import { SelectSupplierModal } from "@comp/suppliers/SelectSupplierModal";
 import { Input } from "@elements/Input";
-import { formatFloatWithDecimalDigits } from "@utils/formating";
+import {
+  BrlStringFromCents,
+  formatFloatWithDecimalDigits,
+} from "@utils/formating";
 import {
   validateFloatFieldOnBlur,
   validateIntFieldOnBlur,
@@ -60,9 +63,9 @@ export function MaterialDataForm({
       setMinAmount(materialData.min_amount);
       setIdealAmount(materialData.ideal_amount);
       setPkgSize(materialData.pkg_size);
-      setProfit(materialData.profit / 10);
-      setCost(materialData.avg_cost / 100);
-      setValue(materialData.value / 100);
+      setProfit(materialData.profit);
+      setCost(materialData.avg_cost);
+      setValue(materialData.value);
       if (materialData.supplier) {
         setSupplierSelected(materialData.supplier);
       }
@@ -109,13 +112,13 @@ export function MaterialDataForm({
     }
 
     if (lastField == "profit" || lastField == "cost") {
-      const newValue = (cost * 100) / (100 - profit);
-      setValue(formatFloatWithDecimalDigits(newValue, 2));
+      const newValue = (cost * 100_00) / (100_00 - profit);
+      setValue(newValue);
     }
 
     if (lastField == "value") {
-      const newProfit = (1 - cost / value) * 100;
-      setProfit(formatFloatWithDecimalDigits(newProfit, 1));
+      const newProfit = Math.round((1 - cost / value) * 100_00);
+      setProfit(newProfit);
     }
 
     setLastField(null);
@@ -130,13 +133,13 @@ export function MaterialDataForm({
       min_amount: minAmount,
       ideal_amount: idealAmount,
       pkg_size: pkgSize,
-      profit: Math.round(profit * 10),
-      avg_cost: Math.round(cost * 100),
-      value: Math.round(value * 100),
+      profit,
+      avg_cost: cost,
+      value,
       supplier_id: supplierSelected?.id || null,
       supplier: supplierSelected || undefined,
-      current_amount: currentAmount || 0,
-      reserved_amount: reservedAmount || 0,
+      current_amount: currentAmount,
+      reserved_amount: reservedAmount,
     };
 
     const errors = await doOnSubmit(submitData);
@@ -239,11 +242,10 @@ export function MaterialDataForm({
         <Input
           label="Lucro"
           name="profit"
-          value={`${profit.toLocaleString("pt-Br")} %`}
+          value={`${(profit / 100).toFixed(2).replace(".", ",")} %`}
           onBlur={(e) => {
             setLastField("profit");
             validateFloatFieldOnBlur(e, setProfit, setValidationErrors, {
-              decimalDigits: 1,
               removeFromString: " %",
             });
           }}
@@ -254,14 +256,10 @@ export function MaterialDataForm({
         <Input
           label="Custo [R$]"
           name="cost"
-          value={cost.toLocaleString("pt-Br", {
-            currency: "BRL",
-            style: "currency",
-          })}
+          value={BrlStringFromCents(cost)}
           onBlur={(e) => {
             setLastField("cost");
             validateFloatFieldOnBlur(e, setCost, setValidationErrors, {
-              decimalDigits: 2,
               removeFromString: "R$",
               min: 0,
             });
@@ -271,14 +269,10 @@ export function MaterialDataForm({
         <Input
           label="Valor [R$]"
           name="value"
-          value={value.toLocaleString("pt-Br", {
-            currency: "BRL",
-            style: "currency",
-          })}
+          value={BrlStringFromCents(value)}
           onBlur={(e) => {
             setLastField("value");
             validateFloatFieldOnBlur(e, setValue, setValidationErrors, {
-              decimalDigits: 2,
               removeFromString: "R$",
               min: 0,
             });
