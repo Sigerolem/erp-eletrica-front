@@ -21,7 +21,7 @@ export type MaterialsType = {
   supplier_id: string | null;
 };
 
-const MATERIAL_URL = import.meta.env.DEV ? "/materiais/id#" : "/materiais/id/";
+const MATERIAL_URL = import.meta.env.DEV ? "/materiais/id#" : "/materiais/id#";
 
 export function Materials() {
   console.log(import.meta.env);
