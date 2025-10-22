@@ -8,7 +8,11 @@ export function MaterialDetails() {
 
   useEffect(() => {
     const path = new URL(window.location.href);
-    const id = path.hash.replace("#", "");
+
+    const id = import.meta.env.DEV
+      ? path.hash.replace("#", "")
+      : path.pathname.replace("/materiais/id/", "");
+
     fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${id}`,
     }).then((result) => {
