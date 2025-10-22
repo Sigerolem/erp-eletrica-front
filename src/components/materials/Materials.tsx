@@ -21,9 +21,13 @@ export type MaterialsType = {
   supplier_id: string | null;
 };
 
+const MATERIAL_URL = import.meta.env.DEV ? "/materiais/id#" : "/materiais/id/";
+
 export function Materials() {
+  console.log(import.meta.env);
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const env = import.meta.env;
 
   function handleNewMaterial() {
     setIsModalOpen(true);
@@ -74,28 +78,20 @@ export function Materials() {
           <tbody>
             {materials.map((material) => (
               <Tr key={material.id}>
-                <Td link={`/materiais/id#${material.id}`}>
+                <Td link={`${MATERIAL_URL}${material.id}/`}>
                   <p className={""}>{material.name}</p>
                   <p className={"text-sm font-semibold"}>
                     {material.supplier?.name ?? ""}
                   </p>
                 </Td>
-                <Td link={`/materiais/id#${material.id}`}>
-                  <p
-                  // className={`${
-                  //   material.current_amount < material.min_amount
-                  //     ? "text-red-700 font-semibold text-lg"
-                  //     : ""
-                  // }`}
-                  >
-                    {material.current_amount}
-                  </p>
+                <Td link={`${MATERIAL_URL}${material.id}/`}>
+                  <p>{material.current_amount}</p>
                   <p>{material.min_amount}</p>
                 </Td>
-                <Td link={`/materiais/id#${material.id}`}>
+                <Td link={`${MATERIAL_URL}${material.id}/`}>
                   <p>{material.reserved_amount}</p>
                 </Td>
-                <Td link={`/materiais/id#${material.id}`}>
+                <Td link={`${MATERIAL_URL}${material.id}/`}>
                   <p className={""}>
                     C: {BrlStringFromCents(material.avg_cost)}
                   </p>
