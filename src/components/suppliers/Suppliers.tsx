@@ -23,6 +23,10 @@ export function Suppliers() {
     setIsModalOpen(true);
   }
 
+  const SUPPLIER_URL = import.meta.env.DEV
+    ? "/fornecedores/id#"
+    : "/fornecedores/id/#";
+
   useEffect(() => {
     fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
       (result) => {
@@ -68,18 +72,18 @@ export function Suppliers() {
           <tbody>
             {suppliers.map((supplier) => (
               <Tr key={supplier.id}>
-                <Td link={`/fornecedores/id#${supplier.id}`}>
+                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
                   <p>{supplier.name}</p>
                   <p className={"text-green-700"}>{supplier.cnpj ?? ""}</p>
                 </Td>
-                <Td link={`/fornecedores/id#${supplier.id}`}>
+                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
                   <p>{supplier.email}</p>
                 </Td>
-                <Td link={`/fornecedores/id#${supplier.id}`}>
+                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
                   <p>{supplier.phone_number}</p>
                   <p>{supplier.mobile_number}</p>
                 </Td>
-                <Td link={`/fornecedores/id#${supplier.id}`}>
+                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
                   <p>{supplier.material_count || 0}</p>
                 </Td>
               </Tr>

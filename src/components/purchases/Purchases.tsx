@@ -30,6 +30,8 @@ export type PurchasesType = {
   updated_at: string;
 };
 
+const PURCHASE_URL = import.meta.env.DEV ? "/compras/id#" : "/compras/id/#";
+
 export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -87,10 +89,10 @@ export function Purchases() {
               const status = formatPurchaseStatusEnum(purchase.status);
               return (
                 <Tr key={purchase.id}>
-                  <Td link={`/compras/id#${purchase.id}`}>
+                  <Td link={`${PURCHASE_URL}${purchase.id}/`}>
                     <p className={""}>{purchase.supplier?.name || "null"}</p>
                   </Td>
-                  <Td link={`/compras/id#${purchase.id}`}>
+                  <Td link={`${PURCHASE_URL}${purchase.id}/`}>
                     <p>{status}</p>
                     <p>
                       {new Date(purchase.updated_at).toLocaleDateString(
@@ -98,10 +100,10 @@ export function Purchases() {
                       )}
                     </p>
                   </Td>
-                  <Td link={`/compras/id#${purchase.id}`}>
+                  <Td link={`${PURCHASE_URL}${purchase.id}/`}>
                     <p>{BrlStringFromCents(totalCost)}</p>
                   </Td>
-                  <Td link={`/compras/id#${purchase.id}`}>
+                  <Td link={`${PURCHASE_URL}${purchase.id}/`}>
                     <p className={""}>{purchase.purchase_items?.length || 0}</p>
                   </Td>
                 </Tr>

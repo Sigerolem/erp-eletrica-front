@@ -12,7 +12,7 @@ export function PurchaseDelivery() {
 
   useEffect(() => {
     const path = new URL(window.location.href);
-    const id = path.hash.replace("#", "");
+    const id = path.hash.replace("#", "").replaceAll("/", "");
     setId(id);
     fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/${id}`,

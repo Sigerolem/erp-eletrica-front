@@ -8,7 +8,7 @@ export function SupplierDetails() {
 
   useEffect(() => {
     const path = new URL(window.location.href);
-    const id = path.hash.replace("#", "");
+    const id = path.hash.replace("#", "").replaceAll("/", "");
     fetchWithToken<{ supplier: SuppliersType }>({
       path: `/suppliers/${id}`,
     }).then((result) => {

@@ -6,13 +6,17 @@ import type { PurchasesType } from "./Purchases";
 import { PurchaseDataForm } from "./PurchaseDataForm";
 import { Button } from "@elements/Button";
 
+const PURCHASE_DELIVERY_URL = import.meta.env.DEV
+  ? "/compras/recebimento/id#"
+  : "/compras/recebimento/id/#";
+
 export function PurchaseDetails() {
   const [purchase, setPurchase] = useState<PurchasesType | null>(null);
   const [id, setId] = useState("");
 
   useEffect(() => {
     const path = new URL(window.location.href);
-    const id = path.hash.replace("#", "");
+    const id = path.hash.replace("#", "").replaceAll("/", "");
     setId(id);
     fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/${id}`,
@@ -133,7 +137,7 @@ export function PurchaseDetails() {
               />
             ) : (
               <a
-                href={`/compras/recebimento/id#${id}`}
+                href={`${PURCHASE_DELIVERY_URL}${id}/`}
                 className={"flex-1 flex"}
               >
                 <Button
