@@ -22,7 +22,7 @@ export async function fetchWithToken<T>({
   let response: Response;
 
   try {
-    response = await fetch(`http://localhost:3000${path}`, {
+    response = await fetch(`https://sigerolem.vps-kinghost.net${path}`, {
       method,
       headers: {
         "Content-Type": "application/json",
