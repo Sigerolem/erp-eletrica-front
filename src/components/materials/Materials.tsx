@@ -17,6 +17,7 @@ export type MaterialsType = {
   avg_cost: number;
   profit: number;
   value: number;
+  is_disabled: boolean;
   supplier?: Pick<SuppliersType, "id" | "name">;
   supplier_id: string | null;
 };
@@ -26,7 +27,6 @@ const MATERIAL_URL = import.meta.env.DEV ? "/materiais/id#" : "/materiais/id/#";
 export function Materials() {
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const env = import.meta.env;
 
   function handleNewMaterial() {
     setIsModalOpen(true);

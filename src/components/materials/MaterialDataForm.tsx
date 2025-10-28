@@ -19,6 +19,7 @@ import {
 import type { MaterialsType } from "./Materials";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
+import { Button } from "@elements/Button";
 
 interface MaterialDataFormProps {
   materialData?: MaterialsType;
@@ -123,6 +124,14 @@ export function MaterialDataForm({
 
     setLastField(null);
   }, [cost, value, profit]);
+
+  async function handleDeleteMaterial(id: string) {
+    const result = await fetchWithToken({
+      path: `/materials/${id}`,
+      method: "DELETE",
+    });
+    console.log(result);
+  }
 
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -294,14 +303,19 @@ export function MaterialDataForm({
             errors={validationErrors}
           />
         </div>
-        <button
-          className={
-            "bg-blue-800 p-2 max-w-2xl rounded-md font-semibold text-white"
-          }
-          type={"submit"}
-        >
-          Salvar
-        </button>
+        <Button text="Salvar" type={"submit"} className={"bg-blue-700 px-4"} />
+        {materialData?.is_disabled === false ? (
+          <Button
+            text="Excluir"
+            type={"button"}
+            className={"bg-red-700"}
+            onClick={() => {
+              handleDeleteMaterial(materialData.id);
+            }}
+          />
+        ) : (
+          false
+        )}
       </div>
       {isSupModalOpen ? (
         <SelectSupplierModal
