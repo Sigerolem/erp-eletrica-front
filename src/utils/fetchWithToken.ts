@@ -22,7 +22,10 @@ export async function fetchWithToken<T>({
   let response: Response;
 
   try {
-    response = await fetch(`https://sigerolem.vps-kinghost.net${path}`, {
+    const url = import.meta.env.DEV
+      ? "http://localhost:3000"
+      : "https://sigerolem.vps-kinghost.net";
+    response = await fetch(`${url}${path}`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -49,6 +52,8 @@ export async function fetchWithToken<T>({
       // error: false,
     };
   }
+
+  console.error({ error: response });
 
   return {
     code: response.status as 400,

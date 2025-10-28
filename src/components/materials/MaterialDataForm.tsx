@@ -112,7 +112,7 @@ export function MaterialDataForm({
     }
 
     if (lastField == "profit" || lastField == "cost") {
-      const newValue = (cost * 100_00) / (100_00 - profit);
+      const newValue = Math.round((cost * 100_00) / (100_00 - profit));
       setValue(newValue);
     }
 
