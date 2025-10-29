@@ -1,54 +1,62 @@
 <body>
-  <main class="w-full h-full p-4 flex items-center justify-center bg-amber-400">
-    <div
-      class="w-md bg-amber-800 flex flex-col items-center min-h-28 p-4 rounded-lg"
+  <main class="w-full h-full p-4 flex items-center justify-center bg-slate-50">
+    <form
+      id="loginForm"
+      class="w-md bg-slate-300 flex flex-col items-center min-h-28 p-4 rounded-lg"
     >
-      <div class="min-h-6 bg-gray-700 p-4">
-        <label for="">login</label>
-        <input id="login" class="ml-8 bg-white p-1 rounded-lg" type="text" />
+      <div class="min-h-6 p-4 gap-1 flex flex-col">
+        <label for="login" class="font-semibold">Login</label>
+        <input id="login" class="bg-white p-2 rounded-md" type="text" />
       </div>
-      <div class="min-h-6 bg-gray-700 p-4">
-        <label for="">senha</label>
-        <input
-          id="password"
-          class="ml-8 bg-white p-1 rounded-lg"
-          type="password"
-        />
+      <div class="min-h-6 p-4 gap-1 flex flex-col">
+        <label for="password" class="font-semibold">Senha</label>
+        <input id="password" class="bg-white p-2 rounded-md" type="password" />
       </div>
       <button
         id="loginButton"
-        onclick=""
-        class="bg-blue-700 p-4 m-2 cursor-pointer disabled:cursor-not-allowed"
+        type="submit"
+        class="bg-blue-800 p-3 font-semibold text-white rounded-md"
         >Login</button
       >
-    </div>
+    </form>
   </main>
 </body>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const loginButton = document.getElementById("loginButton");
+    const loginButton = document.getElementById(
+      "loginButton"
+    ) as HTMLButtonElement;
+    const loginForm = document.getElementById("loginForm") as HTMLFormElement;
     const loginInput = document.getElementById("login") as HTMLInputElement;
     const passInput = document.getElementById("password") as HTMLInputElement;
-    if (loginButton) {
-      loginButton.addEventListener("click", () => {
+
+    if (loginForm) {
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
         const login = loginInput.value;
         const password = passInput.value;
         if (!login || !password) {
-          alert("preencha login e senha corrretamente");
+          alert("Preencha login e senha corrretamente");
           return;
         }
+        loginForm.setAttribute("disabled", "true");
         loginButton.setAttribute("disabled", "true");
 
         loginFetch(login, password);
 
+        loginForm.removeAttribute("disabled");
         loginButton.removeAttribute("disabled");
       });
     }
   });
 
   async function loginFetch(login: string, password: string) {
-    fetch("http://localhost:3000/auth/login", {
+    const loginUrl =
+      window.location.hostname == "localhost"
+        ? "http://localhost:3000/auth/login"
+        : "https://sigerolem.vps-kinghost.net/auth/login";
+    fetch(loginUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,6 +70,7 @@
         return response.json();
       })
       .then((data: { token: string; name: string; role: string }) => {
+        console.log(data);
         localStorage.setItem("apiToken", data.token);
         localStorage.setItem("apiName", data.name);
         localStorage.setItem("apiRole", data.role);
@@ -70,6 +79,7 @@
       })
       .catch((error: Error) => {
         alert("Login failed!");
+        console.error(error);
       });
   }
 </script>

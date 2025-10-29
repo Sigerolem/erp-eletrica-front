@@ -5,7 +5,7 @@ interface SuccessResponse<T> {
 
 interface ErrorResponse {
   code: 400 | 401 | 402 | 404 | 409 | 500 | 501;
-  data: { error: string; message: string };
+  data: { error: Error | string; message: string };
 }
 
 type FetchResult<T> = SuccessResponse<T> | ErrorResponse;
@@ -29,13 +29,14 @@ export async function fetchWithToken<T>({
   ) {
     localStorage.removeItem("apiToken");
     window.location.href = "/login";
-    throw new Error("Sessão expirada");
+    console.warn("Sessão expirada");
   }
 
   try {
-    const url = import.meta.env.DEV
-      ? "http://localhost:3000"
-      : "https://sigerolem.vps-kinghost.net";
+    const url =
+      window.location.hostname == "localhost"
+        ? "http://localhost:3000"
+        : "https://sigerolem.vps-kinghost.net";
     response = await fetch(`${url}${path}`, {
       method,
       headers: {
@@ -44,31 +45,32 @@ export async function fetchWithToken<T>({
       },
       body,
     });
-  } catch (error) {
+  } catch (error: any) {
     window.alert("Erro ao se comunicar com o servidor do sistema!");
     console.error(error);
-    throw error;
+
+    return { data: { error: error, message: error.message }, code: 400 };
   }
+  const data = await response.json();
 
   if (response.status == 401) {
     localStorage.removeItem("apiToken");
-    window.location.href == "/login";
-    throw new Error("Sessão expirada");
+    window.location.href = "/login";
+    console.warn("Unauthorized", data);
+    return { code: 401, data: { error: data, message: "Unauthorized" } };
   }
 
   if (response.status == 200 || response.status == 201) {
     return {
       code: response.status as 200 | 201,
-      data: (await response.json()) as T,
-      // error: false,
+      data: data as T,
     };
   }
 
-  console.error({ error: response });
+  console.error({ error: data, response });
 
   return {
     code: response.status as 400,
-    data: await response.json(),
-    // error: true,
+    data,
   };
 }
