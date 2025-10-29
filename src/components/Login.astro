@@ -65,6 +65,7 @@
         localStorage.setItem("apiToken", data.token);
         localStorage.setItem("apiName", data.name);
         localStorage.setItem("apiRole", data.role);
+        localStorage.setItem("apiTokenDate", new Date().toLocaleDateString());
         window.location.href = "/";
       })
       .catch((error: Error) => {

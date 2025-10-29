@@ -21,6 +21,17 @@ export async function fetchWithToken<T>({
 }): Promise<FetchResult<T>> {
   let response: Response;
 
+  const lastTokenDateString = localStorage.getItem("apiTokenDate");
+  const todayDateString = new Date().toLocaleDateString();
+  if (
+    lastTokenDateString == undefined ||
+    lastTokenDateString !== todayDateString
+  ) {
+    localStorage.removeItem("apiToken");
+    window.location.href = "/login";
+    throw new Error("Sessão expirada");
+  }
+
   try {
     const url = import.meta.env.DEV
       ? "http://localhost:3000"
