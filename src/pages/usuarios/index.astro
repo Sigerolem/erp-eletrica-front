@@ -1,0 +1,12 @@
+---
+import Header from "@comp/Header.astro";
+import { Users } from "@comp/users/Users";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Materiais" transition:persist>
+  <Header title="Usuários">
+    <!-- <Materials client:only="preact" /> -->
+    <Users client:only="preact" />
+  </Header>
+</DefaultLayout>

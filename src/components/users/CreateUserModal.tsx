@@ -1,22 +1,14 @@
-import { z } from "astro/zod";
-import type { TargetedSubmitEvent } from "preact";
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type StateUpdater,
-} from "preact/hooks";
-import { Input } from "src/elements/Input";
-import { fetchWithToken } from "src/utils/fetchWithToken";
-import type { SuppliersType } from "./Suppliers";
-import { SupplierDataForm } from "./SupplierDataForm";
+import { fetchWithToken } from "@utils/fetchWithToken";
+import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
+import type { UsersType } from "./Users";
+import { UserDataForm } from "./UserDataForm";
 
-export function CreateSupplierModal({
+export function CreateUserModal({
   closeModal,
-  setSupplier,
+  setUsers,
 }: {
   closeModal: () => void;
-  setSupplier: Dispatch<StateUpdater<SuppliersType[]>>;
+  setUsers: Dispatch<StateUpdater<UsersType[]>>;
 }) {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -32,11 +24,11 @@ export function CreateSupplierModal({
     };
   }, []);
 
-  async function handleDataSubmition(supplierData: Omit<SuppliersType, "id">) {
-    const { code, data } = await fetchWithToken<{ supplier: SuppliersType }>({
-      path: "/suppliers/create",
+  async function handleDataSubmition(userData: Omit<UsersType, "id">) {
+    const { code, data } = await fetchWithToken<{ user: UsersType }>({
+      path: "/users/create",
       method: "POST",
-      body: JSON.stringify(supplierData),
+      body: JSON.stringify(userData),
     });
 
     if (code == 409) {
@@ -55,11 +47,12 @@ export function CreateSupplierModal({
     }
 
     if (code == 201) {
-      setSupplier((prev) => [data.supplier, ...prev]);
+      setUsers((prev) => [data.user, ...prev]);
       closeModal();
     } else {
       console.error(code, data);
     }
+    return null;
   }
 
   return (
@@ -74,9 +67,7 @@ export function CreateSupplierModal({
         onClick={(e) => e.stopPropagation()}
       >
         <header className={"flex justify-between mb-4"}>
-          <h2 className={"text-3xl font-semibold"}>
-            Cadastrar novo fornecedor
-          </h2>
+          <h2 className={"text-3xl font-semibold"}>Cadastrar novo usuário</h2>
           <button
             className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
             onClick={() => {
@@ -87,7 +78,7 @@ export function CreateSupplierModal({
           </button>
         </header>
         <div>
-          <SupplierDataForm doOnSubmit={handleDataSubmition} />
+          <UserDataForm doOnSubmit={handleDataSubmition} />
         </div>
       </div>
     </section>
