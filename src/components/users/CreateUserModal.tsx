@@ -24,7 +24,7 @@ export function CreateUserModal({
     };
   }, []);
 
-  async function handleDataSubmition(userData: Omit<UsersType, "id">) {
+  async function handleDataSubmition(userData: Partial<UsersType>) {
     const { code, data } = await fetchWithToken<{ user: UsersType }>({
       path: "/users/create",
       method: "POST",

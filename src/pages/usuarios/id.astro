@@ -1,0 +1,10 @@
+---
+import Header from "@comp/Header.astro";
+import { UserDetails } from "@comp/users/UserDetails";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Detalhes do Usuário" transition:persist>
+  <Header title="Detalhes do usuário" />
+  <UserDetails client:only="preact" />
+</DefaultLayout>

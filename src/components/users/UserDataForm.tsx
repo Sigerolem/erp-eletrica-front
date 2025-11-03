@@ -10,7 +10,7 @@ export function UserDataForm({
   doOnSubmit,
 }: {
   doOnSubmit: (
-    userData: Omit<UsersType, "id">
+    userData: Partial<UsersType>
   ) => Promise<{ [key: string]: string } | null>;
   userData?: UsersType;
 }) {
@@ -31,7 +31,6 @@ export function UserDataForm({
       setName(userData.name);
       setCpf(userData.cpf);
       setLogin(userData.login);
-      setPassword(userData.password);
       setRole(userData.role);
       setPhoneNumber(userData.phone_number || "");
       setAddress(userData.address || "");
@@ -67,23 +66,30 @@ export function UserDataForm({
       }));
       return;
     }
-    if (password == "") {
-      setValidationErrors((prev) => ({
-        ...prev,
-        password: "Esse campo é obrigatório.",
-      }));
-      return;
-    }
 
-    const errors = await doOnSubmit({
+    let userData = {
       name,
       address: address || null,
       phone_number: phoneNumber || null,
       cpf,
       login,
-      password,
+      password: password as string | undefined,
       role,
-    });
+    };
+
+    if (password == "") {
+      if (userData == undefined) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          password: "Esse campo é obrigatório.",
+        }));
+        return;
+      } else {
+        delete userData.password;
+      }
+    }
+
+    const errors = await doOnSubmit(userData);
 
     if (errors) {
       setValidationErrors((prev) => ({ ...prev, ...errors }));

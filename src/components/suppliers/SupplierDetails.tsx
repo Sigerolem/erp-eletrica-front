@@ -21,15 +21,15 @@ export function SupplierDetails() {
   async function handleDataSubmition(supplierData: Omit<SuppliersType, "id">) {
     const { code, data } = await fetchWithToken<{ supplier: SuppliersType }>({
       path: `/suppliers/${supplier?.id}`,
-      method: "PATCH",
+      method: "PUT",
       body: JSON.stringify(supplierData),
     });
 
     if (code == 409) {
       const errors = {} as { [key: string]: string };
-      if (data.error.includes("entity.name")) {
+      if (data.message.includes("entity.name")) {
         errors.name = "Esse nome já foi utilizado";
-      } else if (data.error.includes("entity.cnpj")) {
+      } else if (data.message.includes("entity.cnpj")) {
         errors.cnpj = "Esse CNPJ já foi cadastrado";
       }
       return errors;

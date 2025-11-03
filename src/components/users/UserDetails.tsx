@@ -1,31 +1,28 @@
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
-import { MaterialDataForm } from "./MaterialDataForm";
-import type { MaterialsType } from "./Materials";
+import type { UsersType } from "./Users";
+import { UserDataForm } from "./UserDataForm";
 
-export function MaterialDetails() {
-  const [material, setMaterial] = useState<MaterialsType | null>(null);
+export function UserDetails() {
+  const [user, setUser] = useState<UsersType | null>(null);
 
   useEffect(() => {
     const path = new URL(window.location.href);
-
     const id = path.hash.replace("#", "").replaceAll("/", "");
-    // : path.pathname.replace("/materiais/id/", "");
-
-    fetchWithToken<{ material: MaterialsType }>({
-      path: `/materials/${id}`,
+    fetchWithToken<{ user: UsersType }>({
+      path: `/users/${id}`,
     }).then((result) => {
       if (result.code == 200) {
-        setMaterial(result.data.material);
+        setUser(result.data.user);
       }
     });
   }, []);
 
-  async function handleDataSubmition(materialData: Partial<MaterialsType>) {
-    const { code, data } = await fetchWithToken<{ supplier: MaterialsType }>({
-      path: `/materials/${material?.id}`,
+  async function handleDataSubmition(userData: Partial<UsersType>) {
+    const { code, data } = await fetchWithToken<{ user: UsersType }>({
+      path: `/users/${user?.id}`,
       method: "PUT",
-      body: JSON.stringify(materialData),
+      body: JSON.stringify(userData),
     });
 
     if (code == 409) {
@@ -40,18 +37,16 @@ export function MaterialDetails() {
 
     if (code == 200 || code == 201) {
       window.alert("Altterações salvas");
-      return null;
     }
-
-    return { erro: "Alguma coisa" };
+    return null;
   }
 
   return (
     <main>
-      {material ? (
-        <MaterialDataForm
+      {user ? (
+        <UserDataForm
           doOnSubmit={handleDataSubmition}
-          materialData={material}
+          userData={user ?? undefined}
         />
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
