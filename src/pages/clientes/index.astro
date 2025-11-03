@@ -1,0 +1,11 @@
+---
+import Header from "@comp/Header.astro";
+import { Customers } from "@comp/curstomers/Customers";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Clientes" transition:persist>
+  <Header title="Clientes">
+    <Customers client:only="preact" />
+  </Header>
+</DefaultLayout>

@@ -30,7 +30,8 @@ export type PurchasesType = {
   updated_at: string;
 };
 
-const PURCHASE_URL = import.meta.env.DEV ? "/compras/id#" : "/compras/id/#";
+const PURCHASE_URL =
+  window.location.hostname == "localhost" ? "/compras/id#" : "/compras/id/#";
 
 export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);

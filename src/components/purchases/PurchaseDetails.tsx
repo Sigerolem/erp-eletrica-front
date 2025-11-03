@@ -1,18 +1,17 @@
-import { MaterialDataForm } from "@comp/materials/MaterialDataForm";
-import type { MaterialsType } from "@comp/materials/Materials";
-import { fetchWithToken } from "@utils/fetchWithToken";
-import { useState, useEffect } from "preact/hooks";
-import type { PurchasesType } from "./Purchases";
-import { PurchaseDataForm } from "./PurchaseDataForm";
 import { Button } from "@elements/Button";
-
-const PURCHASE_DELIVERY_URL = import.meta.env.DEV
-  ? "/compras/recebimento/id#"
-  : "/compras/recebimento/id/#";
+import { fetchWithToken } from "@utils/fetchWithToken";
+import { useEffect, useState } from "preact/hooks";
+import { PurchaseDataForm } from "./PurchaseDataForm";
+import type { PurchasesType } from "./Purchases";
 
 export function PurchaseDetails() {
   const [purchase, setPurchase] = useState<PurchasesType | null>(null);
   const [id, setId] = useState("");
+
+  const PURCHASE_DELIVERY_URL =
+    window.location.hostname == "localhost"
+      ? "/compras/recebimento/id#"
+      : "/compras/recebimento/id/#";
 
   useEffect(() => {
     const path = new URL(window.location.href);

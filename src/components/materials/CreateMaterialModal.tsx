@@ -46,10 +46,10 @@ export function CreateMaterialModal({
 
     if (code == 409) {
       let erro = {} as { [key: string]: string };
-      if (data.error.includes("name")) {
+      if (data.message.includes("name")) {
         erro = { ...erro, name: "Esse material já foi previamente cadastrado" };
       }
-      if (data.error.includes("barcode")) {
+      if (data.message.includes("barcode")) {
         erro = { ...erro, barcode: "Esse codigo de barras ja está cadastrado" };
       }
       return erro;
@@ -62,7 +62,9 @@ export function CreateMaterialModal({
 
   return (
     <section
-      className={"absolute top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-10"}
+      className={
+        "absolute top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-10 flex flex-col justify-center"
+      }
       onClick={() => {
         closeModal();
       }}

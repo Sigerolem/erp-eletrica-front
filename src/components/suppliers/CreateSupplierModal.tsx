@@ -1,15 +1,7 @@
-import { z } from "astro/zod";
-import type { TargetedSubmitEvent } from "preact";
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type StateUpdater,
-} from "preact/hooks";
-import { Input } from "src/elements/Input";
+import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
 import { fetchWithToken } from "src/utils/fetchWithToken";
-import type { SuppliersType } from "./Suppliers";
 import { SupplierDataForm } from "./SupplierDataForm";
+import type { SuppliersType } from "./Suppliers";
 
 export function CreateSupplierModal({
   closeModal,
@@ -64,7 +56,9 @@ export function CreateSupplierModal({
 
   return (
     <section
-      className={"absolute top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-10"}
+      className={
+        "absolute top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-10 flex flex-col justify-center"
+      }
       onClick={() => {
         closeModal();
       }}

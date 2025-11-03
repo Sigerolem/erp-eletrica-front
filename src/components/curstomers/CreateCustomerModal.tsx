@@ -1,14 +1,14 @@
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
-import type { UsersType } from "./Users";
-import { UserDataForm } from "./UserDataForm";
+import { CustomerDataForm } from "./CustomerDataForm";
+import type { CustomersType } from "./Customers";
 
-export function CreateUserModal({
+export function CreateCustomerModal({
   closeModal,
-  setUsers,
+  setCustomers,
 }: {
   closeModal: () => void;
-  setUsers: Dispatch<StateUpdater<UsersType[]>>;
+  setCustomers: Dispatch<StateUpdater<CustomersType[]>>;
 }) {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -24,11 +24,11 @@ export function CreateUserModal({
     };
   }, []);
 
-  async function handleDataSubmition(userData: Partial<UsersType>) {
-    const { code, data } = await fetchWithToken<{ user: UsersType }>({
-      path: "/users/create",
+  async function handleDataSubmition(customerData: Partial<CustomersType>) {
+    const { code, data } = await fetchWithToken<{ customer: CustomersType }>({
+      path: "/customers/create",
       method: "POST",
-      body: JSON.stringify(userData),
+      body: JSON.stringify(customerData),
     });
 
     if (code == 409) {
@@ -47,7 +47,7 @@ export function CreateUserModal({
     }
 
     if (code == 201) {
-      setUsers((prev) => [data.user, ...prev]);
+      setCustomers((prev) => [data.customer, ...prev]);
       closeModal();
     } else {
       console.error(code, data);
@@ -69,7 +69,7 @@ export function CreateUserModal({
         onClick={(e) => e.stopPropagation()}
       >
         <header className={"flex justify-between mb-4"}>
-          <h2 className={"text-3xl font-semibold"}>Cadastrar novo usuário</h2>
+          <h2 className={"text-3xl font-semibold"}>Cadastrar novo customer</h2>
           <button
             className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
             onClick={() => {
@@ -80,7 +80,7 @@ export function CreateUserModal({
           </button>
         </header>
         <div>
-          <UserDataForm doOnSubmit={handleDataSubmition} />
+          <CustomerDataForm doOnSubmit={handleDataSubmition} />
         </div>
       </div>
     </section>

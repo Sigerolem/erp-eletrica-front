@@ -18,7 +18,10 @@ export function Users() {
   const [users, setUsers] = useState<UsersType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const USER_URL = import.meta.env.DEV ? "/usuarios/id#" : "/usuarios/id/#";
+  const USER_URL =
+    window.location.hostname == "localhost"
+      ? "/usuarios/id#"
+      : "/usuarios/id/#";
 
   function handleNewUser() {
     setIsModalOpen(true);

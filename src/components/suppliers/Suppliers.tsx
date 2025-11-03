@@ -23,9 +23,10 @@ export function Suppliers() {
     setIsModalOpen(true);
   }
 
-  const SUPPLIER_URL = import.meta.env.DEV
-    ? "/fornecedores/id#"
-    : "/fornecedores/id/#";
+  const SUPPLIER_URL =
+    window.location.hostname == "localhost"
+      ? "/fornecedores/id#"
+      : "/fornecedores/id/#";
 
   useEffect(() => {
     fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
