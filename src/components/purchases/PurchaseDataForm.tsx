@@ -103,6 +103,7 @@ export function PurchaseDataForm({
       setSelectedSupplier(purchaseData.supplier);
       setPurchaseItems(purchaseData.purchase_items || []);
     }
+    console.log(isTracked, purchaseData?.is_tracked);
   }, [purchaseData]);
 
   function handleNewPurchaseMaterial(material: MaterialsType) {
@@ -116,7 +117,6 @@ export function PurchaseDataForm({
         purchase_id: purchaseData?.id || undefined,
         amount_delivered: 0,
         new_unit_cost: material.avg_cost,
-        is_tracked: isTracked,
       },
     ]);
   }
@@ -136,6 +136,7 @@ export function PurchaseDataForm({
       window.alert("Adicione pelo menos um material à compra.");
       return;
     }
+    console.log("submited", isTracked);
 
     const purchaseData: Partial<PurchasesType> = {
       status,
@@ -317,7 +318,6 @@ export function PurchaseDataForm({
             <ReceivePurchaseItemsList
               purchaseItems={purchaseItems}
               setPurchaseItems={setPurchaseItems}
-              purchaseStatus={purchaseData.status}
             />
           ) : (
             <PurchaseItemsList
