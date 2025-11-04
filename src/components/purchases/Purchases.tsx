@@ -24,6 +24,7 @@ export type PurchasesType = {
   purchase_cost: number;
   tax_cost: number;
   status: string;
+  is_tracked: boolean;
   supplier: SuppliersType;
   supplier_id: string;
   purchase_items?: PurchaseItemsType[];

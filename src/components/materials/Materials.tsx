@@ -9,11 +9,12 @@ export type MaterialsType = {
   id: string;
   name: string;
   barcode: string | null;
-  current_amount: number;
   pkg_size: number;
   min_amount: number;
   ideal_amount: number;
   reserved_amount: number;
+  current_amount: number;
+  tracked_amount: number;
   avg_cost: number;
   profit: number;
   value: number;

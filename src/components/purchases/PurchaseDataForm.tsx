@@ -44,6 +44,7 @@ export function PurchaseDataForm({
 
   const [id, setId] = useState("");
   const [nf, setNF] = useState("");
+  const [isTracked, setIsTracked] = useState(false);
   const [status, setStatus] = useState("draft");
   const [purchaseCost, setPurchaseCost] = useState(0);
   const [deliveryCost, setDeliveryCost] = useState(0);
@@ -94,6 +95,7 @@ export function PurchaseDataForm({
     if (purchaseData !== undefined) {
       setId(purchaseData.id);
       setNF(purchaseData.nf || "");
+      setIsTracked(purchaseData.is_tracked);
       setStatus(purchaseData.status);
       setPurchaseCost(purchaseData.purchase_cost);
       setDeliveryCost(purchaseData.delivery_cost);
@@ -113,7 +115,8 @@ export function PurchaseDataForm({
         old_unit_cost: material.avg_cost,
         purchase_id: purchaseData?.id || undefined,
         amount_delivered: 0,
-        new_unit_cost: 0,
+        new_unit_cost: material.avg_cost,
+        is_tracked: isTracked,
       },
     ]);
   }
@@ -140,6 +143,7 @@ export function PurchaseDataForm({
       delivery_cost: deliveryCost,
       tax_cost: taxCost,
       purchase_cost: purchaseCost,
+      is_tracked: isTracked,
       supplier: {
         id: selectedSupplier.id,
         name: selectedSupplier.name,
@@ -181,6 +185,25 @@ export function PurchaseDataForm({
               }}
               errors={validationErrors}
             />
+            <div className={"flex flex-col gap-1 items-start"}>
+              <label htmlFor="isTracked" className={"font-semibold"}>
+                E.S. Elétrica
+              </label>
+              <input
+                name="isTracked"
+                className={
+                  "min-w-8 min-h-8 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                }
+                type="checkbox"
+                checked={isTracked}
+                onChange={(e) => {
+                  setIsTracked(e.currentTarget.checked);
+                }}
+                // value={isTracked}
+              />
+            </div>
+          </div>
+          <div className={"flex gap-4"}>
             <Input
               label="Custo"
               name="purchaseCost"
@@ -195,8 +218,6 @@ export function PurchaseDataForm({
               }}
               errors={validationErrors}
             />
-          </div>
-          <div className={"flex gap-4"}>
             <Input
               label="Frete"
               name="deliveryCost"
@@ -296,6 +317,7 @@ export function PurchaseDataForm({
             <ReceivePurchaseItemsList
               purchaseItems={purchaseItems}
               setPurchaseItems={setPurchaseItems}
+              purchaseStatus={purchaseData.status}
             />
           ) : (
             <PurchaseItemsList

@@ -42,6 +42,7 @@ export function MaterialDataForm({
   const [name, setName] = useState("");
   const [barcode, setBarcode] = useState("");
   const [currentAmount, setCurrentAmount] = useState(0);
+  const [trackedAmount, setTrackedAmount] = useState(0);
   const [reservedAmount, setReservedAmount] = useState(0);
   const [minAmount, setMinAmount] = useState(0);
   const [idealAmount, setIdealAmount] = useState(0);
@@ -60,6 +61,7 @@ export function MaterialDataForm({
       setName(materialData.name);
       setBarcode(materialData.barcode || "");
       setCurrentAmount(materialData.current_amount);
+      setTrackedAmount(materialData.tracked_amount);
       setReservedAmount(materialData.reserved_amount);
       setMinAmount(materialData.min_amount);
       setIdealAmount(materialData.ideal_amount);
@@ -148,6 +150,7 @@ export function MaterialDataForm({
       supplier_id: supplierSelected?.id || null,
       supplier: supplierSelected || undefined,
       current_amount: currentAmount,
+      tracked_amount: trackedAmount,
       reserved_amount: reservedAmount,
     };
 
@@ -192,6 +195,20 @@ export function MaterialDataForm({
               validateIntFieldOnBlur(
                 e,
                 setCurrentAmount,
+                setValidationErrors,
+                {}
+              );
+            }}
+            errors={validationErrors}
+          />
+          <Input
+            label="Quantidade da PJ"
+            name="trackedAmount"
+            value={trackedAmount}
+            onBlur={(e) => {
+              validateIntFieldOnBlur(
+                e,
+                setTrackedAmount,
                 setValidationErrors,
                 {}
               );

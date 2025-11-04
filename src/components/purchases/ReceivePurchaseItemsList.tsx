@@ -10,22 +10,40 @@ import { BrlStringFromCents } from "@utils/formating";
 import { parseFloatFromString } from "@utils/inputValidation";
 
 export function ReceivePurchaseItemsList({
-  purchaseItems,
-  setPurchaseItems,
+  purchaseItems: outterState,
+  setPurchaseItems: setOutterState,
+  purchaseStatus,
 }: {
   purchaseItems: Partial<PurchaseItemsType>[];
   setPurchaseItems: Dispatch<StateUpdater<Partial<PurchaseItemsType>[]>>;
+  purchaseStatus: string;
 }) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+  const [purchaseItems, setPurchaseItems] = useState<
+    Partial<PurchaseItemsType>[]
+  >([]);
+
+  useEffect(() => {
+    if (purchaseStatus == "shipped") {
+      setPurchaseItems(
+        outterState.map((item) => ({
+          ...item,
+          new_unit_cost: item.old_unit_cost,
+        }))
+      );
+    } else {
+      setPurchaseItems(outterState);
+    }
+  }, [outterState]);
 
   function handleUpdateRequestedAmount(
     materialId: string,
     amount: number,
     isDeliveryAmount?: boolean
   ) {
-    setPurchaseItems((prev) =>
+    setOutterState((prev) =>
       prev.map((item) => {
         if (item.material_id == materialId) {
           if (isDeliveryAmount) {
@@ -41,7 +59,7 @@ export function ReceivePurchaseItemsList({
   }
 
   function handleUpdateNewCost(materialId: string, amount: number) {
-    setPurchaseItems((prev) =>
+    setOutterState((prev) =>
       prev.map((item) => {
         if (item.material_id == materialId) {
           return { ...item, new_unit_cost: amount };
@@ -64,8 +82,8 @@ export function ReceivePurchaseItemsList({
           <span>Estoque Atual</span>
         </div>
         <div>Solicitado</div>
-        <div>Recebido</div>
-        <div>Novo Custo Unitário</div>
+        <div>Entregue</div>
+        <div>Custo Unitário</div>
       </header>
 
       {purchaseItems.map((item) => {
