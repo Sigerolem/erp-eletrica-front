@@ -1,6 +1,5 @@
 import type { TargetedFocusEvent } from "preact";
 import type { Dispatch, StateUpdater } from "preact/hooks";
-import { formatFloatWithDecimalDigits } from "./formating";
 
 type StringFieldValidationOptions = {
   min?: number;

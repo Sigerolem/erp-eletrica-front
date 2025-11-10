@@ -6,6 +6,14 @@ import { fetchWithToken } from "src/utils/fetchWithToken";
 import { CreatePurchaseModal } from "./CreatePurchaseModal";
 import type { MaterialsType } from "@comp/materials/Materials";
 
+export type PurchaseStatusType =
+  | "draft"
+  | "requested"
+  | "shipped"
+  | "received"
+  | "finished"
+  | "cancelled";
+
 export type PurchaseItemsType = {
   id: string;
   material_id: string;
@@ -23,7 +31,7 @@ export type PurchasesType = {
   delivery_cost: number;
   purchase_cost: number;
   tax_cost: number;
-  status: string;
+  status: PurchaseStatusType;
   is_tracked: boolean;
   supplier: SuppliersType;
   supplier_id: string;

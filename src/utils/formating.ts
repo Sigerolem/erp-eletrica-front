@@ -1,3 +1,5 @@
+import type { PurchaseStatusType } from "@comp/purchases/Purchases";
+
 export function changeDotsCommas(text: string) {
   return text.replaceAll(",", "*").replaceAll(".", ",").replaceAll("*", ".");
 }
@@ -27,21 +29,15 @@ export function formatFloatWithDecimalDigits(
   return floatValue;
 }
 
-export function formatPurchaseStatusEnum(status: string) {
-  const purchaseStatus =
-    status == "draft"
-      ? "Rascunho"
-      : status == "requested"
-      ? "Pedido"
-      : status == "shipped"
-      ? "Aguardando entrega"
-      : status == "received"
-      ? "Recebida"
-      : status == "finished"
-      ? "Concluída"
-      : status == "cancelled"
-      ? "Cancelada"
-      : "Erro, verificar status no server";
+export function formatPurchaseStatusEnum(status: PurchaseStatusType) {
+  const PurchaseStatusMap = {
+    draft: "Rascunho",
+    requested: "Pedido",
+    shipped: "Aguardando entrega",
+    received: "Recebida",
+    finished: "Concluída",
+    cancelled: "Cancelada",
+  };
 
-  return purchaseStatus;
+  return PurchaseStatusMap[status];
 }

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
-import type { PurchaseItemsType, PurchasesType } from "./Purchases";
+import type {
+  PurchaseItemsType,
+  PurchaseStatusType,
+  PurchasesType,
+} from "./Purchases";
 import type { MaterialsType } from "@comp/materials/Materials";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { SelectSupplierModal } from "@comp/suppliers/SelectSupplierModal";
@@ -15,6 +19,7 @@ import {
   validateFloatFieldOnBlur,
   validateStringFieldOnBlur,
 } from "@utils/inputValidation";
+import { Checkbox } from "@elements/Checkbox";
 
 export function PurchaseDataForm({
   purchaseData,
@@ -45,7 +50,7 @@ export function PurchaseDataForm({
   const [id, setId] = useState("");
   const [nf, setNF] = useState("");
   const [isTracked, setIsTracked] = useState(false);
-  const [status, setStatus] = useState("draft");
+  const [status, setStatus] = useState<PurchaseStatusType>("draft");
   const [purchaseCost, setPurchaseCost] = useState(0);
   const [deliveryCost, setDeliveryCost] = useState(0);
   const [taxCost, setTaxCost] = useState(0);
@@ -186,23 +191,12 @@ export function PurchaseDataForm({
               }}
               errors={validationErrors}
             />
-            <div className={"flex flex-col gap-1 items-start"}>
-              <label htmlFor="isTracked" className={"font-semibold"}>
-                E.S. Elétrica
-              </label>
-              <input
-                name="isTracked"
-                className={
-                  "min-w-8 min-h-8 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                }
-                type="checkbox"
-                checked={isTracked}
-                onChange={(e) => {
-                  setIsTracked(e.currentTarget.checked);
-                }}
-                // value={isTracked}
-              />
-            </div>
+            <Checkbox
+              label="NF para E.S. Elétrica"
+              name="isTracked"
+              checked={isTracked}
+              setChecked={setIsTracked}
+            />
           </div>
           <div className={"flex gap-4"}>
             <Input
