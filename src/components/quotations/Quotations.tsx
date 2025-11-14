@@ -1,11 +1,10 @@
 import type { CustomersType } from "@comp/customers/Customers";
 import type { MaterialsType } from "@comp/materials/Materials";
+import { Button } from "@elements/Button";
 import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
-import { CreateQuotationModal } from "./CreateQuotationModal";
-import { Button } from "@elements/Button";
 
 export type QuotationItemTypeType =
   | "inventory_material"
@@ -80,7 +79,7 @@ export function Quotations() {
       : "/orcamentos/id/#";
 
   function handleNewCustomer() {
-    setIsModalOpen(true);
+    window.location.href = "/orcamentos/novo";
   }
 
   useEffect(() => {
@@ -98,14 +97,6 @@ export function Quotations() {
 
   return (
     <main>
-      {isModalOpen ? (
-        <CreateQuotationModal
-          closeModal={() => {
-            setIsModalOpen(false);
-          }}
-          setQuotations={setQuotations}
-        />
-      ) : null}
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de orçamentos</h3>
