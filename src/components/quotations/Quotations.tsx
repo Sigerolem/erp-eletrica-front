@@ -1,14 +1,22 @@
+import type { CustomersType } from "@comp/customers/Customers";
+import type { MaterialsType } from "@comp/materials/Materials";
 import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
+import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
+import { CreateQuotationModal } from "./CreateQuotationModal";
 
 export type QuotationItemTypeType =
   | "inventory_material"
-  | "occasional_material";
+  | "occasional_material"
+  | "private_service"
+  | "public_service"
+  | "third_party_service"
+  | "exceptional";
 
 export type QuotationItemsType = {
   id: string;
-  type: string;
+  type: QuotationItemTypeType;
   name: string;
   unit: string;
   expected_amount: number;
@@ -20,16 +28,33 @@ export type QuotationItemsType = {
   unit_value: number;
   is_private: boolean;
   material_id: string | null;
+  material: MaterialsType | null;
   quotation_id: string;
+  created_at?: string;
 };
 
-export type QuotationsStatusType = "draft" | "cancelled";
+export type QuotationsStatusType =
+  | "draft"
+  | "q_awaiting"
+  | "q_approved"
+  | "os_awaiting"
+  | "os_ongoing"
+  | "os_done_mo"
+  | "os_done_mat"
+  | "awaiting_closure"
+  | "awaiting_delivery"
+  | "delivered"
+  | "awaiting_payment"
+  | "finished"
+  | "denied"
+  | "cancelled";
 
 export type QuotationsType = {
   id: string;
   status: QuotationsStatusType;
-  description: string;
   tool_list: string;
+  description: string;
+  expected_duration: number;
   private_comments: string;
   public_comments: string;
   purchase_order: string;
@@ -40,7 +65,8 @@ export type QuotationsType = {
   direct_cost: number;
   direct_value: number;
   customer_id: string;
-  items: QuotationItemsType[];
+  customer: CustomersType;
+  items: Partial<QuotationItemsType>[];
 };
 
 export function Quotations() {
@@ -71,14 +97,14 @@ export function Quotations() {
 
   return (
     <main>
-      {/* {isModalOpen ? (
-      //   <CreateCustomerModal
-      //     closeModal={() => {
-      //       setIsModalOpen(false);
-      //     }}
-      //     setCustomers={setCustomers}
-      //   />
-      // ) : null} */}
+      {isModalOpen ? (
+        <CreateQuotationModal
+          closeModal={() => {
+            setIsModalOpen(false);
+          }}
+          setQuotations={setQuotations}
+        />
+      ) : null}
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de orçamentos</h3>
@@ -90,16 +116,16 @@ export function Quotations() {
           </button>
         </header>
         <Table>
-          <THead collumns={[["Nome", "CNPJ"], ["Celular"]]} />
+          <THead collumns={[["Descrição", "Cliente"], ["Situação"]]} />
           <tbody>
             {quotations.map((quotation) => (
               <Tr key={quotation.id}>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.id}</p>
-                  <p className={"text-green-700"}>{quotation.status ?? ""}</p>
+                  <p>{quotation.description}</p>
+                  <p className={"text-green-700"}>{quotation.customer.name}</p>
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.description}</p>
+                  <p>{formatQuotationStatusEnum(quotation.status)}</p>
                 </Td>
               </Tr>
             ))}

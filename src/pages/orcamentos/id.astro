@@ -1,0 +1,10 @@
+---
+import Header from "@comp/Header.astro";
+import { QuotationDetails } from "@comp/quotations/QuotationDetails";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Detalhes do Orçamento" transition:persist>
+  <Header title="Detalhes do orçamento" />
+  <QuotationDetails client:only="preact" />
+</DefaultLayout>

@@ -8,7 +8,7 @@ type StringFieldValidationOptions = {
 };
 
 export function validateStringFieldOnBlur(
-  e: TargetedFocusEvent<HTMLInputElement>,
+  e: TargetedFocusEvent<HTMLInputElement | HTMLTextAreaElement>,
   setValue: Dispatch<StateUpdater<string>>,
   setErrors: Dispatch<StateUpdater<{ [key: string]: string }>>,
   options: StringFieldValidationOptions

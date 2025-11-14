@@ -67,7 +67,7 @@ export function CreatePurchaseModal({
       }}
     >
       <div
-        className={"bg-blue-50 p-8 opacity-100 rounded-md"}
+        className={"bg-blue-50 p-8 opacity-100 rounded-md overflow-scroll"}
         onClick={(e) => e.stopPropagation()}
       >
         <header className={"flex justify-between mb-4"}>

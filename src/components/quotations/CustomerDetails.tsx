@@ -1,6 +1,6 @@
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
-import { CustomerDataForm } from "./CustomerDataForm";
+import { CustomerDataForm } from "./QuotationDataForm";
 import type { CustomersType } from "./Quotations";
 
 export function CustomerDetails() {

@@ -1,7 +1,7 @@
 import type { FormHTMLAttributes, JSX } from "preact";
 
 interface DataFormProps extends FormHTMLAttributes {
-  children: JSX.Element[];
+  children: (JSX.Element | undefined)[];
 }
 
 export function DataForm({ children, className, ...rest }: DataFormProps) {
