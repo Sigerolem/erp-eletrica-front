@@ -7,6 +7,7 @@ import {
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
+import { Button } from "@elements/Button";
 
 export function CreateMaterialModal({
   closeModal,
@@ -75,17 +76,18 @@ export function CreateMaterialModal({
       >
         <header className={"flex justify-between mb-4"}>
           <h2 className={"text-3xl font-semibold"}>Cadastrar novo material</h2>
-          <button
+          <Button
+            text="Cancelar"
             className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
             onClick={() => {
               closeModal();
             }}
-          >
-            Cancelar
-          </button>
+          />
         </header>
         <div>
-          <MaterialDataForm doOnSubmit={onFormSubmit} />
+          <MaterialDataForm doOnSubmit={onFormSubmit}>
+            <Button text="Salvar" type={"submit"} />
+          </MaterialDataForm>
         </div>
       </div>
     </section>

@@ -9,7 +9,7 @@ import {
   validateIntFieldOnBlur,
   validateStringFieldOnBlur,
 } from "@utils/inputValidation";
-import type { TargetedSubmitEvent } from "preact";
+import type { JSX, TargetedSubmitEvent } from "preact";
 import {
   useEffect,
   useState,
@@ -26,11 +26,13 @@ interface MaterialDataFormProps {
   doOnSubmit: (
     material: Partial<MaterialsType>
   ) => Promise<{ [key: string]: string } | null>;
+  children: JSX.Element;
 }
 
 export function MaterialDataForm({
   materialData,
   doOnSubmit,
+  children,
 }: MaterialDataFormProps) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -320,12 +322,12 @@ export function MaterialDataForm({
             errors={validationErrors}
           />
         </div>
-        <Button text="Salvar" type={"submit"} className={"bg-blue-700 px-4"} />
+        {children}
         {materialData?.is_disabled === false ? (
           <Button
             text="Excluir"
             type={"button"}
-            className={"bg-red-700"}
+            className={"bg-red-700 text-white"}
             onClick={() => {
               handleDeleteMaterial(materialData.id);
             }}

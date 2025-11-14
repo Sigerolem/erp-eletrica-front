@@ -72,22 +72,21 @@ export function CreatePurchaseModal({
       >
         <header className={"flex justify-between mb-4"}>
           <h2 className={"text-3xl font-semibold"}>Novo pedido de compra</h2>
-          <button
-            className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
+          <Button
+            text="Cancelar"
+            className={"bg-red-700 text-white"}
             onClick={() => {
               closeModal();
             }}
-          >
-            Cancelar
-          </button>
+          />
         </header>
         <div>
           <PurchaseDataForm doOnSubmit={onFormSubmit}>
             <div className={"w-full justify-stretch flex"}>
               <Button
-                text={"salvar"}
+                text={"Salvar"}
                 type={"submit"}
-                className={"bg-blue-700 flex-1"}
+                className={"bg-blue-700 flex-1 text-white"}
               />
             </div>
           </PurchaseDataForm>

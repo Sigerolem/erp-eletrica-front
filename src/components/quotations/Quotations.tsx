@@ -5,6 +5,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
 import { CreateQuotationModal } from "./CreateQuotationModal";
+import { Button } from "@elements/Button";
 
 export type QuotationItemTypeType =
   | "inventory_material"
@@ -108,12 +109,7 @@ export function Quotations() {
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de orçamentos</h3>
-          <button
-            className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
-            onClick={handleNewCustomer}
-          >
-            Novo orçamento
-          </button>
+          <Button text="Novo orçamento" onClick={handleNewCustomer} />
         </header>
         <Table>
           <THead collumns={[["Descrição", "Cliente"], ["Situação"]]} />

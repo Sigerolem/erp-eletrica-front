@@ -2,6 +2,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
 import { CustomerDataForm } from "./CustomerDataForm";
 import type { CustomersType } from "./Customers";
+import { Button } from "@elements/Button";
 
 export function CreateCustomerModal({
   closeModal,
@@ -69,18 +70,19 @@ export function CreateCustomerModal({
         onClick={(e) => e.stopPropagation()}
       >
         <header className={"flex justify-between mb-4"}>
-          <h2 className={"text-3xl font-semibold"}>Cadastrar novo customer</h2>
-          <button
+          <h2 className={"text-3xl font-semibold"}>Cadastrar novo cliente</h2>
+          <Button
+            text="Cancelar"
             className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
             onClick={() => {
               closeModal();
             }}
-          >
-            Cancelar
-          </button>
+          />
         </header>
         <div>
-          <CustomerDataForm doOnSubmit={handleDataSubmition} />
+          <CustomerDataForm doOnSubmit={handleDataSubmition}>
+            <Button text="Salvar" type={"submit"} />
+          </CustomerDataForm>
         </div>
       </div>
     </section>

@@ -5,6 +5,7 @@ import { Table, Td, THead, Tr } from "src/elements/Table";
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { CreatePurchaseModal } from "./CreatePurchaseModal";
 import type { MaterialsType } from "@comp/materials/Materials";
+import { Button } from "@elements/Button";
 
 export type PurchaseStatusType =
   | "draft"
@@ -72,14 +73,12 @@ export function Purchases() {
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de compras</h3>
-          <button
-            className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
+          <Button
+            text="Nova compra"
             onClick={() => {
               setIsModalOpen(true);
             }}
-          >
-            Nova compra
-          </button>
+          />
         </header>
         <Table>
           <THead

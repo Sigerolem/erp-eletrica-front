@@ -1,18 +1,20 @@
 import { useEffect, useState } from "preact/hooks";
-import type { TargetedSubmitEvent } from "preact";
+import type { JSX, TargetedSubmitEvent } from "preact";
 import { Input } from "@elements/Input";
 import { DataForm } from "@elements/DataForm";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
-import type { CustomersType } from "@comp/curstomers/Customers";
+import type { CustomersType } from "@comp/customers/Customers";
 
 export function CustomerDataForm({
   customerData,
   doOnSubmit,
+  children,
 }: {
   doOnSubmit: (
     customerData: Partial<CustomersType>
   ) => Promise<{ [key: string]: string } | null>;
   customerData?: CustomersType;
+  children: JSX.Element;
 }) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -160,16 +162,7 @@ export function CustomerDataForm({
           });
         }}
       />
-      <div className={"flex gap-4 justify-end"}>
-        <button
-          className={
-            "bg-blue-800 p-2 max-w-2xl rounded-md font-semibold text-white"
-          }
-          type={"submit"}
-        >
-          Salvar
-        </button>
-      </div>
+      {children}
     </DataForm>
   );
 }

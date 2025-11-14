@@ -92,21 +92,24 @@ export function CreateQuotationModal({
       >
         <header className={"flex justify-between mb-4"}>
           <h2 className={"text-3xl font-semibold"}>Cadastrar novo orçamento</h2>
-          <button
-            className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
+          <Button
+            text="Cancelar"
+            className={"bg-red-700 text-white"}
             onClick={() => {
               closeModal();
             }}
-          >
-            Cancelar
-          </button>
+          />
         </header>
         <div>
           <QuotationDataForm
             doOnSubmit={handleDataSubmition}
             customers={customers}
           >
-            <Button className={"bg-blue-700"} type={"submit"} text="Salvar" />
+            <Button
+              className={"bg-blue-700 text-white"}
+              type={"submit"}
+              text="Salvar"
+            />
           </QuotationDataForm>
         </div>
       </div>

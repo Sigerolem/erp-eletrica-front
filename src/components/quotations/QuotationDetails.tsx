@@ -32,6 +32,7 @@ export function QuotationDetails() {
 
     console.log(code, data, quotationData);
     if (code == 200) {
+      window.alert("Alterações salvas com sucesso");
     }
     return null;
   }

@@ -108,7 +108,6 @@ export function PurchaseDataForm({
       setSelectedSupplier(purchaseData.supplier);
       setPurchaseItems(purchaseData.purchase_items || []);
     }
-    console.log(isTracked, purchaseData?.is_tracked);
   }, [purchaseData]);
 
   function handleNewPurchaseMaterial(material: MaterialsType) {

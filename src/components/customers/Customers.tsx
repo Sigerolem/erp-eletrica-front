@@ -2,6 +2,7 @@ import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { CreateCustomerModal } from "./CreateCustomerModal";
+import { Button } from "@elements/Button";
 
 export type CustomersType = {
   id: string;
@@ -52,12 +53,7 @@ export function Customers() {
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de clientes</h3>
-          <button
-            className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
-            onClick={handleNewCustomer}
-          >
-            Novo cliente
-          </button>
+          <Button text="Novo cliente" onClick={handleNewCustomer} />
         </header>
         <Table>
           <THead collumns={[["Nome", "CNPJ"], ["Celular"]]} />

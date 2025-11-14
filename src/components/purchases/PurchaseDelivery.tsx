@@ -47,7 +47,7 @@ export function PurchaseDelivery() {
       <PurchaseDataForm doOnSubmit={handleSubmit} purchaseData={purchase}>
         <div className={"flex flex-1"}>
           <Button
-            className={"bg-blue-700 flex-1"}
+            className={"bg-blue-700 flex-1 text-white"}
             type={"submit"}
             text="Confirmar recebimento com dados preenchidos"
           />

@@ -1,5 +1,5 @@
 import { Input } from "@elements/Input";
-import type { TargetedFocusEvent, TargetedSubmitEvent } from "preact";
+import type { JSX, TargetedFocusEvent, TargetedSubmitEvent } from "preact";
 import {
   useEffect,
   useState,
@@ -14,11 +14,13 @@ interface SupplierDataFormProps {
   doOnSubmit: (
     supplierData: Omit<SuppliersType, "id">
   ) => Promise<{ [key: string]: string } | undefined>;
+  children: JSX.Element;
 }
 
 export function SupplierDataForm({
   supplierData,
   doOnSubmit,
+  children,
 }: SupplierDataFormProps) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -180,16 +182,7 @@ export function SupplierDataForm({
           });
         }}
       />
-      <div className={"flex gap-4 justify-end"}>
-        <button
-          className={
-            "bg-blue-800 p-2 max-w-2xl rounded-md font-semibold text-white"
-          }
-          type={"submit"}
-        >
-          Salvar
-        </button>
-      </div>
+      {children}
     </form>
   );
 }

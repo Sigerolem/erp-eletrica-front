@@ -2,6 +2,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
+import { Button } from "@elements/Button";
 
 export function MaterialDetails() {
   const [material, setMaterial] = useState<MaterialsType | null>(null);
@@ -52,7 +53,9 @@ export function MaterialDetails() {
         <MaterialDataForm
           doOnSubmit={handleDataSubmition}
           materialData={material}
-        />
+        >
+          <Button text="Salvar" type={"submit"} />
+        </MaterialDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
           Carregando...

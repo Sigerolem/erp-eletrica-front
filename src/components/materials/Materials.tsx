@@ -4,6 +4,7 @@ import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { Table, Td, THead, Tr } from "src/elements/Table";
 import { BrlStringFromCents } from "@utils/formating";
+import { Button } from "@elements/Button";
 
 export type MaterialsType = {
   id: string;
@@ -62,12 +63,7 @@ export function Materials() {
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de materiais</h3>
-          <button
-            className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
-            onClick={handleNewMaterial}
-          >
-            Novo material
-          </button>
+          <Button text="Novo material" onClick={handleNewMaterial} />
         </header>
         <Table>
           <THead

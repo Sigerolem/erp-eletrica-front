@@ -6,6 +6,7 @@ import {
 } from "preact/hooks";
 import type { PurchaseItemsType } from "./Purchases";
 import { Input } from "@elements/Input";
+import { Button } from "@elements/Button";
 
 export function PurchaseItemsList({
   purchaseItems,
@@ -85,17 +86,13 @@ export function PurchaseItemsList({
                 className={"min-w-5"}
               />
               <div className={"ml-1"}>
-                <button
-                  className={
-                    "bg-red-600 px-1 rounded-md text-white font-semibold text-sm shadow-md"
-                  }
-                  type={"button"}
+                <Button
+                  text="X"
+                  className={"bg-red-600 py-1 text-white"}
                   onClick={() => {
                     handleRemoveItem(item.material_id || "");
                   }}
-                >
-                  X
-                </button>
+                />
               </div>
             </div>
           </div>

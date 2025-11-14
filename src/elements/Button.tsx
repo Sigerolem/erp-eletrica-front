@@ -9,7 +9,7 @@ export function Button({ text, type, className, ...rest }: ButtonProps) {
     <button
       type={type ?? "button"}
       className={`p-2 rounded-md shadow-md font-semibold ${
-        className ? "" : "bg-blue-700 text-white"
+        className ? className : "bg-blue-700 text-white"
       }`}
       {...rest}
     >

@@ -2,6 +2,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import type { SuppliersType } from "./Suppliers";
 import { SupplierDataForm } from "./SupplierDataForm";
+import { Button } from "@elements/Button";
 
 export function SupplierDetails() {
   const [supplier, setSupplier] = useState<SuppliersType | null>(null);
@@ -47,7 +48,9 @@ export function SupplierDetails() {
         <SupplierDataForm
           doOnSubmit={handleDataSubmition}
           supplierData={supplier ?? undefined}
-        />
+        >
+          <Button text="Salvar" type={"submit"} />
+        </SupplierDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
           Carregando...

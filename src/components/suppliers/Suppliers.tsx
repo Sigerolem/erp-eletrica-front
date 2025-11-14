@@ -2,6 +2,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { Table, Td, THead, Tr } from "src/elements/Table";
 import { CreateSupplierModal } from "./CreateSupplierModal";
+import { Button } from "@elements/Button";
 
 export type SuppliersType = {
   id: string;
@@ -54,12 +55,7 @@ export function Suppliers() {
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de fornecedores</h3>
-          <button
-            className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
-            onClick={handleNewSupplier}
-          >
-            Novo fornecedor
-          </button>
+          <Button text="Novo fornecedor" onClick={handleNewSupplier} />
         </header>
         <Table>
           <THead

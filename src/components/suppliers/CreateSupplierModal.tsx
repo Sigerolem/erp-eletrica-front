@@ -2,6 +2,7 @@ import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { SupplierDataForm } from "./SupplierDataForm";
 import type { SuppliersType } from "./Suppliers";
+import { Button } from "@elements/Button";
 
 export function CreateSupplierModal({
   closeModal,
@@ -71,17 +72,18 @@ export function CreateSupplierModal({
           <h2 className={"text-3xl font-semibold"}>
             Cadastrar novo fornecedor
           </h2>
-          <button
-            className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
+          <Button
+            text="Cancelar"
+            className={"bg-red-700 text-white"}
             onClick={() => {
               closeModal();
             }}
-          >
-            Cancelar
-          </button>
+          />
         </header>
         <div>
-          <SupplierDataForm doOnSubmit={handleDataSubmition} />
+          <SupplierDataForm doOnSubmit={handleDataSubmition}>
+            <Button type={"submit"} text="Salvar" />
+          </SupplierDataForm>
         </div>
       </div>
     </section>

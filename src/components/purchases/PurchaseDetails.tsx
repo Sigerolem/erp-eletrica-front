@@ -108,7 +108,7 @@ export function PurchaseDetails() {
               <Button
                 text={"Confirmar rascunho"}
                 type={"button"}
-                className={"bg-slate-700 flex-1"}
+                className={"bg-slate-700 flex-1 text-white"}
                 onClick={handleConfirmDraft}
               />
             )}
@@ -116,7 +116,7 @@ export function PurchaseDetails() {
               <Button
                 text={"Confirmar compra"}
                 type={"button"}
-                className={"bg-slate-700 flex-1"}
+                className={"bg-slate-700 flex-1 text-white"}
                 onClick={handleConfirmPurchase}
               />
             )}
@@ -124,7 +124,7 @@ export function PurchaseDetails() {
               <Button
                 text={"Finalizar compra"}
                 type={"button"}
-                className={"bg-slate-700 flex-1"}
+                className={"bg-slate-700 flex-1 text-white"}
                 onClick={handleConcludePurchase}
               />
             )}
@@ -132,7 +132,7 @@ export function PurchaseDetails() {
               <Button
                 text={"Salvar"}
                 type={"submit"}
-                className={"bg-blue-700 flex-1"}
+                className={"bg-blue-700 flex-1 text-white"}
               />
             ) : (
               <a
@@ -141,7 +141,7 @@ export function PurchaseDetails() {
               >
                 <Button
                   text={"Receber compra"}
-                  className={"bg-blue-700 flex-1"}
+                  className={"bg-blue-700 flex-1 text-white"}
                 />
               </a>
             )}

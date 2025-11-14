@@ -9,6 +9,7 @@ import {
   type StateUpdater,
 } from "preact/hooks";
 import type { QuotationItemsType, QuotationItemTypeType } from "../Quotations";
+import { Button } from "@elements/Button";
 
 interface ComponentProps {
   itemsList: Partial<QuotationItemsType>[];
@@ -219,19 +220,13 @@ export function ExceptionalItemsList({
                 errors={validationErrors}
                 className={"min-w-4"}
               />
-              <div className={""}>
-                <button
-                  className={
-                    "bg-red-600 px-2 py-1 rounded-md text-white font-semibold shadow-md"
-                  }
-                  type={"button"}
-                  onClick={() => {
-                    handleDeleteItem({ createdAt: item.created_at! });
-                  }}
-                >
-                  X
-                </button>
-              </div>
+              <Button
+                text="X"
+                className={"bg-red-600 py-1 text-white"}
+                onClick={() => {
+                  handleDeleteItem({ createdAt: item.created_at! });
+                }}
+              />
             </div>
           </div>
         );

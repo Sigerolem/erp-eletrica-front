@@ -2,6 +2,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { CustomerDataForm } from "./CustomerDataForm";
 import type { CustomersType } from "./Customers";
+import { Button } from "@elements/Button";
 
 export function CustomerDetails() {
   const [customer, setCustomer] = useState<CustomersType | null>(null);
@@ -47,7 +48,9 @@ export function CustomerDetails() {
         <CustomerDataForm
           doOnSubmit={handleDataSubmition}
           customerData={customer ?? undefined}
-        />
+        >
+          <Button text="Salvar" type={"submit"} />
+        </CustomerDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
           Carregando...

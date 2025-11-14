@@ -7,6 +7,7 @@ import {
   type StateUpdater,
 } from "preact/hooks";
 import { BrlStringFromCents } from "@utils/formating";
+import { Button } from "@elements/Button";
 
 interface ComponentProps {
   itemsList: Partial<QuotationItemsType>[];
@@ -178,20 +179,16 @@ export function InventoryItemsList({
                 className={"min-w-5"}
               />
               <div className={"ml-1"}>
-                <button
-                  className={
-                    "bg-red-600 px-1 rounded-md text-white font-semibold text-sm shadow-md"
-                  }
-                  type={"button"}
+                <Button
+                  text="X"
+                  className={"bg-red-600 py-1 text-white"}
                   onClick={() => {
                     handleDeleteItem({
                       createdAt: item.created_at!,
                       matId: item.material_id || "",
                     });
                   }}
-                >
-                  X
-                </button>
+                />
               </div>
             </div>
           </div>
