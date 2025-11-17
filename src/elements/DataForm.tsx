@@ -6,7 +6,15 @@ interface DataFormProps extends FormHTMLAttributes {
 
 export function DataForm({ children, className, ...rest }: DataFormProps) {
   return (
-    <form className={`flex flex-col gap-4 w-ful ${className ?? ""}`} {...rest}>
+    <form
+      className={`flex flex-col w-ful ${className ? className : "gap-4"}`}
+      // onKeyDown={(e) => {
+      //   if (e.key == "Enter") {
+      //     e.preventDefault();
+      //   }
+      // }}
+      {...rest}
+    >
       {children}
     </form>
   );

@@ -17,6 +17,12 @@ export function Input({ label, errors, name, ...rest }: InputProps) {
         onFocus={(e) => {
           e.currentTarget.select();
         }}
+        onKeyPress={(e) => {
+          if (e.key == "Enter") {
+            e.preventDefault();
+            e.currentTarget.blur();
+          }
+        }}
         {...rest}
         name={name}
         className={`border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${

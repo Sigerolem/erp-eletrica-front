@@ -20,6 +20,10 @@ import type {
   QuotationsType,
 } from "./Quotations";
 import { ListWrapper } from "./lists/ListWrapper";
+import {
+  BrlStringFromCents,
+  formatQuotationStatusEnum,
+} from "@utils/formating";
 
 export function QuotationDataForm({
   quotationData,
@@ -34,25 +38,30 @@ export function QuotationDataForm({
   customers?: CustomersType[];
   children?: JSX.Element;
 }) {
+  const URL_PATH = window.location.pathname;
+
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<QuotationsStatusType>("draft");
   const [expectedDuration, setExpectedDuration] = useState(0);
   const [toolList, setToolList] = useState("");
   const [privateComments, setPrivateComments] = useState("");
   const [publicComments, setPublicComments] = useState("");
+  const [status, setStatus] = useState<QuotationsStatusType>("draft");
   const [purchaseOrder, setPurchaseOrder] = useState("");
+
   const [materialCost, setMaterialCost] = useState(0);
   const [materialValue, setMaterialValue] = useState(0);
   const [serviceCost, setServiceCost] = useState(0);
   const [serviceValue, setServiceValue] = useState(0);
   const [directCost, setDirectCost] = useState(0);
   const [directValue, setDirectValue] = useState(0);
+
   const [customerSelected, setCustomerSelected] =
     useState<CustomersType | null>(null);
   const [inventoryItems, setInventoryItems] = useState<
@@ -64,7 +73,9 @@ export function QuotationDataForm({
   const [serviceItems, setServiceItems] = useState<
     Partial<QuotationItemsType>[]
   >([]);
-  //   items: QuotationItemsType[];
+  const [thirdPartyItems, setThirdPartyItems] = useState<
+    Partial<QuotationItemsType>[]
+  >([]);
 
   useEffect(() => {
     if (quotationData) {
@@ -157,7 +168,12 @@ export function QuotationDataForm({
       direct_value: directValue,
       customer_id: customerSelected?.id || "",
       customer: customerSelected || undefined,
-      items: [...inventoryItems, ...occasionalMaterials, ...serviceItems],
+      items: [
+        ...inventoryItems,
+        ...occasionalMaterials,
+        ...serviceItems,
+        ...thirdPartyItems,
+      ],
     };
 
     const errors = await doOnSubmit(newQuotationData);
@@ -167,7 +183,7 @@ export function QuotationDataForm({
     }
   }
 
-  function inventoryItemsErrorChecker(bool: boolean) {
+  function itemsListErrorChecker(bool: boolean) {
     if (bool) {
       setValidationErrors((prev) => ({ ...prev, inventoryItems: "Tem erro" }));
     } else {
@@ -236,8 +252,100 @@ export function QuotationDataForm({
     setServiceItems((prev) => [...prev, newService]);
   }
 
+  function handleNewThirdPartyItem() {
+    const newService: Partial<QuotationItemsType> = {
+      type: "third_party_service",
+      material_id: null,
+      name: "",
+      unit_cost: 0,
+      unit_profit: 0,
+      unit_value: 0,
+      unit: "un",
+      expected_amount: 0,
+      awaiting_amount: 0,
+      returned_amount: 0,
+      taken_amount: 0,
+      is_private: false,
+      created_at: new Date().toISOString(),
+    };
+    setThirdPartyItems((prev) => [...prev, newService]);
+  }
+
   return (
     <DataForm onSubmit={onFormSubmit}>
+      {URL_PATH.includes("novo") ? (
+        <></>
+      ) : (
+        <>
+          <div className={"flex gap-4"}>
+            <Input
+              label="Custo de materiais"
+              name="materialCost"
+              value={BrlStringFromCents(materialCost)}
+              disabled={true}
+            />
+            <Input
+              label="Custo de serviços"
+              name="serviceCost"
+              value={BrlStringFromCents(serviceCost)}
+              disabled={true}
+            />
+            <Input
+              label="Custo direto"
+              name="directCost"
+              value={BrlStringFromCents(directCost)}
+              disabled={true}
+            />
+          </div>
+          <div className={"flex gap-4"}>
+            <Input
+              label="Valor de materiais"
+              name="materialCost"
+              value={BrlStringFromCents(materialValue)}
+              disabled={true}
+            />
+            <Input
+              label="Valor de serviços"
+              name="serviceCost"
+              value={BrlStringFromCents(serviceValue)}
+              disabled={true}
+            />
+            <Input
+              label="Valor direto"
+              name="directCost"
+              value={BrlStringFromCents(directValue)}
+              disabled={true}
+            />
+          </div>
+        </>
+      )}
+      {URL_PATH.includes("novo") ? (
+        <></>
+      ) : (
+        <div className={"flex gap-4"}>
+          <Input
+            label="Situação"
+            name="status"
+            value={formatQuotationStatusEnum(status)}
+            disabled={true}
+          />
+          <Input
+            label="Ordem de Compra"
+            name="purchaseOrder"
+            value={purchaseOrder}
+            onBlur={(e) => {
+              validateStringFieldOnBlur(
+                e,
+                setPurchaseOrder,
+                setValidationErrors,
+                {
+                  max: 20,
+                }
+              );
+            }}
+          />
+        </div>
+      )}
       <div className={"flex gap-4"}>
         <Textarea
           label="Descrição do serviço"
@@ -373,7 +481,7 @@ export function QuotationDataForm({
         <InventoryItemsList
           itemsList={inventoryItems}
           setItemsList={setInventoryItems}
-          setIsThereError={inventoryItemsErrorChecker}
+          setIsThereError={itemsListErrorChecker}
         />
       </ListWrapper>
       <ListWrapper
@@ -383,15 +491,26 @@ export function QuotationDataForm({
         <ExceptionalItemsList
           itemsList={occasionalMaterials}
           setItemsList={setOccasionalMaterials}
-          setIsThereError={inventoryItemsErrorChecker}
+          setIsThereError={itemsListErrorChecker}
         />
       </ListWrapper>
       <ListWrapper label={"Serviços"} doOnClickAdd={handleNewServiceItem}>
         <ExceptionalItemsList
           itemsList={serviceItems}
           setItemsList={setServiceItems}
-          setIsThereError={inventoryItemsErrorChecker}
+          setIsThereError={itemsListErrorChecker}
           type="public_service"
+        />
+      </ListWrapper>
+      <ListWrapper
+        label={"Faturamento direto"}
+        doOnClickAdd={handleNewThirdPartyItem}
+      >
+        <ExceptionalItemsList
+          itemsList={thirdPartyItems}
+          setItemsList={setThirdPartyItems}
+          setIsThereError={itemsListErrorChecker}
+          type="third_party_service"
         />
       </ListWrapper>
       {children}

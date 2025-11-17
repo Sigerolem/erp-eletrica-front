@@ -145,7 +145,7 @@ export function ExceptionalItemsList({
             </div>
             <UnitSelector
               value={item.unit!}
-              type={type == "public_service" ? "service" : "material"}
+              type={type.includes("service") ? "service" : "material"}
               doOnSelect={(value) => {
                 setItemsList((prev) => [
                   ...prev.map((mapItem) => {

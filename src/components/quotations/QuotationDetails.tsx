@@ -30,9 +30,9 @@ export function QuotationDetails() {
       body: JSON.stringify(quotationData),
     });
 
-    console.log(code, data, quotationData);
     if (code == 200) {
       window.alert("Alterações salvas com sucesso");
+      setQuotation(data.quotation);
     }
     return null;
   }

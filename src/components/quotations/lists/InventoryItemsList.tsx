@@ -54,7 +54,7 @@ export function InventoryItemsList({
       }
     });
     setItemsList((prev) => [
-      ...prev.filter((item) => item.created_at == createdAt),
+      ...prev.filter((item) => item.created_at != createdAt),
     ]);
   }
 
@@ -145,9 +145,15 @@ export function InventoryItemsList({
         return (
           <div
             key={item.created_at}
-            className={"grid grid-cols-4 items-center"}
+            className={"grid grid-cols-4 gap-4 items-center"}
           >
-            <span className={"col-span-2"}>{item.name}</span>
+            <span
+              className={
+                "col-span-2 bg-white p-1 rounded-md border border-gray-300"
+              }
+            >
+              {item.name}
+            </span>
             <Input
               name={`unit_value-${index}`}
               value={BrlStringFromCents(item.unit_value)}
@@ -160,7 +166,7 @@ export function InventoryItemsList({
                 });
               }}
               errors={validationErrors}
-              className={"min-w-5 mr-10"}
+              className={"min-w-5"}
             />
             <div className={"flex gap-2 items-center justify-stretch"}>
               <Input

@@ -47,13 +47,10 @@ export function CreateQuotation() {
   }
 
   return (
-    <main
-      className={"bg-blue-50 p-8 opacity-100 rounded-md overflow-scroll"}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <header className={"flex mb-4"}>
+    <main className={""}>
+      {/* <header className={"flex mb-4"}>
         <h2 className={"text-3xl font-semibold"}>Cadastrar novo orçamento</h2>
-      </header>
+      </header> */}
       <div>
         <QuotationDataForm
           doOnSubmit={handleDataSubmition}
