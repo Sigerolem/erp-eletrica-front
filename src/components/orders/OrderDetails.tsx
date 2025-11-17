@@ -4,11 +4,11 @@ import type {
   QuotationItemTypeType,
   QuotationsStatusType,
   QuotationsType,
-} from "./Quotations";
-import { QuotationDataForm } from "./QuotationDataForm";
+} from "@comp/quotations/Quotations";
 import { Button } from "@elements/Button";
+import { OrderDataForm } from "./OrderDataForm";
 
-export function QuotationDetails() {
+export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
   const [id, setId] = useState("");
 
@@ -114,7 +114,7 @@ export function QuotationDetails() {
   return (
     <main>
       {quotation ? (
-        <QuotationDataForm
+        <OrderDataForm
           doOnSubmit={updateQuotationData}
           quotationData={quotation}
         >
@@ -134,7 +134,7 @@ export function QuotationDetails() {
             )}
             <Button type={"submit"} text="Salvar" />
           </div>
-        </QuotationDataForm>
+        </OrderDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
           Carregando...

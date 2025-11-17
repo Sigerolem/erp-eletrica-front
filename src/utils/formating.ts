@@ -56,7 +56,7 @@ export function formatQuotationStatusEnum(status: QuotationsStatusType) {
     awaiting_delivery: "Aguardando Envio ao Cliente",
     delivered: "Entregue ao Cliente",
     awaiting_payment: "Aguardando pagamento",
-    finished: "Serviço Encerrada",
+    finished: "Ordem de Serviço Encerrada",
     denied: "Orçamento Recusado",
     cancelled: "Serviço Cancelado",
   };

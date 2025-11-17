@@ -54,7 +54,6 @@ export type QuotationsType = {
   status: QuotationsStatusType;
   tool_list: string;
   description: string;
-  discount: number;
   expected_duration: number;
   private_comments: string;
   public_comments: string;
@@ -70,21 +69,15 @@ export type QuotationsType = {
   items: Partial<QuotationItemsType>[];
 };
 
-export function Quotations() {
+export function Orders() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
 
   const QUOTATION_URL =
-    window.location.hostname == "localhost"
-      ? "/orcamentos/id#"
-      : "/orcamentos/id/#";
-
-  function handleNewCustomer() {
-    window.location.href = "/orcamentos/novo";
-  }
+    window.location.hostname == "localhost" ? "/ordens/id#" : "/ordens/id/#";
 
   useEffect(() => {
     fetchWithToken<{ quotations: QuotationsType[] }>({
-      path: "/quotations/quotes",
+      path: "/quotations/orders",
     }).then((result) => {
       if (result.code == 200 || result.code == 201) {
         setQuotations(result.data.quotations);
@@ -99,10 +92,7 @@ export function Quotations() {
     <main>
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>
-            Lista de orçamentos abertos
-          </h3>
-          <Button text="Novo orçamento" onClick={handleNewCustomer} />
+          <h3 className={"text-xl font-semibold"}>Lista de ordens abertas</h3>
         </header>
         <Table>
           <THead collumns={[["Descrição", "Cliente"], ["Situação"]]} />

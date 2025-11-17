@@ -13,20 +13,20 @@ import {
 } from "@utils/inputValidation";
 import type { JSX, TargetedSubmitEvent } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { ExceptionalItemsList } from "./lists/ExceptionalItemsList";
-import { InventoryItemsList } from "./lists/InventoryItemsList";
-import type {
-  QuotationItemsType,
-  QuotationsStatusType,
-  QuotationsType,
-} from "./Quotations";
-import { ListWrapper } from "./lists/ListWrapper";
 import {
   BrlStringFromCents,
   formatQuotationStatusEnum,
 } from "@utils/formating";
+import type {
+  QuotationItemsType,
+  QuotationsStatusType,
+  QuotationsType,
+} from "@comp/quotations/Quotations";
+import { ListWrapper } from "@comp/quotations/lists/ListWrapper";
+import { InventoryItemsList } from "@comp/quotations/lists/InventoryItemsList";
+import { ExceptionalItemsList } from "@comp/quotations/lists/ExceptionalItemsList";
 
-export function QuotationDataForm({
+export function OrderDataForm({
   quotationData,
   doOnSubmit,
   customers,
@@ -477,6 +477,7 @@ export function QuotationDataForm({
               removeFromString: "%",
             });
           }}
+          disabled={true}
         />
       </div>
 
