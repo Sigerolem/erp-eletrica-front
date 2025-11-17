@@ -23,8 +23,8 @@ import type {
   QuotationsType,
 } from "@comp/quotations/Quotations";
 import { ListWrapper } from "@comp/quotations/lists/ListWrapper";
-import { InventoryItemsList } from "@comp/quotations/lists/InventoryItemsList";
-import { ExceptionalItemsList } from "@comp/quotations/lists/ExceptionalItemsList";
+import { InventoryItemsList } from "@comp/orders/lists/InventoryItemsList";
+import { ExceptionalItemsList } from "@comp/orders/lists/ExceptionalItemsList";
 
 export function OrderDataForm({
   quotationData,
