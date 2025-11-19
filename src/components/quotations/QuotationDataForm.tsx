@@ -48,6 +48,7 @@ export function QuotationDataForm({
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
+  const [reference, setReference] = useState("");
   const [description, setDescription] = useState("");
   const [expectedDuration, setExpectedDuration] = useState(0);
   const [toolList, setToolList] = useState("");
@@ -75,13 +76,12 @@ export function QuotationDataForm({
   const [serviceItems, setServiceItems] = useState<
     Partial<QuotationItemsType>[]
   >([]);
-  const [thirdPartyItems, setThirdPartyItems] = useState<
-    Partial<QuotationItemsType>[]
-  >([]);
+  const [expenses, setExpenses] = useState<Partial<QuotationItemsType>[]>([]);
 
   useEffect(() => {
     if (quotationData) {
       setStatus(quotationData.status);
+      setReference(quotationData.reference);
       setDescription(quotationData.description);
       setExpectedDuration(quotationData.expected_duration);
       setToolList(quotationData.tool_list);
@@ -105,10 +105,10 @@ export function QuotationDataForm({
         )
       );
       setServiceItems(
-        quotationData.items.filter(
-          (item) =>
-            item.type === "private_service" || item.type === "public_service"
-        )
+        quotationData.items.filter((item) => item.type === "service")
+      );
+      setExpenses(
+        quotationData.items.filter((item) => item.type === "expense")
       );
     }
   }, [quotationData]);
@@ -134,6 +134,14 @@ export function QuotationDataForm({
       return;
     }
 
+    if (reference == "") {
+      setValidationErrors((prev) => ({
+        ...prev,
+        reference: "Esse campo é obrigatório.",
+      }));
+      errorFound = true;
+    }
+
     if (description == "") {
       setValidationErrors((prev) => ({
         ...prev,
@@ -156,8 +164,9 @@ export function QuotationDataForm({
 
     const newQuotationData: Partial<QuotationsType> = {
       status,
-      expected_duration: expectedDuration,
+      reference,
       description,
+      expected_duration: expectedDuration,
       tool_list: toolList,
       discount,
       private_comments: privateComments,
@@ -175,7 +184,7 @@ export function QuotationDataForm({
         ...inventoryItems,
         ...occasionalMaterials,
         ...serviceItems,
-        ...thirdPartyItems,
+        ...expenses,
       ],
     };
 
@@ -238,7 +247,7 @@ export function QuotationDataForm({
 
   function handleNewServiceItem() {
     const newService: Partial<QuotationItemsType> = {
-      type: "public_service",
+      type: "service",
       material_id: null,
       name: "",
       unit_cost: 0,
@@ -255,9 +264,9 @@ export function QuotationDataForm({
     setServiceItems((prev) => [...prev, newService]);
   }
 
-  function handleNewThirdPartyItem() {
+  function handleNewExpenseItem() {
     const newService: Partial<QuotationItemsType> = {
-      type: "third_party_service",
+      type: "expense",
       material_id: null,
       name: "",
       unit_cost: 0,
@@ -271,7 +280,7 @@ export function QuotationDataForm({
       is_private: false,
       created_at: new Date().toISOString(),
     };
-    setThirdPartyItems((prev) => [...prev, newService]);
+    setExpenses((prev) => [...prev, newService]);
   }
 
   console.log(quotationData);
@@ -296,7 +305,7 @@ export function QuotationDataForm({
               disabled={true}
             />
             <Input
-              label="Custo direto"
+              label="Custo das despesas"
               name="directCost"
               value={BrlStringFromCents(directCost)}
               disabled={true}
@@ -316,7 +325,7 @@ export function QuotationDataForm({
               disabled={true}
             />
             <Input
-              label="Valor direto"
+              label="Valor das despesass"
               name="directCost"
               value={BrlStringFromCents(directValue)}
               disabled={true}
@@ -351,6 +360,18 @@ export function QuotationDataForm({
           />
         </div>
       )}
+      <Input
+        label="Referência"
+        name="reference"
+        value={reference}
+        onBlur={(e) => {
+          validateStringFieldOnBlur(e, setReference, setValidationErrors, {
+            required: true,
+            min: 5,
+          });
+        }}
+        errors={validationErrors}
+      />
       <div className={"flex gap-4"}>
         <Textarea
           label="Descrição do serviço"
@@ -381,7 +402,7 @@ export function QuotationDataForm({
       </div>
       <div className={"flex gap-4"}>
         <Textarea
-          label="Comentários abertos"
+          label="Informações Adicionais"
           name="publicComments"
           errors={validationErrors}
           value={publicComments}
@@ -399,7 +420,7 @@ export function QuotationDataForm({
           }}
         />
         <Textarea
-          label="Comentários para uso interno"
+          label="Anotações"
           name="privateComments"
           errors={validationErrors}
           value={privateComments}
@@ -419,7 +440,7 @@ export function QuotationDataForm({
       </div>
       <div className={"flex gap-4"}>
         <Input
-          label="Tempo experado de execução em horas"
+          label="Tempo esperado de execução em horas"
           name="expectedDuration"
           errors={validationErrors}
           value={expectedDuration}
@@ -520,18 +541,15 @@ export function QuotationDataForm({
           itemsList={serviceItems}
           setItemsList={setServiceItems}
           setIsThereError={itemsListErrorChecker}
-          type="public_service"
+          type="service"
         />
       </ListWrapper>
-      <ListWrapper
-        label={"Faturamento direto"}
-        doOnClickAdd={handleNewThirdPartyItem}
-      >
+      <ListWrapper label={"Despesas"} doOnClickAdd={handleNewExpenseItem}>
         <ExceptionalItemsList
-          itemsList={thirdPartyItems}
-          setItemsList={setThirdPartyItems}
+          itemsList={expenses}
+          setItemsList={setExpenses}
           setIsThereError={itemsListErrorChecker}
-          type="third_party_service"
+          type="expense"
         />
       </ListWrapper>
       {children}

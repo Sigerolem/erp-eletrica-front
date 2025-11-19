@@ -1,73 +1,11 @@
 import type { CustomersType } from "@comp/customers/Customers";
 import type { MaterialsType } from "@comp/materials/Materials";
+import type { QuotationsType } from "@comp/quotations/Quotations";
 import { Button } from "@elements/Button";
 import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
-
-export type QuotationItemTypeType =
-  | "inventory_material"
-  | "occasional_material"
-  | "private_service"
-  | "public_service"
-  | "third_party_service"
-  | "exceptional";
-
-export type QuotationItemsType = {
-  id: string;
-  type: QuotationItemTypeType;
-  name: string;
-  unit: string;
-  expected_amount: number;
-  awaiting_amount: number;
-  taken_amount: number;
-  returned_amount: number;
-  unit_cost: number;
-  unit_profit: number;
-  unit_value: number;
-  is_private: boolean;
-  material_id: string | null;
-  material: MaterialsType | null;
-  quotation_id: string;
-  created_at?: string;
-};
-
-export type QuotationsStatusType =
-  | "draft"
-  | "q_awaiting"
-  | "q_approved"
-  | "os_awaiting"
-  | "os_ongoing"
-  | "os_done_mo"
-  | "os_done_mat"
-  | "awaiting_closure"
-  | "awaiting_delivery"
-  | "delivered"
-  | "awaiting_payment"
-  | "finished"
-  | "denied"
-  | "cancelled";
-
-export type QuotationsType = {
-  id: string;
-  status: QuotationsStatusType;
-  tool_list: string;
-  description: string;
-  expected_duration: number;
-  private_comments: string;
-  public_comments: string;
-  purchase_order: string;
-  material_cost: number;
-  material_value: number;
-  service_cost: number;
-  service_value: number;
-  direct_cost: number;
-  direct_value: number;
-  customer_id: string;
-  customer: CustomersType;
-  items: Partial<QuotationItemsType>[];
-};
 
 export function Orders() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
@@ -95,12 +33,12 @@ export function Orders() {
           <h3 className={"text-xl font-semibold"}>Lista de ordens abertas</h3>
         </header>
         <Table>
-          <THead collumns={[["Descrição", "Cliente"], ["Situação"]]} />
+          <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
           <tbody>
             {quotations.map((quotation) => (
               <Tr key={quotation.id}>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.description}</p>
+                  <p>{quotation.reference}</p>
                   <p className={"text-green-700"}>{quotation.customer.name}</p>
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>

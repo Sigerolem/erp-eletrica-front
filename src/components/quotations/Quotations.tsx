@@ -9,10 +9,8 @@ import { useEffect, useState } from "preact/hooks";
 export type QuotationItemTypeType =
   | "inventory_material"
   | "occasional_material"
-  | "private_service"
-  | "public_service"
-  | "third_party_service"
-  | "exceptional";
+  | "service"
+  | "expense";
 
 export type QuotationItemsType = {
   id: string;
@@ -53,6 +51,7 @@ export type QuotationsType = {
   id: string;
   status: QuotationsStatusType;
   tool_list: string;
+  reference: string;
   description: string;
   discount: number;
   expected_duration: number;
@@ -105,12 +104,12 @@ export function Quotations() {
           <Button text="Novo orçamento" onClick={handleNewCustomer} />
         </header>
         <Table>
-          <THead collumns={[["Descrição", "Cliente"], ["Situação"]]} />
+          <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
           <tbody>
             {quotations.map((quotation) => (
               <Tr key={quotation.id}>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.description}</p>
+                  <p>{quotation.reference}</p>
                   <p className={"text-green-700"}>{quotation.customer.name}</p>
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>

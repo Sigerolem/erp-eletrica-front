@@ -6,7 +6,7 @@ import type {
   QuotationsType,
 } from "@comp/quotations/Quotations";
 import { Button } from "@elements/Button";
-import { OrderDataForm } from "./OrderDataForm";
+import { QuotationDataForm } from "@comp/quotations/QuotationDataForm";
 
 export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
@@ -114,7 +114,7 @@ export function OrderDetails() {
   return (
     <main>
       {quotation ? (
-        <OrderDataForm
+        <QuotationDataForm
           doOnSubmit={updateQuotationData}
           quotationData={quotation}
         >
@@ -134,7 +134,7 @@ export function OrderDetails() {
             )}
             <Button type={"submit"} text="Salvar" />
           </div>
-        </OrderDataForm>
+        </QuotationDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
           Carregando...

@@ -25,11 +25,8 @@ export function UnitSelector({
           <optgroup label={"Selecione:"}>
             <option value="un">Unidade</option>
             <option value="m">Metro</option>
-            <option value="l">Litro</option>
-            <option value="kg">Kilograma</option>
+            <option value="cent">Cento</option>
             <option value="pct">Pacote</option>
-            <option value="rolo">Rolo</option>
-            <option value="cx">Caixa</option>
           </optgroup>
         )}
         {type == "service" && (
@@ -37,9 +34,6 @@ export function UnitSelector({
             <option value="un">Unidade</option>
             <option value="h">Hora</option>
             <option value="d">Dia</option>
-            <option value="sem">Semana</option>
-            <option value="m">Metro</option>
-            <option value="m2">Metro²</option>
             <option value="km">Kilometro</option>
           </optgroup>
         )}
