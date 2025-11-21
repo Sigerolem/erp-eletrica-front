@@ -70,7 +70,6 @@
         return response.json();
       })
       .then((data: { token: string; name: string; role: string }) => {
-        console.log(data);
         localStorage.setItem("apiToken", data.token);
         localStorage.setItem("apiName", data.name);
         localStorage.setItem("apiRole", data.role);

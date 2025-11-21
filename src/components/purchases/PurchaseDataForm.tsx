@@ -140,7 +140,6 @@ export function PurchaseDataForm({
       window.alert("Adicione pelo menos um material à compra.");
       return;
     }
-    console.log("submited", isTracked);
 
     const purchaseData: Partial<PurchasesType> = {
       status,

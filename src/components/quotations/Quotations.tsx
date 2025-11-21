@@ -51,6 +51,7 @@ export type QuotationsType = {
   id: string;
   status: QuotationsStatusType;
   tool_list: string;
+  slug: string;
   reference: string;
   description: string;
   discount: number;

@@ -162,7 +162,6 @@ export function parseFloatFromString({
   setErrors?: Dispatch<StateUpdater<{ [key: string]: string }>>;
   name?: string;
 }) {
-  console.log(value);
   let erro: { [key: string]: string };
 
   if (removeFromString) {

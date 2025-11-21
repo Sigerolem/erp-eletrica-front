@@ -283,8 +283,6 @@ export function QuotationDataForm({
     setExpenses((prev) => [...prev, newService]);
   }
 
-  console.log(quotationData);
-
   return (
     <DataForm onSubmit={onFormSubmit}>
       {URL_PATH.includes("novo") ? (

@@ -1,0 +1,11 @@
+---
+import Header from "@comp/Header.astro";
+import { Transactions } from "@comp/transactions/Transactions";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="Pedidos" transition:persist>
+  <Header title="Pedidos e separações de material">
+    <Transactions client:only="preact" />
+  </Header>
+</DefaultLayout>

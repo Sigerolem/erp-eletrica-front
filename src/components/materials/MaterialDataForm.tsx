@@ -134,7 +134,6 @@ export function MaterialDataForm({
       path: `/materials/${id}`,
       method: "DELETE",
     });
-    console.log(result);
   }
 
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {

@@ -86,7 +86,6 @@ export function PurchaseDetails() {
       method: "PUT",
       body: JSON.stringify(purchaseData),
     });
-    console.log(code, data);
 
     if (code == 200) {
       window.alert("Alterações salvas");
