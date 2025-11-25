@@ -1,5 +1,6 @@
 import type { PurchaseStatusType } from "@comp/purchases/Purchases";
 import type { QuotationsStatusType } from "@comp/quotations/Quotations";
+import type { TransactionsStatusType } from "@comp/transactions/Transactions";
 
 export function changeDotsCommas(text: string) {
   return text.replaceAll(",", "*").replaceAll(".", ",").replaceAll("*", ".");
@@ -62,4 +63,17 @@ export function formatQuotationStatusEnum(status: QuotationsStatusType) {
   };
 
   return QuotationStatusMap[status] || status;
+}
+
+export function formatTransactionStatusEnum(status: TransactionsStatusType) {
+  const TransactionStatusMap = {
+    draft: "Rascunho",
+    awaiting: "Aguardando separação",
+    ongoing: "Em separação",
+    partial: "Atendido parcialmente",
+    completed: "Concluido",
+    cancelled: "Cancelado",
+  };
+
+  return TransactionStatusMap[status] || status;
 }

@@ -68,7 +68,12 @@ export function Transactions() {
           <Button text="Novo orçamento" onClick={handleNewTransaction} />
         </header>
         <Table>
-          <THead collumns={[["Referência"], ["Situação"]]} />
+          <THead
+            collumns={[
+              ["Código da ordem de serviço", "Referência"],
+              ["Situação"],
+            ]}
+          />
           <tbody>
             {transactions.map((transaction) => (
               <Tr key={transaction.id}>

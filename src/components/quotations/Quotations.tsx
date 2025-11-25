@@ -1,5 +1,9 @@
 import type { CustomersType } from "@comp/customers/Customers";
 import type { MaterialsType } from "@comp/materials/Materials";
+import type {
+  TransactionItemsType,
+  TransactionsType,
+} from "@comp/transactions/Transactions";
 import { Button } from "@elements/Button";
 import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
@@ -27,6 +31,8 @@ export type QuotationItemsType = {
   is_private: boolean;
   material_id: string | null;
   material: MaterialsType | null;
+  transaction_item_id: string | null;
+  transaction_item: TransactionItemsType | null;
   quotation_id: string;
   created_at?: string;
 };
@@ -68,6 +74,7 @@ export type QuotationsType = {
   customer_id: string;
   customer: CustomersType;
   items: Partial<QuotationItemsType>[];
+  transactions: Partial<TransactionsType>[];
 };
 
 export function Quotations() {
@@ -105,10 +112,15 @@ export function Quotations() {
           <Button text="Novo orçamento" onClick={handleNewCustomer} />
         </header>
         <Table>
-          <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
+          <THead
+            collumns={[["Código"], ["Referência", "Cliente"], ["Situação"]]}
+          />
           <tbody>
             {quotations.map((quotation) => (
               <Tr key={quotation.id}>
+                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                  <p>{quotation.slug}</p>
+                </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                   <p>{quotation.reference}</p>
                   <p className={"text-green-700"}>{quotation.customer.name}</p>

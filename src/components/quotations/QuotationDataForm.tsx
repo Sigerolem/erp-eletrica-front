@@ -186,6 +186,7 @@ export function QuotationDataForm({
         ...serviceItems,
         ...expenses,
       ],
+      transactions: [],
     };
 
     const errors = await doOnSubmit(newQuotationData);

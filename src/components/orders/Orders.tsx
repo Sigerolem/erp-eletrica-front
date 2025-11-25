@@ -33,10 +33,15 @@ export function Orders() {
           <h3 className={"text-xl font-semibold"}>Lista de ordens abertas</h3>
         </header>
         <Table>
-          <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
+          <THead
+            collumns={[["Código"], ["Referência", "Cliente"], ["Situação"]]}
+          />
           <tbody>
             {quotations.map((quotation) => (
               <Tr key={quotation.id}>
+                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                  <p>{quotation.slug}</p>
+                </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                   <p>{quotation.reference}</p>
                   <p className={"text-green-700"}>{quotation.customer.name}</p>
