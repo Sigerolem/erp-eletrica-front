@@ -412,7 +412,7 @@ export function QuotationDataForm({
               setValidationErrors,
               {
                 min: 0,
-                max: 200,
+                max: 300,
                 required: false,
               }
             );
@@ -430,7 +430,7 @@ export function QuotationDataForm({
               setValidationErrors,
               {
                 min: 0,
-                max: 200,
+                max: 300,
                 required: false,
               }
             );

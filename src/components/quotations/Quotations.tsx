@@ -9,6 +9,7 @@ import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
+import { fetchPdf } from "src/utils/fetchPdf";
 
 export type QuotationItemTypeType =
   | "inventory_material"
@@ -113,7 +114,12 @@ export function Quotations() {
         </header>
         <Table>
           <THead
-            collumns={[["Código"], ["Referência", "Cliente"], ["Situação"]]}
+            collumns={[
+              ["Código"],
+              ["Referência", "Cliente"],
+              ["Situação"],
+              [""],
+            ]}
           />
           <tbody>
             {quotations.map((quotation) => (
@@ -127,6 +133,14 @@ export function Quotations() {
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                   <p>{formatQuotationStatusEnum(quotation.status)}</p>
+                </Td>
+                <Td>
+                  <Button
+                    text="PDF"
+                    onClick={() =>
+                      fetchPdf(`/quotations/print/${quotation.id}`)
+                    }
+                  />
                 </Td>
               </Tr>
             ))}

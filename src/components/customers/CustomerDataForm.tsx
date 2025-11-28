@@ -64,6 +64,7 @@ export function CustomerDataForm({
     const newCustomerData = {
       name,
       cnpj,
+      email,
       address: address || null,
       phone_number: phoneNumber || null,
       mobile_number: mobileNumber || null,
@@ -99,8 +100,8 @@ export function CustomerDataForm({
           value={cnpj}
           onBlur={(e) => {
             validateStringFieldOnBlur(e, setCnpj, setValidationErrors, {
-              min: 9,
-              max: 18,
+              min: 10,
+              max: 19,
               required: true,
             });
           }}
