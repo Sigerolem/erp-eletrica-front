@@ -1,6 +1,6 @@
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
-import { Table, Td, THead, Tr } from "src/elements/Table";
+import { Table, Td, THead, Tr } from "/src/elements/Table";
 import { CreateSupplierModal } from "./CreateSupplierModal";
 import { Button } from "@elements/Button";
 

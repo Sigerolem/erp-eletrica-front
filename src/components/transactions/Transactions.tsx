@@ -18,7 +18,7 @@ export type TransactionItemsType = {
   material_id: string | null;
   material: MaterialsType | null;
   transaction_id: string;
-  created_at?: string;
+  created_at: string;
 };
 
 export type TransactionsStatusType =
@@ -35,6 +35,7 @@ export type TransactionsType = {
   quotation: QuotationsType;
   quotations_id: string;
   items: Partial<TransactionItemsType>[];
+  created_at: string;
 };
 
 export function Transactions() {
@@ -69,10 +70,7 @@ export function Transactions() {
         </header>
         <Table>
           <THead
-            collumns={[
-              ["Código da ordem de serviço", "Referência"],
-              ["Situação"],
-            ]}
+            collumns={[["Código da OS", "Referência da OS"], ["Situação"]]}
           />
           <tbody>
             {transactions.map((transaction) => (

@@ -1,18 +1,22 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
-import tailwindcss from '@tailwindcss/vite';
+import tailwindcss from "@tailwindcss/vite";
 
-import preact from '@astrojs/preact';
+import preact from "@astrojs/preact";
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static',
+  output: "static",
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
   },
   base: "",
-  trailingSlash: 'ignore',
+  trailingSlash: "ignore",
 
-  integrations: [preact()]
+  integrations: [
+    preact({
+      compat: true,
+    }),
+  ],
 });

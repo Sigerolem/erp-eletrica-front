@@ -4,7 +4,7 @@ import {
   type Dispatch,
   type StateUpdater,
 } from "preact/hooks";
-import { fetchWithToken } from "src/utils/fetchWithToken";
+import { fetchWithToken } from "/src/utils/fetchWithToken";
 import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
 import { Button } from "@elements/Button";

@@ -3,10 +3,12 @@ import { Input } from "@elements/Input";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
 import type { JSX, TargetedSubmitEvent } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import type { TransactionsType } from "./Transactions";
+import type { TransactionsStatusType, TransactionsType } from "./Transactions";
 import type { QuotationsType } from "@comp/quotations/Quotations";
+import { formatTransactionStatusEnum } from "src/utils/formating";
+import { Textarea } from "src/elements/TextArea";
 
-export function CustomerDataForm({
+export function TransactionDataForm({
   transactionData,
   doOnSubmit,
   children,
@@ -21,10 +23,13 @@ export function CustomerDataForm({
     [key: string]: string;
   }>({});
 
-  const [quotation, setQuotation] = useState<Partial<QuotationsType>>({});
-  const [cnpj, setCnpj] = useState("");
+  const [quotation, setQuotation] = useState<Partial<QuotationsType>>({
+    reference: "Carregando...",
+    slug: "Carregando...",
+  });
+  const [status, setStatus] = useState<TransactionsStatusType>("draft");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [transaction, setTransaction] = useState<TransactionsType | null>(null);
   const [mobileNumber, setMobileNumber] = useState("");
   const [address, setAddress] = useState("");
 
@@ -32,6 +37,8 @@ export function CustomerDataForm({
     if (transactionData) {
       //set the state
       setQuotation(transactionData.quotation);
+      setStatus(transactionData.status);
+      setTransaction({ ...transactionData });
     }
   }, [transactionData]);
 
@@ -66,82 +73,97 @@ export function CustomerDataForm({
     <DataForm onSubmit={onFormSubmit}>
       <div className={"flex gap-4"}>
         <Input
-          label="Nome"
-          name="name"
-          errors={validationErrors}
-          // value={name}
+          label="Referência da OS"
+          name="reference"
+          value={quotation.reference}
           disabled={true}
         />
         <Input
-          label="CNPJ/CPF"
-          name="cnpj"
-          errors={validationErrors}
-          value={cnpj}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(e, setCnpj, setValidationErrors, {
-              min: 9,
-              max: 18,
-              required: true,
-            });
-          }}
+          label="Código da OS"
+          name="slug"
+          value={quotation.slug}
+          disabled={true}
         />
       </div>
       <div className={"flex gap-4"}>
         <Input
-          label="Telefone"
-          name="phoneNumber"
-          errors={validationErrors}
-          value={phoneNumber}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(e, setPhoneNumber, setValidationErrors, {
-              min: 0,
-              max: 15,
-              required: false,
-            });
-          }}
+          label="Cliente"
+          name="customer"
+          value={quotation?.customer?.name || "Carregando..."}
+          disabled={true}
         />
         <Input
-          label="Celular"
-          name="mobileNumber"
-          errors={validationErrors}
-          value={mobileNumber}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(e, setMobileNumber, setValidationErrors, {
-              min: 0,
-              max: 15,
-              required: false,
-            });
-          }}
+          label="Situação"
+          name="status"
+          value={formatTransactionStatusEnum(status)}
+          disabled={true}
+        />
+        <Input
+          label="Data errada"
+          name="status"
+          value={new Date(transaction?.created_at || "").toLocaleDateString()}
+          disabled={true}
         />
       </div>
-      <Input
-        label="Email"
-        name="email"
-        type="text"
+      <Textarea
+        label="Descrição"
+        name="description"
         errors={validationErrors}
-        value={email}
-        onBlur={(e) => {
-          validateStringFieldOnBlur(e, setEmail, setValidationErrors, {
-            min: 10,
-            max: 50,
-            required: false,
-          });
-        }}
+        value={quotation.description}
+        disabled={true}
       />
-      <Input
-        label="Endereço"
-        name="address"
-        type="text"
-        errors={validationErrors}
-        value={address}
-        onBlur={(e) => {
-          validateStringFieldOnBlur(e, setAddress, setValidationErrors, {
-            min: 0,
-            max: 150,
-            required: false,
-          });
-        }}
-      />
+      <div className={"flex gap-4"}>
+        <section
+          className={
+            "w-full border border-slate-300 rounded-md p-2 flex flex-col gap-2"
+          }
+        >
+          <div className={"grid grid-cols-4 gap-x-4"}>
+            <span className={"font-semibold text-lg pl-2"}>Material</span>
+            <span className={"font-semibold text-lg pl-2"}>Código</span>
+            <span className={"font-semibold text-lg pl-2"}>
+              Qtd. Solicitada
+            </span>
+            <span className={"font-semibold text-lg pl-2"}>
+              Qtd. em Estoque
+            </span>
+          </div>
+
+          {transaction?.items.map((item) => (
+            <div className={"grid grid-cols-4 gap-x-4"}>
+              <span
+                className={
+                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
+                }
+              >
+                {item.name}
+              </span>
+              <span
+                className={
+                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
+                }
+              >
+                {item.material?.barcode || "sem código de barras"}
+              </span>
+              <span
+                className={
+                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
+                }
+              >
+                {item.expected_amount}
+              </span>
+              <span
+                className={
+                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
+                }
+              >
+                {item.material?.current_amount}
+              </span>
+              {/* <Input name="takenAmount" value={item.material?.current_amount} /> */}
+            </div>
+          ))}
+        </section>
+      </div>
       {children}
     </DataForm>
   );

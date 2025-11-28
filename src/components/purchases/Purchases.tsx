@@ -1,11 +1,12 @@
+import type { MaterialsType } from "@comp/materials/Materials";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
+import { Button } from "@elements/Button";
 import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
 import { Table, Td, THead, Tr } from "src/elements/Table";
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { CreatePurchaseModal } from "./CreatePurchaseModal";
-import type { MaterialsType } from "@comp/materials/Materials";
-import { Button } from "@elements/Button";
+import { fetchPdf } from "src/utils/fetchPdf";
 
 export type PurchaseStatusType =
   | "draft"
@@ -87,6 +88,7 @@ export function Purchases() {
               ["Status", "Data"],
               ["Valor"],
               ["Itens", "comprados"],
+              [""],
             ]}
           />
           <tbody>
@@ -114,6 +116,14 @@ export function Purchases() {
                   </Td>
                   <Td link={`${PURCHASE_URL}${purchase.id}/`}>
                     <p className={""}>{purchase.purchase_items?.length || 0}</p>
+                  </Td>
+                  <Td>
+                    <Button
+                      text="PDF"
+                      onClick={() =>
+                        fetchPdf(`/purchases/print/${purchase.id}`)
+                      }
+                    />
                   </Td>
                 </Tr>
               );

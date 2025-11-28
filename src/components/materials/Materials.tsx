@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { CreateMaterialModal } from "@comp/materials/CreateMaterialModal";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
-import { fetchWithToken } from "src/utils/fetchWithToken";
-import { Table, Td, THead, Tr } from "src/elements/Table";
+import { fetchWithToken } from "/src/utils/fetchWithToken";
+import { Table, Td, THead, Tr } from "/src/elements/Table";
 import { BrlStringFromCents } from "@utils/formating";
 import { Button } from "@elements/Button";
 
