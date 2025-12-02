@@ -22,6 +22,7 @@ export function PurchaseDetails() {
     }).then((result) => {
       if (result.code == 200) {
         setPurchase(result.data.purchase);
+        console.log(result.data);
       } else {
         window.alert("Erro ao se comunicar com o servidor.");
       }
@@ -38,7 +39,7 @@ export function PurchaseDetails() {
       window.alert("Alterado com sucesso.");
       setPurchase((prev) => {
         if (prev) {
-          return { ...prev, status: data.purchase.status };
+          return { ...prev, status: "requested" };
         }
         return prev;
       });
@@ -55,7 +56,7 @@ export function PurchaseDetails() {
       window.alert("Alterado com sucesso.");
       setPurchase((prev) => {
         if (prev) {
-          return { ...prev, status: data.purchase.status };
+          return { ...prev, status: "shipped" };
         }
         return prev;
       });
@@ -72,7 +73,7 @@ export function PurchaseDetails() {
       window.alert("Alterado com sucesso.");
       setPurchase((prev) => {
         if (prev) {
-          return { ...prev, status: data.purchase.status };
+          return { ...prev, status: "finished" };
         }
         return prev;
       });
@@ -89,6 +90,7 @@ export function PurchaseDetails() {
 
     if (code == 200) {
       window.alert("Alterações salvas");
+      setPurchase(data.purchase);
       return null;
     }
 
@@ -102,7 +104,7 @@ export function PurchaseDetails() {
           doOnSubmit={handleDataSubmition}
           purchaseData={purchase}
         >
-          <div className={"flex justify-stretch gap-4 mt-4"}>
+          <div className={""}>
             {purchase.id !== "" && purchase.status == "draft" && (
               <Button
                 text={"Confirmar rascunho"}
@@ -111,6 +113,7 @@ export function PurchaseDetails() {
                 onClick={handleConfirmDraft}
               />
             )}
+
             {purchase.id !== "" && purchase.status == "requested" && (
               <Button
                 text={"Confirmar compra"}
@@ -119,6 +122,7 @@ export function PurchaseDetails() {
                 onClick={handleConfirmPurchase}
               />
             )}
+
             {purchase.id !== "" && purchase.status == "received" && (
               <Button
                 text={"Finalizar compra"}
@@ -127,20 +131,15 @@ export function PurchaseDetails() {
                 onClick={handleConcludePurchase}
               />
             )}
-            {purchase.status !== "shipped" ? (
-              <Button
-                text={"Salvar"}
-                type={"submit"}
-                className={"bg-blue-700 flex-1 text-white"}
-              />
-            ) : (
+
+            {purchase.status == "shipped" && (
               <a
                 href={`${PURCHASE_DELIVERY_URL}${id}/`}
                 className={"flex-1 flex"}
               >
                 <Button
                   text={"Receber compra"}
-                  className={"bg-blue-700 flex-1 text-white"}
+                  className={"bg-slate-700 flex-1 text-white"}
                 />
               </a>
             )}

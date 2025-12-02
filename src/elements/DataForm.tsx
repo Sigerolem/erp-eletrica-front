@@ -1,7 +1,8 @@
 import type { FormHTMLAttributes, JSX } from "preact";
+import type { ReactNode } from "preact/compat";
 
 interface DataFormProps extends FormHTMLAttributes {
-  children: (JSX.Element | undefined)[];
+  children: ReactNode | ReactNode[];
 }
 
 export function DataForm({ children, className, ...rest }: DataFormProps) {

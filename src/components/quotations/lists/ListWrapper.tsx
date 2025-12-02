@@ -1,4 +1,5 @@
 import type { JSX } from "preact";
+import type { ReactNode } from "preact/compat";
 
 export function ListWrapper({
   label,
@@ -7,7 +8,7 @@ export function ListWrapper({
 }: {
   label: string;
   doOnClickAdd: () => void;
-  children: JSX.Element;
+  children: ReactNode | ReactNode[];
 }) {
   return (
     <div>

@@ -13,6 +13,9 @@ export type MaterialsType = {
   pkg_size: number;
   min_amount: number;
   ideal_amount: number;
+  ipi: number;
+  clean_cost: number;
+  unit: string;
   reserved_amount: number;
   current_amount: number;
   tracked_amount: number;
@@ -31,11 +34,6 @@ const MATERIAL_URL =
 
 export function Materials() {
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  function handleNewMaterial() {
-    setIsModalOpen(true);
-  }
 
   useEffect(() => {
     fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }).then(
@@ -52,18 +50,12 @@ export function Materials() {
 
   return (
     <>
-      {isModalOpen ? (
-        <CreateMaterialModal
-          setMaterials={setMaterials}
-          closeModal={() => {
-            setIsModalOpen(false);
-          }}
-        />
-      ) : null}
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de materiais</h3>
-          <Button text="Novo material" onClick={handleNewMaterial} />
+          <a href="/materiais/novo">
+            <Button text="Novo material" />
+          </a>
         </header>
         <Table>
           <THead

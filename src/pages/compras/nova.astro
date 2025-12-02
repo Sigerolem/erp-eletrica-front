@@ -1,0 +1,10 @@
+---
+import Header from "@comp/Header.astro";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+import { CreatePurchase } from "src/components/purchases/CreatePurchase";
+---
+
+<DefaultLayout title="Nova compra" transition:persist>
+  <Header title="Nova compra" />
+  <CreatePurchase client:only="preact" />
+</DefaultLayout>

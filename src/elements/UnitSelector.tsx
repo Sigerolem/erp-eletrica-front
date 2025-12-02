@@ -11,7 +11,7 @@ export function UnitSelector({
 }) {
   return (
     <div className={"flex flex-col"}>
-      <label className={"font-semibold"} htmlFor="select">
+      <label className={"font-semibold not-md:text-sm"} htmlFor="select">
         {label}
       </label>
       <select

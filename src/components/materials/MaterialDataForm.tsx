@@ -20,6 +20,7 @@ import type { MaterialsType } from "./Materials";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { Button } from "@elements/Button";
+import { UnitSelector } from "src/elements/UnitSelector";
 
 interface MaterialDataFormProps {
   materialData?: MaterialsType;
@@ -47,6 +48,9 @@ export function MaterialDataForm({
   const [trackedAmount, setTrackedAmount] = useState(0);
   const [reservedAmount, setReservedAmount] = useState(0);
   const [minAmount, setMinAmount] = useState(0);
+  const [unit, setUnit] = useState("un");
+  const [ipi, setIpi] = useState(0);
+  const [cleanCost, setCleanCost] = useState(0);
   const [idealAmount, setIdealAmount] = useState(0);
   const [pkgSize, setPkgSize] = useState(1);
   const [profit, setProfit] = useState(0);
@@ -66,6 +70,9 @@ export function MaterialDataForm({
       setTrackedAmount(materialData.tracked_amount);
       setReservedAmount(materialData.reserved_amount);
       setMinAmount(materialData.min_amount);
+      setIpi(materialData.ipi);
+      setUnit(materialData.unit);
+      setCleanCost(materialData.clean_cost);
       setIdealAmount(materialData.ideal_amount);
       setPkgSize(materialData.pkg_size);
       setProfit(materialData.profit);
@@ -146,6 +153,9 @@ export function MaterialDataForm({
       ideal_amount: idealAmount,
       pkg_size: pkgSize,
       profit,
+      ipi,
+      unit,
+      clean_cost: cleanCost,
       avg_cost: cost,
       value,
       supplier_id: supplierSelected?.id || null,
@@ -160,7 +170,7 @@ export function MaterialDataForm({
   }
 
   return (
-    <form onSubmit={onFormSubmit} className={"flex flex-col gap-2 w-ful"}>
+    <form onSubmit={onFormSubmit} className={"flex flex-col gap-3 w-ful"}>
       <Input
         label="Nome do material"
         name="name"
@@ -186,6 +196,26 @@ export function MaterialDataForm({
         }}
         errors={validationErrors}
       />
+      <div className={"flex gap-4"}>
+        <UnitSelector
+          label="Unidade"
+          value={unit}
+          doOnSelect={(value) => {
+            setUnit(value);
+          }}
+        />
+        <Input
+          label="Tamanho da embalagem"
+          name="pkgSize"
+          value={pkgSize}
+          onBlur={(e) => {
+            validateIntFieldOnBlur(e, setPkgSize, setValidationErrors, {
+              min: 1,
+            });
+          }}
+          errors={validationErrors}
+        />
+      </div>
       {materialData != undefined && (
         <div className={"flex gap-4"}>
           <Input
@@ -216,23 +246,10 @@ export function MaterialDataForm({
             }}
             errors={validationErrors}
           />
-          <Input
-            label="Quantidade reservada"
-            name="reservedAmount"
-            value={reservedAmount}
-            onBlur={(e) => {
-              validateIntFieldOnBlur(
-                e,
-                setReservedAmount,
-                setValidationErrors,
-                {}
-              );
-            }}
-            errors={validationErrors}
-          />
         </div>
       )}
-      <div className={"flex gap-4"}>
+
+      <div className={"grid grid-cols-3 gap-2 not-md:grid-cols-2 "}>
         <Input
           label="Quantidade mínima"
           name="minAmount"
@@ -253,15 +270,63 @@ export function MaterialDataForm({
           }}
           errors={validationErrors}
         />
-      </div>
-      <div className={"flex gap-4"}>
         <Input
-          label="Tamanho da embalagem"
-          name="pkgSize"
-          value={pkgSize}
+          label="Quantidade reservada"
+          name="reservedAmount"
+          value={reservedAmount}
           onBlur={(e) => {
-            validateIntFieldOnBlur(e, setPkgSize, setValidationErrors, {
-              min: 1,
+            validateIntFieldOnBlur(
+              e,
+              setReservedAmount,
+              setValidationErrors,
+              {}
+            );
+          }}
+          errors={validationErrors}
+        />
+        <Input
+          name="supplier"
+          label="Fornecedor"
+          onFocus={(e) => {
+            e.currentTarget.blur();
+            setIsSupModalOpen(true);
+          }}
+          className={"cursor-pointer"}
+          value={supplierSelected === null ? "" : supplierSelected.name}
+          errors={validationErrors}
+        />
+        <Input
+          label="IPI"
+          name="ipi"
+          value={`${(ipi / 100).toFixed(2).replace(".", ",")} %`}
+          onBlur={(e) => {
+            validateFloatFieldOnBlur(e, setIpi, setValidationErrors, {
+              removeFromString: " %",
+            });
+          }}
+          errors={validationErrors}
+        />
+        <Input
+          label="Preço s/ IPI"
+          name="cleanCost"
+          value={BrlStringFromCents(cleanCost)}
+          onBlur={(e) => {
+            validateFloatFieldOnBlur(e, setCleanCost, setValidationErrors, {
+              removeFromString: "R$",
+              min: 0,
+            });
+          }}
+          errors={validationErrors}
+        />
+        <Input
+          label="Custo"
+          name="cost"
+          value={BrlStringFromCents(cost)}
+          onBlur={(e) => {
+            setLastField("cost");
+            validateFloatFieldOnBlur(e, setCost, setValidationErrors, {
+              removeFromString: "R$",
+              min: 0,
             });
           }}
           errors={validationErrors}
@@ -278,23 +343,8 @@ export function MaterialDataForm({
           }}
           errors={validationErrors}
         />
-      </div>
-      <div className={"flex gap-4"}>
         <Input
-          label="Custo [R$]"
-          name="cost"
-          value={BrlStringFromCents(cost)}
-          onBlur={(e) => {
-            setLastField("cost");
-            validateFloatFieldOnBlur(e, setCost, setValidationErrors, {
-              removeFromString: "R$",
-              min: 0,
-            });
-          }}
-          errors={validationErrors}
-        />
-        <Input
-          label="Valor [R$]"
+          label="Valor"
           name="value"
           value={BrlStringFromCents(value)}
           onBlur={(e) => {
@@ -307,24 +357,12 @@ export function MaterialDataForm({
           errors={validationErrors}
         />
       </div>
-      <div className={"flex gap-4 justify-between items-end"}>
-        <div>
-          <Input
-            name="supplier"
-            label="Fornecedor"
-            onFocus={(e) => {
-              e.currentTarget.blur();
-              setIsSupModalOpen(true);
-            }}
-            className={"cursor-pointer"}
-            value={supplierSelected === null ? "" : supplierSelected.name}
-            errors={validationErrors}
-          />
-        </div>
+
+      <div className={"flex gap-4 mt-4 justify-evenly items-end"}>
         {children}
         {materialData?.is_disabled === false ? (
           <Button
-            text="Excluir"
+            text="Excluir material"
             type={"button"}
             className={"bg-red-700 text-white"}
             onClick={() => {

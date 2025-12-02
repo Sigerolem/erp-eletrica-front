@@ -35,6 +35,7 @@ export function PurchaseDataForm({
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+  const [itemsWereChanged, setItemsWereChanged] = useState(false);
   const [isSupModalOpen, setIsSupModalOpen] = useState(false);
   const [isMatModalOpen, setIsMatModalOpen] = useState(false);
   const [suppliers, setSuppliers] = useState<SuppliersType[]>([]);
@@ -105,12 +106,21 @@ export function PurchaseDataForm({
       setPurchaseCost(purchaseData.purchase_cost);
       setDeliveryCost(purchaseData.delivery_cost);
       setTaxCost(purchaseData.tax_cost);
-      setSelectedSupplier(purchaseData.supplier);
       setPurchaseItems(purchaseData.purchase_items || []);
+      if (purchaseData.supplier !== undefined) {
+        setSelectedSupplier(purchaseData.supplier);
+      }
     }
   }, [purchaseData]);
 
+  const isThereChange =
+    purchaseData?.is_tracked != isTracked ||
+    purchaseData?.purchase_cost != purchaseCost ||
+    purchaseData?.delivery_cost != deliveryCost ||
+    purchaseData?.tax_cost != taxCost;
+
   function handleNewPurchaseMaterial(material: MaterialsType) {
+    console.log(material);
     setPurchaseItems((prev) => [
       ...prev,
       {
@@ -118,9 +128,12 @@ export function PurchaseDataForm({
         material_id: material.id,
         amount_requested: material.ideal_amount - material.current_amount,
         old_unit_cost: material.avg_cost,
+        new_unit_cost: material.avg_cost,
         purchase_id: purchaseData?.id || undefined,
         amount_delivered: 0,
-        new_unit_cost: material.avg_cost,
+        ipi: material.ipi,
+        old_clean_cost: material.clean_cost,
+        new_clean_cost: material.clean_cost,
       },
     ]);
   }
@@ -160,19 +173,14 @@ export function PurchaseDataForm({
 
     if (errors) {
       setValidationErrors((prev) => ({ ...prev, ...errors }));
+    } else {
+      setItemsWereChanged(false);
     }
   }
 
   const showCostsBool =
-    purchaseData?.status == "finished" ||
-    purchaseData?.status == "received" ||
-    (purchaseData?.status == "shipped" &&
-      window.location.href.includes("recebimento"));
-  const isDeliveryList =
-    purchaseData?.status == "received" ||
-    purchaseData?.status == "finished" ||
-    (purchaseData?.status == "shipped" &&
-      window.location.href.includes("recebimento"));
+    purchaseData?.status == "finished" || purchaseData?.status == "received";
+
   return (
     <form className={"flex flex-col gap-2 w-ful"} onSubmit={handleSubmit}>
       {showCostsBool && (
@@ -183,6 +191,7 @@ export function PurchaseDataForm({
               name="nf"
               value={nf}
               onBlur={(e) => {
+                setItemsWereChanged(true);
                 validateStringFieldOnBlur(e, setNF, setValidationErrors, {
                   max: 50,
                 });
@@ -254,12 +263,14 @@ export function PurchaseDataForm({
             purchaseData?.status == "finished" ||
             purchaseData?.status == "cancelled"
           }
+          className={status == "draft" ? undefined : "bg-blue-50!"}
         />
         <Input
           label="Status"
           name="status"
           value={formatPurchaseStatusEnum(status)}
-          disabled
+          disabled={true}
+          className={"bg-blue-50!"}
         />
       </div>
 
@@ -305,21 +316,24 @@ export function PurchaseDataForm({
       <div
         className={"bg-slate-100 border border-slate-400 py-1 rounded-md mb-4"}
       >
-        <div>
-          {isDeliveryList ? (
-            <ReceivePurchaseItemsList
-              purchaseItems={purchaseItems}
-              setPurchaseItems={setPurchaseItems}
-            />
-          ) : (
-            <PurchaseItemsList
-              purchaseItems={purchaseItems}
-              setPurchaseItems={setPurchaseItems}
-            />
-          )}
-        </div>
+        <PurchaseItemsList
+          purchaseItems={purchaseItems}
+          setPurchaseItems={setPurchaseItems}
+          setItemsWereChanged={setItemsWereChanged}
+        />
       </div>
-      {children}
+      <div className={"flex gap-2"}>
+        {itemsWereChanged || isThereChange ? (
+          <Button
+            text={
+              purchaseData == undefined ? "Salvar compra" : "Salvar alterações"
+            }
+            type={"submit"}
+          />
+        ) : (
+          children
+        )}
+      </div>
     </form>
   );
 }

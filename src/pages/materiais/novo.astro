@@ -1,10 +1,10 @@
 ---
 import Header from "@comp/Header.astro";
-import { Materials } from "@comp/materials/Materials";
 import DefaultLayout from "@layouts/DefaultLayout.astro";
+import { CreateMaterial } from "src/components/materials/CreateMaterial";
 ---
 
 <DefaultLayout title="Materiais" transition:persist>
-  <Header title="Materiais" />
-  <Materials client:only="preact" />
+  <Header title="Novo material" />
+  <CreateMaterial client:only="preact" />
 </DefaultLayout>

@@ -14,10 +14,17 @@ const routes = [
 ];
 ---
 
-<aside class="bg-slate-800 p-4 gap-3 flex flex-col navBar">
-  <div id="idCard" class="p-2 text-white rounded-md font-semibold">
-    <p>Olá</p>
-    <span transition:persist="userName" id="userName">...</span>
+<aside
+  class="bg-slate-800 p-4 gap-3 flex md:flex-col navBar md:fixed md:h-full not-md:w-full not-md:overflow-scroll"
+>
+  <div
+    id="idCard"
+    class="p-1 md:p-2 text-white font-semibold rounded-md not-md:bg-slate-600 not-md:flex not-md:items-center"
+  >
+    <p class="not-md:hidden">Olá</p>
+    <span transition:persist="userName" id="userName" class="not-md:p-1"
+      >...</span
+    >
   </div>
   {
     routes.map((route) => {

@@ -439,7 +439,7 @@ export function QuotationDataForm({
       </div>
       <div className={"flex gap-4"}>
         <Input
-          label="Tempo esperado de execução em horas"
+          label="Tempo esperado"
           name="expectedDuration"
           errors={validationErrors}
           value={expectedDuration}

@@ -7,14 +7,19 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
 }
 
-export function Input({ label, errors, name, ...rest }: InputProps) {
+export function Input({ label, errors, name, className, ...rest }: InputProps) {
   return (
     <div className="flex flex-col flex-1 relative min-w-20">
       {label !== undefined && label !== "" && (
-        <label className="mb-0.5 font-semibold pl-1">{label}</label>
+        <label className="mb-0.5 font-semibold pl-1 not-md:text-sm">
+          {label}
+        </label>
       )}
       <input
         onFocus={(e) => {
+          e.currentTarget.select();
+        }}
+        onFocusCapture={(e) => {
           e.currentTarget.select();
         }}
         onKeyPress={(e) => {
@@ -23,10 +28,10 @@ export function Input({ label, errors, name, ...rest }: InputProps) {
             e.currentTarget.blur();
           }
         }}
-        {...rest}
         name={name}
+        {...rest}
         className={`border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          rest.className || ""
+          className || ""
         } ${errors?.[name] ? "border-red-500" : ""}`}
       />
       {errors?.[name] == undefined || (

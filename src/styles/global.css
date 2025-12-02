@@ -1,19 +1,25 @@
 @import "tailwindcss";
 
-*, strong, div {
+*,
+strong,
+div {
   font-family: sans-serif;
   box-sizing: border-box;
 }
 
-button, nav {
+button,
+nav {
   cursor: pointer;
 }
 
-button:disabled, button:disabled, input:disabled {
-  cursor:not-allowed
+button:disabled,
+button:disabled,
+input:disabled {
+  cursor: not-allowed
 }
 
-button:hover, nav:hover {
+button:hover,
+nav:hover {
   filter: brightness(75%);
 }
 

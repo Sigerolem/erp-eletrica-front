@@ -11,9 +11,11 @@ import { Button } from "@elements/Button";
 export function PurchaseItemsList({
   purchaseItems,
   setPurchaseItems,
+  setItemsWereChanged,
 }: {
   purchaseItems: Partial<PurchaseItemsType>[];
   setPurchaseItems: Dispatch<StateUpdater<Partial<PurchaseItemsType>[]>>;
+  setItemsWereChanged: Dispatch<StateUpdater<boolean>>;
 }) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -29,12 +31,14 @@ export function PurchaseItemsList({
         }
       })
     );
+    setItemsWereChanged(true);
   }
 
   function handleRemoveItem(materialId: string) {
     setPurchaseItems((prev) =>
       prev.filter((item) => item.material_id !== materialId)
     );
+    setItemsWereChanged(true);
   }
 
   return (

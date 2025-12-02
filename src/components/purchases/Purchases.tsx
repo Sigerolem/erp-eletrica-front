@@ -25,6 +25,9 @@ export type PurchaseItemsType = {
   amount_delivered: number;
   old_unit_cost: number;
   new_unit_cost: number;
+  new_clean_cost: number;
+  old_clean_cost: number;
+  ipi: number;
 };
 
 export type PurchasesType = {
@@ -37,7 +40,7 @@ export type PurchasesType = {
   is_tracked: boolean;
   supplier: SuppliersType;
   supplier_id: string;
-  purchase_items?: PurchaseItemsType[];
+  purchase_items: PurchaseItemsType[];
   updated_at: string;
 };
 
@@ -46,7 +49,6 @@ const PURCHASE_URL =
 
 export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchWithToken<{ purchases: PurchasesType[] }>({ path: "/purchases" }).then(
@@ -63,23 +65,12 @@ export function Purchases() {
 
   return (
     <>
-      {isModalOpen ? (
-        <CreatePurchaseModal
-          closeModal={() => {
-            setIsModalOpen(false);
-          }}
-          setPurchases={setPurchases}
-        />
-      ) : null}
       <div>
         <header className={"flex justify-between items-center px-2 mb-2"}>
           <h3 className={"text-xl font-semibold"}>Lista de compras</h3>
-          <Button
-            text="Nova compra"
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-          />
+          <a href="/compras/nova">
+            <Button text="Nova compra" />
+          </a>
         </header>
         <Table>
           <THead
