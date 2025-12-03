@@ -25,7 +25,11 @@ export function CreateQuotation() {
     );
   }, []);
 
-  async function handleDataSubmition(quotationData: Partial<QuotationsType>) {
+  async function handleDataSubmition({
+    quotationData,
+  }: {
+    quotationData: Partial<QuotationsType>;
+  }) {
     const { code, data } = await fetchWithToken<{ quotation: QuotationsType }>({
       path: "/quotations/create",
       method: "POST",

@@ -4,6 +4,7 @@ import { Button } from "@elements/Button";
 import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
+import { formatTransactionStatusEnum } from "src/utils/formating";
 
 export type TransactionItemsType = {
   id: string;
@@ -15,8 +16,8 @@ export type TransactionItemsType = {
   unit_cost: number;
   unit_profit: number;
   unit_value: number;
-  material_id: string | null;
-  material: MaterialsType | null;
+  material_id: string;
+  material: MaterialsType;
   transaction_id: string;
   created_at: string;
 };
@@ -33,8 +34,8 @@ export type TransactionsType = {
   id: string;
   status: TransactionsStatusType;
   quotation: QuotationsType;
-  quotations_id: string;
-  items: Partial<TransactionItemsType>[];
+  quotation_id: string;
+  items: TransactionItemsType[];
   created_at: string;
 };
 
@@ -80,7 +81,7 @@ export function Transactions() {
                   <p className={""}>{transaction.quotation.reference}</p>
                 </Td>
                 <Td link={`${TRANSACTION_URL}${transaction.id}/`}>
-                  <p>{transaction.status}</p>
+                  <p>{formatTransactionStatusEnum(transaction.status)}</p>
                 </Td>
               </Tr>
             ))}

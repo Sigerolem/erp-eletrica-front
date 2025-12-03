@@ -17,6 +17,7 @@ import { ExceptionalItemsList } from "./lists/ExceptionalItemsList";
 import { InventoryItemsList } from "./lists/InventoryItemsList";
 import type {
   QuotationItemsType,
+  QuotationMaterialsType,
   QuotationsStatusType,
   QuotationsType,
 } from "./Quotations";
@@ -32,9 +33,11 @@ export function QuotationDataForm({
   customers,
   children,
 }: {
-  doOnSubmit: (
-    quotationData: Partial<QuotationsType>
-  ) => Promise<{ [key: string]: string } | null>;
+  doOnSubmit: ({}: {
+    quotationData: Partial<QuotationsType>;
+    itemsToDelete?: string[];
+    materialsToDelete?: string[];
+  }) => Promise<{ [key: string]: string } | null>;
   quotationData?: QuotationsType;
   customers?: CustomersType[];
   children?: JSX.Element;
@@ -47,6 +50,8 @@ export function QuotationDataForm({
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [itemsToDelete, setItemsToDelete] = useState<string[]>([]);
+  const [materialsToDelete, setMaterialsToDelete] = useState<string[]>([]);
 
   const [reference, setReference] = useState("");
   const [description, setDescription] = useState("");
@@ -67,7 +72,7 @@ export function QuotationDataForm({
 
   const [customerSelected, setCustomerSelected] =
     useState<CustomersType | null>(null);
-  const [inventoryItems, setInventoryItems] = useState<
+  const [quoteMaterials, setQuoteMaterials] = useState<
     Partial<QuotationItemsType>[]
   >([]);
   const [occasionalMaterials, setOccasionalMaterials] = useState<
@@ -96,9 +101,7 @@ export function QuotationDataForm({
       setDirectValue(quotationData.direct_value);
       setDiscount(quotationData.discount);
       setCustomerSelected(quotationData.customer);
-      setInventoryItems(
-        quotationData.items.filter((item) => item.type === "inventory_material")
-      );
+      setQuoteMaterials(quotationData.materials);
       setOccasionalMaterials(
         quotationData.items.filter(
           (item) => item.type === "occasional_material"
@@ -142,14 +145,6 @@ export function QuotationDataForm({
       errorFound = true;
     }
 
-    if (description == "") {
-      setValidationErrors((prev) => ({
-        ...prev,
-        description: "Esse campo é obrigatório.",
-      }));
-      errorFound = true;
-    }
-
     if (customerSelected == null) {
       setValidationErrors((prev) => ({
         ...prev,
@@ -178,18 +173,17 @@ export function QuotationDataForm({
       service_value: serviceValue,
       direct_cost: directCost,
       direct_value: directValue,
-      customer_id: customerSelected?.id || "",
-      customer: customerSelected || undefined,
-      items: [
-        ...inventoryItems,
-        ...occasionalMaterials,
-        ...serviceItems,
-        ...expenses,
-      ],
+      customer_id: customerSelected!.id,
+      items: [...occasionalMaterials, ...serviceItems, ...expenses],
+      materials: quoteMaterials,
       transactions: [],
     };
 
-    const errors = await doOnSubmit(newQuotationData);
+    const errors = await doOnSubmit({
+      quotationData: newQuotationData,
+      itemsToDelete,
+      materialsToDelete,
+    });
 
     if (errors) {
       setValidationErrors((prev) => ({ ...prev, ...errors }));
@@ -198,50 +192,43 @@ export function QuotationDataForm({
 
   function itemsListErrorChecker(bool: boolean) {
     if (bool) {
-      setValidationErrors((prev) => ({ ...prev, inventoryItems: "Tem erro" }));
+      setValidationErrors((prev) => ({ ...prev, quoteMaterials: "Tem erro" }));
     } else {
       setValidationErrors((prev) => {
-        delete prev.inventoryItems;
+        delete prev.quoteMaterials;
         return prev;
       });
     }
   }
 
   function handleNewInventoryMaterial(material: MaterialsType) {
-    const newInvMaterial: Partial<QuotationItemsType> = {
-      type: "inventory_material",
-      material,
+    const newInvMaterial: Partial<QuotationMaterialsType> = {
       material_id: material.id,
       name: material.name,
       unit_cost: material.avg_cost,
       unit_profit: material.profit,
       unit_value: material.value,
-      unit: "sla", // TODO material unit
       expected_amount: 0,
-      awaiting_amount: 0,
       returned_amount: 0,
       taken_amount: 0,
+      quotation_id: quotationData?.id || undefined,
       is_private: false,
-      created_at: new Date().toISOString(),
     };
-    setInventoryItems((prev) => [...prev, newInvMaterial]);
+    setQuoteMaterials((prev) => [...prev, newInvMaterial]);
   }
 
   function handleNewExceptionalMaterial() {
     const newOccMaterial: Partial<QuotationItemsType> = {
       type: "occasional_material",
-      material_id: null,
       name: "",
       unit_cost: 0,
       unit_profit: 0,
       unit_value: 0,
       unit: "un",
       expected_amount: 0,
-      awaiting_amount: 0,
-      returned_amount: 0,
       taken_amount: 0,
       is_private: false,
-      created_at: new Date().toISOString(),
+      quotation_id: quotationData?.id,
     };
     setOccasionalMaterials((prev) => [...prev, newOccMaterial]);
   }
@@ -249,18 +236,15 @@ export function QuotationDataForm({
   function handleNewServiceItem() {
     const newService: Partial<QuotationItemsType> = {
       type: "service",
-      material_id: null,
       name: "",
       unit_cost: 0,
       unit_profit: 0,
       unit_value: 0,
       unit: "un",
       expected_amount: 0,
-      awaiting_amount: 0,
-      returned_amount: 0,
       taken_amount: 0,
       is_private: false,
-      created_at: new Date().toISOString(),
+      quotation_id: quotationData?.id,
     };
     setServiceItems((prev) => [...prev, newService]);
   }
@@ -268,18 +252,15 @@ export function QuotationDataForm({
   function handleNewExpenseItem() {
     const newService: Partial<QuotationItemsType> = {
       type: "expense",
-      material_id: null,
       name: "",
       unit_cost: 0,
       unit_profit: 0,
       unit_value: 0,
       unit: "un",
       expected_amount: 0,
-      awaiting_amount: 0,
-      returned_amount: 0,
       taken_amount: 0,
       is_private: false,
-      created_at: new Date().toISOString(),
+      quotation_id: quotationData?.id,
     };
     setExpenses((prev) => [...prev, newService]);
   }
@@ -379,9 +360,8 @@ export function QuotationDataForm({
           value={description}
           onBlur={(e) => {
             validateStringFieldOnBlur(e, setDescription, setValidationErrors, {
-              min: 10,
+              min: 5,
               max: 100,
-              required: true,
             });
           }}
         />
@@ -520,9 +500,10 @@ export function QuotationDataForm({
         }}
       >
         <InventoryItemsList
-          itemsList={inventoryItems}
-          setItemsList={setInventoryItems}
+          itemsList={quoteMaterials}
+          setItemsList={setQuoteMaterials}
           setIsThereError={itemsListErrorChecker}
+          deleteItem={setMaterialsToDelete}
         />
       </ListWrapper>
       <ListWrapper
@@ -532,6 +513,7 @@ export function QuotationDataForm({
         <ExceptionalItemsList
           itemsList={occasionalMaterials}
           setItemsList={setOccasionalMaterials}
+          deleteItem={setItemsToDelete}
           setIsThereError={itemsListErrorChecker}
         />
       </ListWrapper>
@@ -539,6 +521,7 @@ export function QuotationDataForm({
         <ExceptionalItemsList
           itemsList={serviceItems}
           setItemsList={setServiceItems}
+          deleteItem={setItemsToDelete}
           setIsThereError={itemsListErrorChecker}
           type="service"
         />
@@ -547,6 +530,7 @@ export function QuotationDataForm({
         <ExceptionalItemsList
           itemsList={expenses}
           setItemsList={setExpenses}
+          deleteItem={setItemsToDelete}
           setIsThereError={itemsListErrorChecker}
           type="expense"
         />

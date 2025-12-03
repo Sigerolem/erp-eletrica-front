@@ -77,12 +77,14 @@ export function TransactionDataForm({
           name="reference"
           value={quotation.reference}
           disabled={true}
+          className={"bg-blue-50!"}
         />
         <Input
           label="Código da OS"
           name="slug"
           value={quotation.slug}
           disabled={true}
+          className={"bg-blue-50!"}
         />
       </div>
       <div className={"flex gap-4"}>
@@ -91,18 +93,21 @@ export function TransactionDataForm({
           name="customer"
           value={quotation?.customer?.name || "Carregando..."}
           disabled={true}
+          className={"bg-blue-50!"}
         />
         <Input
           label="Situação"
           name="status"
           value={formatTransactionStatusEnum(status)}
           disabled={true}
+          className={"bg-blue-50!"}
         />
         <Input
           label="Data errada"
           name="status"
           value={new Date(transaction?.created_at || "").toLocaleDateString()}
           disabled={true}
+          className={"bg-blue-50!"}
         />
       </div>
       <Textarea
@@ -111,6 +116,7 @@ export function TransactionDataForm({
         errors={validationErrors}
         value={quotation.description}
         disabled={true}
+        className={"bg-blue-50!"}
       />
       <div className={"flex gap-4"}>
         <section
@@ -124,41 +130,67 @@ export function TransactionDataForm({
             <span className={"font-semibold text-lg pl-2"}>
               Qtd. Solicitada
             </span>
-            <span className={"font-semibold text-lg pl-2"}>
-              Qtd. em Estoque
-            </span>
+            {["ongoing", "partial", "concluded"].includes(
+              transaction?.status || ""
+            ) ? (
+              transaction?.status == "ongoing" ? (
+                <span className={"font-semibold text-lg pl-2"}>
+                  Qtd. Separada
+                </span>
+              ) : (
+                <span className={"font-semibold text-lg pl-2"}>
+                  Qtd. Enviada
+                </span>
+              )
+            ) : (
+              <span className={"font-semibold text-lg pl-2"}>
+                Qtd. em Estoque
+              </span>
+            )}
           </div>
 
           {transaction?.items.map((item) => (
             <div className={"grid grid-cols-4 gap-x-4"}>
               <span
                 className={
-                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
+                  "p-1 rounded-md font-semibold border border-slate-300"
                 }
               >
                 {item.name}
               </span>
               <span
                 className={
-                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
+                  "p-1 rounded-md font-semibold border border-slate-300 overflow-hidden"
                 }
               >
                 {item.material?.barcode || "sem código de barras"}
               </span>
               <span
                 className={
-                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
+                  "p-1 rounded-md font-semibold border border-slate-300"
                 }
               >
                 {item.expected_amount}
               </span>
-              <span
-                className={
-                  "p-1 bg-white rounded-md font-semibold border border-slate-300"
-                }
-              >
-                {item.material?.current_amount}
-              </span>
+              {["ongoing", "partial", "concluded"].includes(
+                transaction.status
+              ) ? (
+                <span
+                  className={
+                    "p-1 rounded-md font-semibold border border-slate-300"
+                  }
+                >
+                  {item.taken_amount}
+                </span>
+              ) : (
+                <span
+                  className={
+                    "p-1 rounded-md font-semibold border border-slate-300"
+                  }
+                >
+                  {item.material?.current_amount}
+                </span>
+              )}
               {/* <Input name="takenAmount" value={item.material?.current_amount} /> */}
             </div>
           ))}

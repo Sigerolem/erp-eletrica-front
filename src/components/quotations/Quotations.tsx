@@ -12,10 +12,27 @@ import { useEffect, useState } from "preact/hooks";
 import { fetchPdf } from "src/utils/fetchPdf";
 
 export type QuotationItemTypeType =
-  | "inventory_material"
   | "occasional_material"
   | "service"
   | "expense";
+
+export type QuotationMaterialsType = {
+  id: string;
+  name: string;
+  expected_amount: number;
+  taken_amount: number;
+  returned_amount: number;
+  unit_cost: number;
+  unit_profit: number;
+  unit_value: number;
+  is_private: boolean;
+  material_id: string;
+  material: MaterialsType;
+  transaction_item_id: string | null;
+  transaction_item: TransactionItemsType | null;
+  quotation_id: string;
+  created_at?: string;
+};
 
 export type QuotationItemsType = {
   id: string;
@@ -23,17 +40,11 @@ export type QuotationItemsType = {
   name: string;
   unit: string;
   expected_amount: number;
-  awaiting_amount: number;
   taken_amount: number;
-  returned_amount: number;
   unit_cost: number;
   unit_profit: number;
   unit_value: number;
   is_private: boolean;
-  material_id: string | null;
-  material: MaterialsType | null;
-  transaction_item_id: string | null;
-  transaction_item: TransactionItemsType | null;
   quotation_id: string;
   created_at?: string;
 };
@@ -75,6 +86,7 @@ export type QuotationsType = {
   customer_id: string;
   customer: CustomersType;
   items: Partial<QuotationItemsType>[];
+  materials: Partial<QuotationItemsType>[];
   transactions: Partial<TransactionsType>[];
 };
 
@@ -140,6 +152,13 @@ export function Quotations() {
                     onClick={() =>
                       fetchPdf(`/quotations/print/${quotation.id}`)
                     }
+                  />
+                  <Button
+                    text="PDF s/ valores"
+                    onClick={() =>
+                      fetchPdf(`/quotations/print/${quotation.id}?mode=hidden`)
+                    }
+                    className={"ml-2 bg-blue-700 text-white"}
                   />
                 </Td>
               </Tr>

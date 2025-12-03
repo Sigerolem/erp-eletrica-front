@@ -82,11 +82,23 @@ export function QuotationDetails() {
     });
   }, []);
 
-  async function updateQuotationData(quotationData: Partial<QuotationsType>) {
+  async function updateQuotationData({
+    quotationData,
+    itemsToDelete,
+    materialsToDelete,
+  }: {
+    quotationData: Partial<QuotationsType>;
+    itemsToDelete?: string[];
+    materialsToDelete?: string[];
+  }) {
     const { code, data } = await fetchWithToken<{ quotation: QuotationsType }>({
       path: `/quotations/${id}`,
       method: "PUT",
-      body: JSON.stringify(quotationData),
+      body: JSON.stringify({
+        quotation: quotationData,
+        itemsToDelete,
+        materialsToDelete,
+      }),
     });
 
     if (code == 200) {

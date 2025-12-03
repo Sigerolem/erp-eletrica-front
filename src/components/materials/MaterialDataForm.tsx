@@ -205,7 +205,7 @@ export function MaterialDataForm({
           }}
         />
         <Input
-          label="Tamanho da embalagem"
+          label="Qtd. na embalagem"
           name="pkgSize"
           value={pkgSize}
           onBlur={(e) => {

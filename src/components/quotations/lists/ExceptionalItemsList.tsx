@@ -16,6 +16,7 @@ interface ComponentProps {
   setItemsList: Dispatch<StateUpdater<Partial<QuotationItemsType>[]>>;
   setIsThereError: (bool: boolean) => void;
   type?: QuotationItemTypeType;
+  deleteItem: Dispatch<StateUpdater<string[]>>;
 }
 
 export function ExceptionalItemsList({
@@ -23,6 +24,7 @@ export function ExceptionalItemsList({
   setIsThereError,
   setItemsList,
   type = "occasional_material",
+  deleteItem,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
@@ -224,6 +226,9 @@ export function ExceptionalItemsList({
                 text="X"
                 className={"bg-red-600 py-1 text-white"}
                 onClick={() => {
+                  if (item.id) {
+                    deleteItem((prev) => [...prev, item.id!]);
+                  }
                   handleDeleteItem({ createdAt: item.created_at! });
                 }}
               />

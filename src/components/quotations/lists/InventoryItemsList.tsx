@@ -1,5 +1,5 @@
 import { Input } from "@elements/Input";
-import type { QuotationItemsType } from "../Quotations";
+import type { QuotationMaterialsType } from "../Quotations";
 import {
   useEffect,
   useState,
@@ -10,17 +10,19 @@ import { BrlStringFromCents } from "@utils/formating";
 import { Button } from "@elements/Button";
 
 interface ComponentProps {
-  itemsList: Partial<QuotationItemsType>[];
-  setItemsList: Dispatch<StateUpdater<Partial<QuotationItemsType>[]>>;
+  itemsList: Partial<QuotationMaterialsType>[];
+  setItemsList: Dispatch<StateUpdater<Partial<QuotationMaterialsType>[]>>;
   setIsThereError: (bool: boolean) => void;
+  deleteItem: Dispatch<StateUpdater<string[]>>;
 }
 
 export function InventoryItemsList({
   itemsList,
   setIsThereError,
   setItemsList,
+  deleteItem,
 }: ComponentProps) {
-  const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);
+  const [items, setItems] = useState<Partial<QuotationMaterialsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
@@ -37,16 +39,10 @@ export function InventoryItemsList({
     setItems(itemsList);
   }, [itemsList]);
 
-  function handleDeleteItem({
-    createdAt,
-    matId,
-  }: {
-    createdAt: string;
-    matId: string;
-  }) {
+  function handleDeleteItem({ matId }: { matId: string }) {
     const errors = Object.keys(validationErrors);
     errors.forEach((error) => {
-      if (error.includes(`-${createdAt}`)) {
+      if (error.includes(`-${matId}`)) {
         setValidationErrors((prev) => {
           delete prev[error];
           return prev;
@@ -54,33 +50,33 @@ export function InventoryItemsList({
       }
     });
     setItemsList((prev) => [
-      ...prev.filter((item) => item.created_at != createdAt),
+      ...prev.filter((item) => item.material_id != matId),
     ]);
   }
 
   function handleUpdateItemInt({
     value,
     propName,
-    createdAt,
+    material_id,
   }: {
-    createdAt: string;
     value: string;
     propName: string;
+    material_id: string;
   }) {
     if (isNaN(parseInt(value || "0"))) {
       setValidationErrors((prev) => ({
         ...prev,
-        [`${propName}-${createdAt}`]: "Digite um valor válido",
+        [`${propName}-${material_id}`]: "Digite um valor válido",
       }));
     } else {
       setValidationErrors((prev) => {
-        delete prev[`${propName}-${createdAt}`];
+        delete prev[`${propName}-${material_id}`];
         return { ...prev };
       });
     }
     setItemsList((prev) =>
       prev.map((item) => {
-        if (item.created_at == createdAt) {
+        if (item.material_id == material_id) {
           return { ...item, [propName]: parseInt(value || "0") };
         } else {
           return item;
@@ -90,11 +86,11 @@ export function InventoryItemsList({
   }
 
   function handleUpdateItemCurrency({
-    index,
+    material_id,
     value,
     propName,
   }: {
-    index: number;
+    material_id: string;
     value: string;
     propName: string;
   }) {
@@ -106,17 +102,17 @@ export function InventoryItemsList({
     if (isNaN(parseFloat(value || "0"))) {
       setValidationErrors((prev) => ({
         ...prev,
-        [`${propName}-${index}`]: "Digite um valor válido",
+        [`${propName}-${material_id}`]: "Digite um valor válido",
       }));
     } else {
       setValidationErrors((prev) => {
-        delete prev[`${propName}-${index}`];
+        delete prev[`${propName}-${material_id}`];
         return { ...prev };
       });
     }
     setItems((prev) =>
-      prev.map((item, i) => {
-        if (i == index) {
+      prev.map((item) => {
+        if (item.material_id == material_id) {
           return {
             ...item,
             [propName]: Math.round(parseFloat(value || "0") * 100),
@@ -138,7 +134,7 @@ export function InventoryItemsList({
         <div>Quantidade prevista</div>
       </header>
 
-      {items.map((item, index) => {
+      {items.map((item) => {
         if (item == undefined) {
           return <></>;
         }
@@ -149,35 +145,27 @@ export function InventoryItemsList({
           >
             <span
               className={
-                "col-span-2 bg-white p-1 rounded-md border border-gray-300"
+                "col-span-2 bg-blue-50 p-1 rounded-md border border-gray-300"
               }
             >
               {item.name}
             </span>
             <Input
-              name={`unit_value-${index}`}
+              name={`unit_value-${item.material_id}`}
               value={BrlStringFromCents(item.unit_value)}
-              onBlur={(e) => {
-                const value = e.currentTarget.value;
-                handleUpdateItemCurrency({
-                  value,
-                  index,
-                  propName: "unit_value",
-                });
-              }}
-              errors={validationErrors}
-              className={"min-w-5"}
+              disabled={true}
+              className={"min-w-5 bg-blue-50!"}
             />
             <div className={"flex gap-2 items-center justify-stretch"}>
               <Input
                 label=""
-                name={`expected_amount-${index}`}
+                name={`expected_amount-${item.material_id}`}
                 value={item.expected_amount}
                 onBlur={(e) => {
                   const value = e.currentTarget.value;
                   handleUpdateItemInt({
                     value,
-                    createdAt: item.created_at!,
+                    material_id: item.material_id!,
                     propName: "expected_amount",
                   });
                 }}
@@ -189,9 +177,11 @@ export function InventoryItemsList({
                   text="X"
                   className={"bg-red-600 py-1 text-white"}
                   onClick={() => {
+                    if (item.id) {
+                      deleteItem((prev) => [...prev, item.id!]);
+                    }
                     handleDeleteItem({
-                      createdAt: item.created_at!,
-                      matId: item.material_id || "",
+                      matId: item.material_id!,
                     });
                   }}
                 />

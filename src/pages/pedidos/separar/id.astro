@@ -1,0 +1,10 @@
+---
+import Header from "@comp/Header.astro";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+import { TransactionDelivery } from "src/components/transactions/TransactionDelivery";
+---
+
+<DefaultLayout title="Separação do Pedido" transition:persist>
+  <Header title="Separação do pedido" />
+  <TransactionDelivery client:only="preact" />
+</DefaultLayout>

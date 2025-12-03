@@ -14,7 +14,6 @@ import { Input } from "@elements/Input";
 import type { JSX, TargetedSubmitEvent } from "preact";
 import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
 import { Button } from "@elements/Button";
-import { ReceivePurchaseItemsList } from "./ReceivePurchaseItemsList";
 import {
   validateFloatFieldOnBlur,
   validateStringFieldOnBlur,
@@ -317,6 +316,7 @@ export function PurchaseDataForm({
         className={"bg-slate-100 border border-slate-400 py-1 rounded-md mb-4"}
       >
         <PurchaseItemsList
+          purchase={purchaseData!}
           purchaseItems={purchaseItems}
           setPurchaseItems={setPurchaseItems}
           setItemsWereChanged={setItemsWereChanged}

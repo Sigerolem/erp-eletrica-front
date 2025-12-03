@@ -75,6 +75,11 @@ export function PurchaseDelivery() {
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+    if (nf == "") {
+      // window.alert("Preencha o número da NF");
+      setValidationErrors((prev) => ({ ...prev, nf: "Campo obrigarório" }));
+      return;
+    }
     const purchaseData: Partial<PurchasesType> = {
       status: "received",
       is_tracked: isTracked,
@@ -156,7 +161,11 @@ export function PurchaseDelivery() {
             : item
         ),
       ]);
-    } else {
+    } else if (code == 409) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [`barcode-${materialId}`]: "Código repetido",
+      }));
     }
   }
 
@@ -266,14 +275,17 @@ export function PurchaseDelivery() {
                     : ""
                 }`}
               >
-                <div className={"flex flex-col gap-2 min-h-30"}>
+                <div className={"flex flex-col gap-4 min-h-30"}>
                   <Input
-                    name={`barcode-${item.id}`}
+                    name={`barcode-${item.material_id}`}
                     label={"Código de barras"}
                     value={item.material?.barcode || "cadastre um código"}
-                    disabled={materialBeingUpdated !== item.id}
+                    disabled={materialBeingUpdated !== item.material_id}
+                    errors={validationErros}
                     className={
-                      materialBeingUpdated !== item.id ? "bg-blue-50!" : ""
+                      materialBeingUpdated !== item.material_id
+                        ? "bg-blue-50!"
+                        : ""
                     }
                     onKeyPress={(e) => {
                       if (e.key == "Enter") {
@@ -286,7 +298,7 @@ export function PurchaseDelivery() {
                       }
                     }}
                   />
-                  {materialBeingUpdated == item.id ? (
+                  {materialBeingUpdated == item.material_id ? (
                     <div className={"flex gap-2"}>
                       {/* <Button
                         text="Salvar"
@@ -314,7 +326,7 @@ export function PurchaseDelivery() {
                         "max-w-16 bg-blue-700 text-white text-sm p-1! mb-6"
                       }
                       onClick={() => {
-                        setMaterialBeingUpdated(item.id);
+                        setMaterialBeingUpdated(item.material_id);
                       }}
                     />
                   )}
