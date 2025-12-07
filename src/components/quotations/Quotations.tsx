@@ -87,7 +87,7 @@ export type QuotationsType = {
   customer: CustomersType;
   items: Partial<QuotationItemsType>[];
   materials: Partial<QuotationItemsType>[];
-  transactions: Partial<TransactionsType>[];
+  transaction: Partial<TransactionsType> | null;
 };
 
 export function Quotations() {

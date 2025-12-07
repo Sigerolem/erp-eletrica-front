@@ -1,3 +1,4 @@
+import { Button } from "@elements/Button";
 import { Input } from "@elements/Input";
 import { UnitSelector } from "@elements/UnitSelector";
 import { BrlStringFromCents } from "@utils/formating";
@@ -8,8 +9,11 @@ import {
   type Dispatch,
   type StateUpdater,
 } from "preact/hooks";
-import type { QuotationItemsType, QuotationItemTypeType } from "../Quotations";
-import { Button } from "@elements/Button";
+import type {
+  QuotationItemsType,
+  QuotationItemTypeType,
+  QuotationsType,
+} from "../Quotations";
 
 interface ComponentProps {
   itemsList: Partial<QuotationItemsType>[];
@@ -17,6 +21,7 @@ interface ComponentProps {
   setIsThereError: (bool: boolean) => void;
   type?: QuotationItemTypeType;
   deleteItem: Dispatch<StateUpdater<string[]>>;
+  quotation?: QuotationsType;
 }
 
 export function ExceptionalItemsList({
@@ -25,6 +30,7 @@ export function ExceptionalItemsList({
   setItemsList,
   type = "occasional_material",
   deleteItem,
+  quotation,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
@@ -108,8 +114,11 @@ export function ExceptionalItemsList({
     });
   }
 
+  const xSize = window.innerWidth;
+
+  window.alert(xSize);
   return (
-    <div className={"px-2 flex flex-col gap-4 pb-3"}>
+    <div className={"px-2 pb-3"}>
       <header className={"grid grid-cols-8 gap-x-4 font-semibold"}>
         <span className={"col-span-3"}>Nome/Descrição</span>
         <span>Unidade</span>

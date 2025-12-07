@@ -77,8 +77,6 @@ export function TransactionDetails() {
     }
   }
 
-  console.log(transaction);
-
   return (
     <main>
       {transaction ? (

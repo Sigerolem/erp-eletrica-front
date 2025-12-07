@@ -39,6 +39,15 @@ export function CreateMaterial() {
     return { erro: "Algum problema ocorreu" };
   }
 
+  useEffect(() => {
+    setTimeout(() => {
+      const input = document.querySelector<HTMLInputElement>("input");
+      if (input) {
+        input.focus();
+      }
+    }, 100);
+  }, []);
+
   return (
     <div className={""}>
       <MaterialDataForm doOnSubmit={onFormSubmit}>

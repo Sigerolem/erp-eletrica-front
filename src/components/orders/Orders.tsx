@@ -1,7 +1,4 @@
-import type { CustomersType } from "@comp/customers/Customers";
-import type { MaterialsType } from "@comp/materials/Materials";
 import type { QuotationsType } from "@comp/quotations/Quotations";
-import { Button } from "@elements/Button";
 import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
@@ -20,7 +17,7 @@ export function Orders() {
       if (result.code == 200 || result.code == 201) {
         setQuotations(result.data.quotations);
       } else {
-        window.alert("Erro ao buscar orçamentos.");
+        window.alert("Erro ao buscar ordens de serviço.");
         console.error(result.data, result.code);
       }
     });

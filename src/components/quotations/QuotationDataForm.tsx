@@ -176,7 +176,6 @@ export function QuotationDataForm({
       customer_id: customerSelected!.id,
       items: [...occasionalMaterials, ...serviceItems, ...expenses],
       materials: quoteMaterials,
-      transactions: [],
     };
 
     const errors = await doOnSubmit({
@@ -514,6 +513,7 @@ export function QuotationDataForm({
           itemsList={occasionalMaterials}
           setItemsList={setOccasionalMaterials}
           deleteItem={setItemsToDelete}
+          quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
         />
       </ListWrapper>
@@ -522,6 +522,7 @@ export function QuotationDataForm({
           itemsList={serviceItems}
           setItemsList={setServiceItems}
           deleteItem={setItemsToDelete}
+          quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
           type="service"
         />
@@ -531,6 +532,7 @@ export function QuotationDataForm({
           itemsList={expenses}
           setItemsList={setExpenses}
           deleteItem={setItemsToDelete}
+          quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
           type="expense"
         />

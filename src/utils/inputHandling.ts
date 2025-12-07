@@ -44,6 +44,21 @@ export function handleUpdateListItemValues({
     let [newCost, newValue, newProfit] = [0, 0, 0];
     if (propName == "unit_cost") {
       newCost = Math.round(parseFloat(value || "0") * 100);
+      if (oldItem.type == "expense") {
+        setItemsList((prev) =>
+          prev.map((item) => {
+            if (item.created_at == created_at) {
+              return {
+                ...item,
+                unit_cost: newCost,
+              };
+            } else {
+              return item;
+            }
+          })
+        );
+        return;
+      }
       newProfit = itemsList.find((item) => item.created_at == created_at)!
         .unit_profit!;
       newValue = calculateProfit({

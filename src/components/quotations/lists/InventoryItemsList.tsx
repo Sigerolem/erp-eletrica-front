@@ -1,13 +1,12 @@
+import { Button } from "@elements/Button";
 import { Input } from "@elements/Input";
-import type { QuotationMaterialsType } from "../Quotations";
 import {
   useEffect,
   useState,
   type Dispatch,
   type StateUpdater,
 } from "preact/hooks";
-import { BrlStringFromCents } from "@utils/formating";
-import { Button } from "@elements/Button";
+import type { QuotationMaterialsType } from "../Quotations";
 
 interface ComponentProps {
   itemsList: Partial<QuotationMaterialsType>[];
@@ -126,13 +125,13 @@ export function InventoryItemsList({
 
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3"}>
-      <header className={"grid grid-cols-4 font-semibold"}>
+      {/* <header className={"grid grid-cols-4 font-semibold"}>
         <div className={"col-span-2"}>
           <span className={"block -mb-2"}>Material</span>
         </div>
         <div>Valor unitário</div>
         <div>Quantidade prevista</div>
-      </header>
+      </header> */}
 
       {items.map((item) => {
         if (item == undefined) {
@@ -143,34 +142,36 @@ export function InventoryItemsList({
             key={item.created_at}
             className={"grid grid-cols-4 gap-4 items-center"}
           >
-            <span
-              className={
-                "col-span-2 bg-blue-50 p-1 rounded-md border border-gray-300"
-              }
-            >
-              {item.name}
-            </span>
-            <Input
-              name={`unit_value-${item.material_id}`}
-              value={BrlStringFromCents(item.unit_value)}
-              disabled={true}
-              className={"min-w-5 bg-blue-50!"}
-            />
-            <div className={"flex gap-2 items-center justify-stretch"}>
+            <div className={"col-span-2"}>
               <Input
-                label=""
-                name={`expected_amount-${item.material_id}`}
-                value={item.expected_amount}
-                onBlur={(e) => {
-                  const value = e.currentTarget.value;
-                  handleUpdateItemInt({
-                    value,
-                    material_id: item.material_id!,
-                    propName: "expected_amount",
-                  });
-                }}
-                errors={validationErrors}
-                className={"min-w-5"}
+                label="Nome descritivo"
+                name={`name-${item.material_id}`}
+                value={item.name}
+                disabled={true}
+                className={"min-w-5 bg-blue-50!"}
+              />
+            </div>
+            <Input
+              label="Quantidade esperada"
+              name={`expected_amount-${item.material_id}`}
+              value={item.expected_amount}
+              onBlur={(e) => {
+                const value = e.currentTarget.value;
+                handleUpdateItemInt({
+                  value,
+                  material_id: item.material_id!,
+                  propName: "expected_amount",
+                });
+              }}
+              errors={validationErrors}
+              className={"min-w-5"}
+            />
+            <div className={"flex gap-2 items-end justify-stretch"}>
+              <Input
+                label="Quantidade real"
+                name={`real_amount-${item.material_id}`}
+                value={(item.taken_amount || 0) - (item.returned_amount || 0)}
+                className={"min-w-5 bg-blue-50!"}
               />
               <div className={"ml-1"}>
                 <Button

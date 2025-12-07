@@ -1,12 +1,8 @@
+import { Button } from "@elements/Button";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
-import type {
-  QuotationItemTypeType,
-  QuotationsStatusType,
-  QuotationsType,
-} from "./Quotations";
 import { QuotationDataForm } from "./QuotationDataForm";
-import { Button } from "@elements/Button";
+import type { QuotationsStatusType, QuotationsType } from "./Quotations";
 
 export function QuotationDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);

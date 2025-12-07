@@ -1,12 +1,11 @@
-import { fetchWithToken } from "@utils/fetchWithToken";
-import { useEffect, useState } from "preact/hooks";
+import { QuotationDataForm } from "@comp/quotations/QuotationDataForm";
 import type {
-  QuotationItemTypeType,
   QuotationsStatusType,
   QuotationsType,
 } from "@comp/quotations/Quotations";
 import { Button } from "@elements/Button";
-import { QuotationDataForm } from "@comp/quotations/QuotationDataForm";
+import { fetchWithToken } from "@utils/fetchWithToken";
+import { useEffect, useState } from "preact/hooks";
 
 export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
@@ -82,11 +81,23 @@ export function OrderDetails() {
     });
   }, []);
 
-  async function updateQuotationData(quotationData: Partial<QuotationsType>) {
+  async function updateQuotationData({
+    quotationData,
+    itemsToDelete,
+    materialsToDelete,
+  }: {
+    quotationData: Partial<QuotationsType>;
+    itemsToDelete?: string[];
+    materialsToDelete?: string[];
+  }) {
     const { code, data } = await fetchWithToken<{ quotation: QuotationsType }>({
       path: `/quotations/${id}`,
       method: "PUT",
-      body: JSON.stringify(quotationData),
+      body: JSON.stringify({
+        quotation: quotationData,
+        itemsToDelete,
+        materialsToDelete,
+      }),
     });
 
     if (code == 200) {
