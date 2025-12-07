@@ -116,7 +116,6 @@ export function ExceptionalItemsList({
 
   const xSize = window.innerWidth;
 
-  window.alert(xSize);
   return (
     <div className={"px-2 pb-3"}>
       <header className={"grid grid-cols-8 gap-x-4 font-semibold"}>
