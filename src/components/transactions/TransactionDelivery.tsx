@@ -185,7 +185,7 @@ export function TransactionDelivery() {
                 key={item.id}
                 className={`flex flex-col gap-2 py-3 px-2 ${
                   Object.keys(barcodeLog).includes(item.material?.barcode!)
-                    ? item.taken_amount == item.expected_amount
+                    ? item.separated_amount == item.expected_amount
                       ? "bg-green-200"
                       : "bg-amber-200"
                     : ""

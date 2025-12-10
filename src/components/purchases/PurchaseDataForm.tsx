@@ -119,7 +119,6 @@ export function PurchaseDataForm({
     purchaseData?.tax_cost != taxCost;
 
   function handleNewPurchaseMaterial(material: MaterialsType) {
-    console.log(material);
     setPurchaseItems((prev) => [
       ...prev,
       {
