@@ -9,8 +9,8 @@ import { formatTransactionStatusEnum } from "src/utils/formating";
 export type TransactionItemsType = {
   id: string;
   name: string;
-  unit: string;
   expected_amount: number;
+  separated_amount: number;
   taken_amount: number;
   returned_amount: number;
   unit_cost: number;

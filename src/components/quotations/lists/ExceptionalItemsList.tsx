@@ -94,6 +94,7 @@ export function ExceptionalItemsList({
       })
     );
   }
+  const xSize = window.innerWidth;
 
   function handleUpdateItemCurrency({
     value,
@@ -114,30 +115,33 @@ export function ExceptionalItemsList({
     });
   }
 
-  const xSize = window.innerWidth;
-
   return (
-    <div className={"px-2 pb-3"}>
-      <header className={"grid grid-cols-8 gap-x-4 font-semibold"}>
-        <span className={"col-span-3"}>Nome/Descrição</span>
-        <span>Unidade</span>
-        <span>Custo unitário</span>
-        <span>Margem de lucro</span>
-        <span>Valor unitário</span>
-        <span>Quantidade prevista</span>
-      </header>
+    <div className={"px-2 flex flex-col gap-3 pb-3"}>
+      {xSize >= 720 && (
+        <header className={"grid grid-cols-8 gap-x-4 font-semibold"}>
+          <span className={"col-span-3"}>Nome/Descrição</span>
+          <span>Unidade</span>
+          <span>Custo unitário</span>
+          <span>Margem de lucro</span>
+          <span>Valor unitário</span>
+          <span>Quantidade prevista</span>
+        </header>
+      )}
 
-      {items.map((item) => {
+      {items.map((item, index) => {
         if (item == undefined) {
           return <></>;
         }
         return (
           <div
             key={item.created_at}
-            className={"grid grid-cols-8 gap-x-4 items-center"}
+            className={`grid gap-x-4 items-end ${
+              xSize < 720 ? "grid-cols-4" : "grid-cols-8"
+            } ${index > 0 && "border-t border-gray-400"}`}
           >
-            <div className={"col-span-3"}>
+            <div className={"col-span-3 pt-2"}>
               <Input
+                label={xSize < 720 ? "Nome" : ""}
                 name={`name-${item.created_at}`}
                 value={item.name}
                 onBlur={(e) => {
@@ -170,6 +174,7 @@ export function ExceptionalItemsList({
             />
             <Input
               name={`unit_cost-${item.created_at}`}
+              label={xSize < 720 ? "Custo Unit." : ""}
               value={BrlStringFromCents(item.unit_cost)}
               onBlur={(e) => {
                 const value = e.currentTarget.value;
@@ -183,6 +188,7 @@ export function ExceptionalItemsList({
               className={"min-w-5"}
             />
             <Input
+              label={xSize < 720 ? "Lucro" : ""}
               name={`unit_profit-${item.created_at}`}
               value={`${(item.unit_profit! / 100)
                 .toFixed(2)
@@ -201,6 +207,7 @@ export function ExceptionalItemsList({
             />
             <Input
               name={`unit_value-${item.created_at}`}
+              label={xSize < 720 ? "Valor Unit." : ""}
               value={BrlStringFromCents(item.unit_value)}
               onBlur={(e) => {
                 const value = e.currentTarget.value;
@@ -214,9 +221,9 @@ export function ExceptionalItemsList({
               className={"min-w-5"}
             />
 
-            <div className={"flex gap-2 items-center justify-stretch"}>
+            <div className={"flex gap-2 items-end justify-stretch"}>
               <Input
-                label=""
+                label={xSize < 720 ? "Qtd. Eesperada" : ""}
                 name={`expected_amount-${item.created_at}`}
                 value={item.expected_amount}
                 onBlur={(e) => {

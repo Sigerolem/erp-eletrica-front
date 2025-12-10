@@ -180,7 +180,7 @@ export function TransactionDataForm({
                     "p-1 rounded-md font-semibold border border-slate-300"
                   }
                 >
-                  {item.taken_amount}
+                  {item.separated_amount}
                 </span>
               ) : (
                 <span

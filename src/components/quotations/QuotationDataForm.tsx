@@ -26,6 +26,7 @@ import {
   BrlStringFromCents,
   formatQuotationStatusEnum,
 } from "@utils/formating";
+import { Button } from "src/elements/Button";
 
 export function QuotationDataForm({
   quotationData,
@@ -68,7 +69,11 @@ export function QuotationDataForm({
   const [serviceValue, setServiceValue] = useState(0);
   const [directCost, setDirectCost] = useState(0);
   const [directValue, setDirectValue] = useState(0);
-  const [discount, setDiscount] = useState(0);
+  const [matDiscount, setMatDiscount] = useState(0);
+  const [serDiscount, setSerDiscount] = useState(0);
+
+  const [showValues, setShowValues] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const [customerSelected, setCustomerSelected] =
     useState<CustomersType | null>(null);
@@ -86,10 +91,10 @@ export function QuotationDataForm({
   useEffect(() => {
     if (quotationData) {
       setStatus(quotationData.status);
+      setToolList(quotationData.tool_list);
       setReference(quotationData.reference);
       setDescription(quotationData.description);
       setExpectedDuration(quotationData.expected_duration);
-      setToolList(quotationData.tool_list);
       setPrivateComments(quotationData.private_comments);
       setPublicComments(quotationData.public_comments);
       setPurchaseOrder(quotationData.purchase_order);
@@ -99,7 +104,8 @@ export function QuotationDataForm({
       setServiceValue(quotationData.service_value);
       setDirectCost(quotationData.direct_cost);
       setDirectValue(quotationData.direct_value);
-      setDiscount(quotationData.discount);
+      setSerDiscount(quotationData.ser_discount);
+      setMatDiscount(quotationData.mat_discount);
       setCustomerSelected(quotationData.customer);
       setQuoteMaterials(quotationData.materials);
       setOccasionalMaterials(
@@ -125,8 +131,6 @@ export function QuotationDataForm({
       }
     );
   }, []);
-
-  useEffect(() => {}, [validationErrors]);
 
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -163,7 +167,8 @@ export function QuotationDataForm({
       description,
       expected_duration: expectedDuration,
       tool_list: toolList,
-      discount,
+      mat_discount: 0,
+      ser_discount: 0,
       private_comments: privateComments,
       public_comments: publicComments,
       purchase_order: purchaseOrder,
@@ -266,79 +271,6 @@ export function QuotationDataForm({
 
   return (
     <DataForm onSubmit={onFormSubmit}>
-      {URL_PATH.includes("novo") ? (
-        <></>
-      ) : (
-        <>
-          <div className={"flex gap-4"}>
-            <Input
-              label="Custo de materiais"
-              name="materialCost"
-              value={BrlStringFromCents(materialCost)}
-              disabled={true}
-            />
-            <Input
-              label="Custo de serviços"
-              name="serviceCost"
-              value={BrlStringFromCents(serviceCost)}
-              disabled={true}
-            />
-            <Input
-              label="Custo das despesas"
-              name="directCost"
-              value={BrlStringFromCents(directCost)}
-              disabled={true}
-            />
-          </div>
-          <div className={"flex gap-4"}>
-            <Input
-              label="Valor de materiais"
-              name="materialCost"
-              value={BrlStringFromCents(materialValue)}
-              disabled={true}
-            />
-            <Input
-              label="Valor de serviços"
-              name="serviceCost"
-              value={BrlStringFromCents(serviceValue)}
-              disabled={true}
-            />
-            <Input
-              label="Valor das despesass"
-              name="directCost"
-              value={BrlStringFromCents(directValue)}
-              disabled={true}
-            />
-          </div>
-        </>
-      )}
-      {URL_PATH.includes("novo") ? (
-        <></>
-      ) : (
-        <div className={"flex gap-4"}>
-          <Input
-            label="Situação"
-            name="status"
-            value={formatQuotationStatusEnum(status)}
-            disabled={true}
-          />
-          <Input
-            label="Ordem de Compra"
-            name="purchaseOrder"
-            value={purchaseOrder}
-            onBlur={(e) => {
-              validateStringFieldOnBlur(
-                e,
-                setPurchaseOrder,
-                setValidationErrors,
-                {
-                  max: 20,
-                }
-              );
-            }}
-          />
-        </div>
-      )}
       <Input
         label="Referência"
         name="reference"
@@ -351,72 +283,7 @@ export function QuotationDataForm({
         }}
         errors={validationErrors}
       />
-      <div className={"flex gap-4"}>
-        <Textarea
-          label="Descrição do serviço"
-          name="description"
-          errors={validationErrors}
-          value={description}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(e, setDescription, setValidationErrors, {
-              min: 5,
-              max: 100,
-            });
-          }}
-        />
-        <Textarea
-          label="Ferramentas ou Equipamento"
-          name="toolList"
-          errors={validationErrors}
-          value={toolList}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(e, setToolList, setValidationErrors, {
-              min: 2,
-              max: 200,
-              required: false,
-            });
-          }}
-        />
-      </div>
-      <div className={"flex gap-4"}>
-        <Textarea
-          label="Informações Adicionais"
-          name="publicComments"
-          errors={validationErrors}
-          value={publicComments}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(
-              e,
-              setPublicComments,
-              setValidationErrors,
-              {
-                min: 0,
-                max: 300,
-                required: false,
-              }
-            );
-          }}
-        />
-        <Textarea
-          label="Anotações"
-          name="privateComments"
-          errors={validationErrors}
-          value={privateComments}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(
-              e,
-              setPrivateComments,
-              setValidationErrors,
-              {
-                min: 0,
-                max: 300,
-                required: false,
-              }
-            );
-          }}
-        />
-      </div>
-      <div className={"flex gap-4"}>
+      <div className={"flex gap-4 items-end"}>
         <Input
           label="Tempo esperado"
           name="expectedDuration"
@@ -462,22 +329,226 @@ export function QuotationDataForm({
           disabled={customers == undefined}
         />
         <Input
-          label="Desconto"
-          name="discount"
+          label="Desconto Material"
+          name="mat_discount"
           errors={validationErrors}
-          value={(discount / 100_00).toLocaleString("pt-br", {
+          value={(matDiscount / 100_00).toLocaleString("pt-br", {
             maximumFractionDigits: 2,
             unit: "percent",
             unitDisplay: "short",
             style: "percent",
           })}
           onBlur={(e) => {
-            validateFloatFieldOnBlur(e, setDiscount, setValidationErrors, {
+            validateFloatFieldOnBlur(e, setMatDiscount, setValidationErrors, {
+              removeFromString: "%",
+            });
+          }}
+        />
+        <Input
+          label="Desconto Serviço"
+          name="ser_discount"
+          errors={validationErrors}
+          value={(matDiscount / 100_00).toLocaleString("pt-br", {
+            maximumFractionDigits: 2,
+            unit: "percent",
+            unitDisplay: "short",
+            style: "percent",
+          })}
+          onBlur={(e) => {
+            validateFloatFieldOnBlur(e, setSerDiscount, setValidationErrors, {
               removeFromString: "%",
             });
           }}
         />
       </div>
+
+      {URL_PATH.includes("novo") ? (
+        <></>
+      ) : showValues ? (
+        <div className={"flex gap-4"}>
+          <Input
+            label="Situação"
+            name="status"
+            value={formatQuotationStatusEnum(status)}
+            disabled={true}
+            className={"bg-blue-50!"}
+          />
+          <Input
+            label="Ordem de Compra"
+            name="purchaseOrder"
+            value={purchaseOrder}
+            onBlur={(e) => {
+              validateStringFieldOnBlur(
+                e,
+                setPurchaseOrder,
+                setValidationErrors,
+                {
+                  max: 20,
+                }
+              );
+            }}
+          />
+        </div>
+      ) : (
+        <Button
+          text="Ver Valores"
+          onClick={() => {
+            setShowValues(true);
+          }}
+          className={"bg-gray-400"}
+        />
+      )}
+
+      {URL_PATH.includes("novo") ? (
+        <></>
+      ) : (
+        <section
+          className={`border rounded-md p-2 border-gray-400 ${
+            !showValues && "hidden"
+          }`}
+        >
+          <div className={`flex gap-4 items-end ${!showValues && "hidden"}`}>
+            <Input
+              label="Custo de materiais"
+              name="materialCost"
+              value={BrlStringFromCents(materialCost)}
+              disabled={true}
+              className={"bg-blue-50!"}
+            />
+            <Input
+              label="Custo de serviços"
+              name="serviceCost"
+              value={BrlStringFromCents(serviceCost)}
+              disabled={true}
+              className={"bg-blue-50!"}
+            />
+            <Input
+              label="Custo das despesas"
+              name="directCost"
+              value={BrlStringFromCents(directCost)}
+              disabled={true}
+              className={"bg-blue-50!"}
+            />
+          </div>
+          <div className={`flex gap-4 items-end ${!showValues && "hidden"}`}>
+            <Input
+              label="Valor de materiais"
+              name="materialCost"
+              value={BrlStringFromCents(materialValue)}
+              disabled={true}
+              className={"bg-blue-50!"}
+            />
+            <Input
+              label="Valor de serviços"
+              name="serviceCost"
+              value={BrlStringFromCents(serviceValue)}
+              disabled={true}
+              className={"bg-blue-50!"}
+            />
+            <Input
+              label="Valor das despesass"
+              name="directCost"
+              value={BrlStringFromCents(directValue)}
+              disabled={true}
+              className={"bg-blue-50!"}
+            />
+          </div>
+        </section>
+      )}
+
+      <div className={"flex text-xl font-semibold gap-2 -mb-2"}>
+        Detalhes
+        <button
+          type={"button"}
+          className={
+            "bg-blue-800 shadow-md text-white rounded-md flex items-center justify-center"
+          }
+          onClick={() => {
+            setShowDetails((prev) => !prev);
+          }}
+        >
+          <svg fill="#fff" width="30px" viewBox="-5.5 0 32 32">
+            <title>eye-slash</title>
+            <path d="M20.44 15.48c-0.12-0.16-2.28-2.92-5.48-4.56l0.92-3c0.12-0.44-0.12-0.92-0.56-1.040s-0.92 0.12-1.040 0.56l-0.88 2.8c-0.96-0.32-2-0.56-3.080-0.56-5.6 0-9.92 5.56-10.12 5.8-0.24 0.32-0.24 0.72 0 1.040 0.16 0.24 4.2 5.36 9.48 5.76l-0.56 1.8c-0.12 0.44 0.12 0.92 0.56 1.040 0.080 0.040 0.16 0.040 0.24 0.040 0.36 0 0.68-0.24 0.8-0.6l0.72-2.36c5-0.68 8.8-5.48 9-5.72 0.24-0.28 0.24-0.68 0-1zM1.96 16c1.16-1.32 4.52-4.64 8.36-4.64 0.88 0 1.76 0.2 2.6 0.48l-0.28 0.88c-0.68-0.48-1.48-0.72-2.32-0.72-2.2 0-4 1.8-4 4s1.8 4 4 4c0.040 0 0.040 0 0.080 0l-0.2 0.64c-3.8-0.080-7.080-3.36-8.24-4.64zM10.88 18.24c-0.2 0.040-0.4 0.080-0.6 0.080-1.28 0-2.32-1.040-2.32-2.32s1.040-2.32 2.32-2.32c0.68 0 1.32 0.32 1.76 0.8l-1.16 3.76zM12 20.44l2.4-7.88c1.96 1.080 3.52 2.64 4.24 3.44-0.96 1.12-3.52 3.68-6.64 4.44z"></path>
+          </svg>
+        </button>
+      </div>
+      <section
+        className={`flex flex-col gap-2 p-1 border rounded-md border-gray-400 ${
+          !showDetails && "hidden"
+        }`}
+      >
+        <div className={"flex gap-4 items-end"}>
+          <Textarea
+            label="Descrição do serviço"
+            name="description"
+            errors={validationErrors}
+            value={description}
+            onBlur={(e) => {
+              validateStringFieldOnBlur(
+                e,
+                setDescription,
+                setValidationErrors,
+                {
+                  min: 5,
+                  max: 100,
+                }
+              );
+            }}
+          />
+          <Textarea
+            label="Ferramentas ou Equipamentos"
+            name="toolList"
+            errors={validationErrors}
+            value={toolList}
+            onBlur={(e) => {
+              validateStringFieldOnBlur(e, setToolList, setValidationErrors, {
+                min: 2,
+                max: 200,
+                required: false,
+              });
+            }}
+          />
+        </div>
+        <div className={"flex gap-4 items-end"}>
+          <Textarea
+            label="Informações Adicionais"
+            name="publicComments"
+            errors={validationErrors}
+            value={publicComments}
+            onBlur={(e) => {
+              validateStringFieldOnBlur(
+                e,
+                setPublicComments,
+                setValidationErrors,
+                {
+                  min: 0,
+                  max: 300,
+                  required: false,
+                }
+              );
+            }}
+          />
+          <Textarea
+            label="Anotações"
+            name="privateComments"
+            errors={validationErrors}
+            value={privateComments}
+            onBlur={(e) => {
+              validateStringFieldOnBlur(
+                e,
+                setPrivateComments,
+                setValidationErrors,
+                {
+                  min: 0,
+                  max: 300,
+                  required: false,
+                }
+              );
+            }}
+          />
+        </div>
+      </section>
 
       <>
         {isMaterialModalOpen && (

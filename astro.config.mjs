@@ -11,9 +11,10 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  base: "",
+  base: "/",
   trailingSlash: "ignore",
 
+  root: "./",
   integrations: [
     preact({
       compat: true,

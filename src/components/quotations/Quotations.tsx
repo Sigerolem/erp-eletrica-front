@@ -72,7 +72,8 @@ export type QuotationsType = {
   slug: string;
   reference: string;
   description: string;
-  discount: number;
+  mat_discount: number;
+  ser_discount: number;
   expected_duration: number;
   private_comments: string;
   public_comments: string;

@@ -139,8 +139,8 @@ export function InventoryItemsList({
         }
         return (
           <div
-            key={item.created_at}
-            className={"grid grid-cols-4 gap-4 items-center"}
+            key={`${item.created_at}-${item.material_id}`}
+            className={"grid grid-cols-4 gap-4 items-end"}
           >
             <div className={"col-span-2"}>
               <Input

@@ -88,7 +88,7 @@ export function TransactionDelivery() {
     setTransactionItems((prev) =>
       prev.map((item) =>
         item.material.barcode == barcode
-          ? { ...item, taken_amount: item.taken_amount + 1 }
+          ? { ...item, separated_amount: item.separated_amount + 1 }
           : item
       )
     );
@@ -117,8 +117,16 @@ export function TransactionDelivery() {
       body: JSON.stringify({ barcode: barcode }),
     });
     if (code == 200) {
-      // sla
+      setTransactionItems((prev) =>
+        prev.map((item) =>
+          item.material_id == materialId
+            ? { ...item, material: { ...item.material, barcode } }
+            : item
+        )
+      );
     } else {
+      window.alert("Erro ao se comunicar com o servidor");
+      window.location.reload();
     }
   }
 
@@ -175,7 +183,7 @@ export function TransactionDelivery() {
             return (
               <article
                 key={item.id}
-                className={`grid grid-cols-3 gap-x-2 p-2 py-3 items-center ${
+                className={`flex flex-col gap-2 py-3 px-2 ${
                   Object.keys(barcodeLog).includes(item.material?.barcode!)
                     ? item.taken_amount == item.expected_amount
                       ? "bg-green-200"
@@ -183,29 +191,78 @@ export function TransactionDelivery() {
                     : ""
                 }`}
               >
-                <div className={"flex flex-col gap-2 min-h-30"}>
-                  <Input
-                    name={`barcode-${item.id}`}
-                    label={"Código de barras"}
-                    value={item.material?.barcode || "cadastre um código"}
-                    disabled={materialBeingUpdated !== item.id}
-                    className={
-                      materialBeingUpdated !== item.id ? "bg-blue-50!" : ""
-                    }
-                    onKeyPress={(e) => {
-                      if (e.key == "Enter") {
-                        e.preventDefault();
-                        handleMaterialBarcodeUpdate(
-                          item.material_id!,
-                          e.currentTarget.value.trim()
-                        );
-                        setMaterialBeingUpdated("");
-                      }
-                    }}
+                <div className={"grid grid-cols-[2fr_1fr] gap-x-2"}>
+                  <Textarea
+                    label="Nome"
+                    name={"name"}
+                    value={item.material.name}
+                    disabled={true}
+                    className={"bg-blue-50! min-h-24"}
                   />
-                  {materialBeingUpdated == item.id ? (
-                    <div className={"flex gap-2"}>
-                      {/* <Button
+                  <div className={"flex flex-col gap-1"}>
+                    <Input
+                      id={`barcode-${
+                        item.material.barcode || item.material_id
+                      }`}
+                      name={`separatedAmount`}
+                      label={"Separado"}
+                      value={item.separated_amount}
+                      onKeyPress={handleScanning}
+                      className={"text-center font-semibold"}
+                      onBlur={(e) => {
+                        if (e.currentTarget.value.length > 7) {
+                          e.currentTarget.value =
+                            item.separated_amount.toString();
+                          return;
+                        }
+                        let val = parseInt(e.currentTarget.value);
+                        if (isNaN(val)) {
+                          val = 0;
+                        }
+                        setTransactionItems((prev) => [
+                          ...prev.map((pItem) =>
+                            pItem.material_id == item.material_id
+                              ? { ...pItem, separated_amount: val }
+                              : pItem
+                          ),
+                        ]);
+                      }}
+                    />
+
+                    <Input
+                      label={"Pedido"}
+                      name={`amountRequested`}
+                      value={`${item.expected_amount} ${item.material.unit}`}
+                      className={"bg-blue-50! text-center font-semibold"}
+                      disabled={true}
+                    />
+                  </div>
+                </div>
+
+                <div className={"flex items-start gap-1"}>
+                  <div className={"flex-1 flex flex-col gap-2 min-h-30"}>
+                    <Input
+                      name={`barcode-${item.id}`}
+                      label={"Código de barras"}
+                      value={item.material?.barcode || "cadastre um código"}
+                      disabled={materialBeingUpdated !== item.id}
+                      className={
+                        materialBeingUpdated !== item.id ? "bg-blue-50!" : ""
+                      }
+                      onKeyPress={(e) => {
+                        if (e.key == "Enter") {
+                          e.preventDefault();
+                          handleMaterialBarcodeUpdate(
+                            item.material_id!,
+                            e.currentTarget.value.trim()
+                          );
+                          setMaterialBeingUpdated("");
+                        }
+                      }}
+                    />
+                    {materialBeingUpdated == item.id ? (
+                      <div className={"flex gap-2"}>
+                        {/* <Button
                         text="Salvar"
                         className={"bg-blue-700 text-white text-sm p-1! mb-6"}
                         onClick={(e) => {
@@ -216,68 +273,46 @@ export function TransactionDelivery() {
                           setMaterialBeingUpdated("");
                         }}
                       /> */}
+                        <Button
+                          text="Cancelar"
+                          className={"bg-red-700 text-white text-sm p-1! mb-6"}
+                          onClick={() => {
+                            setMaterialBeingUpdated("");
+                          }}
+                        />
+                      </div>
+                    ) : (
                       <Button
-                        text="Cancelar"
-                        className={"bg-red-700 text-white text-sm p-1! mb-6"}
+                        text="Alterar"
+                        className={
+                          "max-w-16 bg-blue-700 text-white text-sm p-1! mb-6"
+                        }
                         onClick={() => {
-                          setMaterialBeingUpdated("");
+                          setMaterialBeingUpdated(item.id);
                         }}
                       />
-                    </div>
-                  ) : (
-                    <Button
-                      text="Alterar"
-                      className={
-                        "max-w-16 bg-blue-700 text-white text-sm p-1! mb-6"
-                      }
-                      onClick={() => {
-                        setMaterialBeingUpdated(item.id);
-                      }}
-                    />
-                  )}
-                </div>
-                <Textarea
-                  label="Nome"
-                  name={"name"}
-                  value={item.material.name}
-                  disabled={true}
-                  className={"bg-blue-50! min-h-24"}
-                />
-
-                <div>
+                    )}
+                  </div>
                   <Input
                     id={`barcode-${item.material.barcode || item.material_id}`}
                     name={`takenAmount`}
-                    label={"Separado"}
-                    value={item.taken_amount}
-                    onKeyPress={handleScanning}
-                    className={"text-center font-semibold"}
-                    onBlur={(e) => {
-                      if (e.currentTarget.value.length > 7) {
-                        e.currentTarget.value = item.taken_amount.toString();
-                        return;
-                      }
-                      let val = parseInt(e.currentTarget.value);
-                      if (isNaN(val)) {
-                        val = 0;
-                      }
-                      setTransactionItems((prev) => [
-                        ...prev.map((pItem) =>
-                          pItem.material_id == item.material_id
-                            ? { ...pItem, taken_amount: val }
-                            : pItem
-                        ),
-                      ]);
-                    }}
-                  />
-
-                  <Input
-                    label={"Pedido"}
-                    name={`amountRequested`}
-                    value={`${item.expected_amount} ${item.material.unit}`}
+                    label={"Já entregue"}
+                    value={`${item.taken_amount} ${item.material.unit}`}
                     className={"bg-blue-50! text-center font-semibold"}
                     disabled={true}
                   />
+                  {item.returned_amount == 0 && (
+                    <Input
+                      id={`barcode-${
+                        item.material.barcode || item.material_id
+                      }`}
+                      name={`takenAmount`}
+                      label={"Devolvido"}
+                      value={`${item.returned_amount} ${item.material.unit}`}
+                      className={"bg-blue-50! text-center font-semibold"}
+                      disabled={true}
+                    />
+                  )}
                 </div>
               </article>
             );
