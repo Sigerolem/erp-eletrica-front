@@ -4,6 +4,7 @@ import { Input } from "@elements/Input";
 import { DataForm } from "@elements/DataForm";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
 import type { CustomersType } from "@comp/customers/Customers";
+import { Checkbox } from "src/elements/Checkbox";
 
 export function CustomerDataForm({
   customerData,
@@ -26,6 +27,7 @@ export function CustomerDataForm({
   const [phoneNumber, setPhoneNumber] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [address, setAddress] = useState("");
+  const [prefers, setPrefers] = useState(false);
 
   useEffect(() => {
     if (customerData) {
@@ -35,6 +37,7 @@ export function CustomerDataForm({
       setPhoneNumber(customerData.phone_number || "");
       setMobileNumber(customerData.mobile_number || "");
       setAddress(customerData.address || "");
+      setPrefers(customerData.prefers_es);
     }
   }, [customerData]);
 
@@ -68,6 +71,7 @@ export function CustomerDataForm({
       address: address || null,
       phone_number: phoneNumber || null,
       mobile_number: mobileNumber || null,
+      prefers_es: prefers,
     };
 
     const errors = await doOnSubmit(newCustomerData);
@@ -135,20 +139,28 @@ export function CustomerDataForm({
           }}
         />
       </div>
-      <Input
-        label="Email"
-        name="email"
-        type="text"
-        errors={validationErrors}
-        value={email}
-        onBlur={(e) => {
-          validateStringFieldOnBlur(e, setEmail, setValidationErrors, {
-            min: 10,
-            max: 50,
-            required: false,
-          });
-        }}
-      />
+      <div className={"flex gap-4"}>
+        <Input
+          label="Email"
+          name="email"
+          type="text"
+          errors={validationErrors}
+          value={email}
+          onBlur={(e) => {
+            validateStringFieldOnBlur(e, setEmail, setValidationErrors, {
+              min: 10,
+              max: 50,
+              required: false,
+            });
+          }}
+        />
+        <Checkbox
+          label="Prefere E.S."
+          name="prefers"
+          checked={prefers}
+          setChecked={setPrefers}
+        />
+      </div>
       <Input
         label="Endereço"
         name="address"

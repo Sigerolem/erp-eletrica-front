@@ -67,7 +67,9 @@ export async function fetchWithToken<T>({
     };
   }
 
-  console.error({ error: data, response });
+  const error = data;
+
+  console.error({ error, message: error.message, response });
 
   return {
     code: response.status as 400,

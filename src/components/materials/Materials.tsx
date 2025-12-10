@@ -10,6 +10,7 @@ export type MaterialsType = {
   id: string;
   name: string;
   barcode: string | null;
+  pkg_barcode: string | null;
   pkg_size: number;
   min_amount: number;
   ideal_amount: number;
@@ -48,6 +49,8 @@ export function Materials() {
     );
   }, []);
 
+  const xSize = window.innerWidth;
+
   return (
     <>
       <div>
@@ -58,38 +61,99 @@ export function Materials() {
           </a>
         </header>
         <Table>
-          <THead
-            collumns={[
-              ["Nome", "Fornecedor"],
-              ["Estoque", "(atual / mín)"],
-              ["Reservado"],
-              ["Preços", "(custo / venda)"],
-            ]}
-          />
+          {xSize < 700 ? (
+            <THead collumns={[["Nome", "Fornecedor"], ["Estoque"]]} />
+          ) : (
+            <THead
+              collumns={[
+                ["Nome", "Fornecedor"],
+                ["Estoque"],
+                ["Preços", "(custo / venda)"],
+              ]}
+            />
+          )}
           <tbody>
-            {materials.map((material) => (
-              <Tr key={material.id}>
-                <Td link={`${MATERIAL_URL}${material.id}/`}>
-                  <p className={""}>{material.name}</p>
-                  <p className={"text-sm font-semibold"}>
-                    {material.supplier?.name ?? ""}
-                  </p>
-                </Td>
-                <Td link={`${MATERIAL_URL}${material.id}/`}>
-                  <p>{material.current_amount}</p>
-                  <p>{material.min_amount}</p>
-                </Td>
-                <Td link={`${MATERIAL_URL}${material.id}/`}>
-                  <p>{material.reserved_amount}</p>
-                </Td>
-                <Td link={`${MATERIAL_URL}${material.id}/`}>
-                  <p className={""}>
-                    C: {BrlStringFromCents(material.avg_cost)}
-                  </p>
-                  <p className={""}>V: {BrlStringFromCents(material.value)}</p>
-                </Td>
-              </Tr>
-            ))}
+            {materials.map((material) =>
+              xSize < 700 ? (
+                <Tr key={material.id}>
+                  <Td link={`${MATERIAL_URL}${material.id}/`}>
+                    <p className={""}>
+                      {material.name} iduhasiud daiudhiuadhaduasda audhau{" "}
+                    </p>
+                    <p className={"text-sm font-semibold"}>
+                      {material.supplier?.name ?? "Sem Fornecedor"}
+                    </p>
+                  </Td>
+                  <Td link={`${MATERIAL_URL}${material.id}/`}>
+                    <p
+                      className={`min-w-32 ${
+                        material.current_amount < material.min_amount &&
+                        "text-red-600 font-semibold"
+                      }`}
+                    >
+                      <span className={"text-sm font-semibold"}>Atual:</span>
+                      {` ${material.current_amount} 
+                      ${material.unit}`}
+                    </p>
+                    <p className={"min-w-32"}>
+                      <span className={"text-sm font-semibold"}>Mín:</span>
+                      {` ${material.min_amount} 
+                      ${material.unit}`}
+                    </p>
+                    <p className={"min-w-32"}>
+                      <span className={"text-sm font-semibold"}>
+                        Reservado:
+                      </span>
+                      {` ${material.reserved_amount} 
+                      ${material.unit}`}
+                    </p>
+                  </Td>
+                </Tr>
+              ) : (
+                <Tr key={material.id}>
+                  <Td link={`${MATERIAL_URL}${material.id}/`}>
+                    <p className={""}>{material.name}</p>
+                    <p className={"text-sm font-semibold"}>
+                      {material.supplier?.name ?? ""}
+                    </p>
+                  </Td>
+                  <Td link={`${MATERIAL_URL}${material.id}/`}>
+                    <p
+                      className={`min-w-32 ${
+                        material.current_amount < material.min_amount &&
+                        "text-red-600 font-semibold"
+                      }`}
+                    >
+                      <span className={"text-sm font-semibold text-black"}>
+                        Atual:
+                      </span>
+                      {` ${material.current_amount} 
+                      ${material.unit}`}
+                    </p>
+                    <p className={"min-w-32"}>
+                      <span className={"text-sm font-semibold"}>Mín.:</span>
+                      {` ${material.min_amount} 
+                      ${material.unit}`}
+                    </p>
+                    <p className={"min-w-32"}>
+                      <span className={"text-sm font-semibold"}>
+                        Reservado:
+                      </span>
+                      {` ${material.reserved_amount} 
+                      ${material.unit}`}
+                    </p>
+                  </Td>
+                  <Td link={`${MATERIAL_URL}${material.id}/`}>
+                    <p className={""}>
+                      C: {BrlStringFromCents(material.avg_cost)}
+                    </p>
+                    <p className={""}>
+                      V: {BrlStringFromCents(material.value)}
+                    </p>
+                  </Td>
+                </Tr>
+              )
+            )}
           </tbody>
         </Table>
       </div>

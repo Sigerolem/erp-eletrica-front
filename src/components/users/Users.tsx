@@ -2,6 +2,7 @@ import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { CreateUserModal } from "./CreateUserModal";
+import { Button } from "src/elements/Button";
 
 export type UsersType = {
   id: string;
@@ -85,6 +86,14 @@ export function Users() {
           </tbody>
         </Table>
       </div>
+      <Button
+        text="Logoff"
+        className={"bg-red-800 text-white mt-8"}
+        onClick={() => {
+          localStorage.removeItem("apiToken");
+          window.location.href = "/login";
+        }}
+      />
     </main>
   );
 }

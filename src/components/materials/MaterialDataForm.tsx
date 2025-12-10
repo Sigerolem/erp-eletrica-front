@@ -44,6 +44,7 @@ export function MaterialDataForm({
   >([]);
   const [name, setName] = useState("");
   const [barcode, setBarcode] = useState("");
+  const [pkgBarcode, setPkgBarcode] = useState("");
   const [currentAmount, setCurrentAmount] = useState(0);
   const [trackedAmount, setTrackedAmount] = useState(0);
   const [reservedAmount, setReservedAmount] = useState(0);
@@ -66,6 +67,7 @@ export function MaterialDataForm({
     if (materialData) {
       setName(materialData.name);
       setBarcode(materialData.barcode || "");
+      setPkgBarcode(materialData.pkg_barcode || "");
       setCurrentAmount(materialData.current_amount);
       setTrackedAmount(materialData.tracked_amount);
       setReservedAmount(materialData.reserved_amount);
@@ -141,6 +143,9 @@ export function MaterialDataForm({
       path: `/materials/${id}`,
       method: "DELETE",
     });
+    if (result.code == 200) {
+      window.location.href = "/materiais";
+    }
   }
 
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
@@ -184,18 +189,32 @@ export function MaterialDataForm({
         }}
         errors={validationErrors}
       />
-      <Input
-        label="Código de barras"
-        name="barcode"
-        value={barcode}
-        onBlur={(e) => {
-          validateStringFieldOnBlur(e, setBarcode, setValidationErrors, {
-            min: 4,
-            max: 100,
-          });
-        }}
-        errors={validationErrors}
-      />
+      <div className={"flex gap-4"}>
+        <Input
+          label="Código de barras"
+          name="barcode"
+          value={barcode}
+          onBlur={(e) => {
+            validateStringFieldOnBlur(e, setBarcode, setValidationErrors, {
+              min: 4,
+              max: 100,
+            });
+          }}
+          errors={validationErrors}
+        />
+        <Input
+          label="Código de barras da caixa"
+          name="barcode"
+          value={barcode}
+          onBlur={(e) => {
+            validateStringFieldOnBlur(e, setBarcode, setValidationErrors, {
+              min: 4,
+              max: 100,
+            });
+          }}
+          errors={validationErrors}
+        />
+      </div>
       <div className={"flex gap-4"}>
         <UnitSelector
           label="Unidade"
@@ -360,7 +379,9 @@ export function MaterialDataForm({
 
       <div className={"flex gap-4 mt-4 justify-evenly items-end"}>
         {children}
-        {materialData?.is_disabled === false ? (
+        {materialData?.is_disabled === false &&
+        materialData.reserved_amount == 0 &&
+        materialData.current_amount == 0 ? (
           <Button
             text="Excluir material"
             type={"button"}

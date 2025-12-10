@@ -12,6 +12,7 @@ export type CustomersType = {
   address: string | null;
   phone_number: string | null;
   mobile_number: string | null;
+  prefers_es: boolean;
 };
 
 export function Customers() {

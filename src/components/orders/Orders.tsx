@@ -41,7 +41,9 @@ export function Orders() {
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                   <p>{quotation.reference}</p>
-                  <p className={"text-green-700"}>{quotation.customer.name}</p>
+                  <p className={"font-semibold text-sm"}>
+                    {quotation.customer.name}
+                  </p>
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                   <p>{formatQuotationStatusEnum(quotation.status)}</p>

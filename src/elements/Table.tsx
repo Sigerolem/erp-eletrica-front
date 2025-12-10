@@ -32,7 +32,10 @@ export function Tr({
   key?: string;
 }) {
   return (
-    <tr key={key} className={"bg-slate-100 even:bg-slate-200"}>
+    <tr
+      key={key}
+      className={"bg-blue-100 even:bg-blue-50 border border-blue-100"}
+    >
       {children}
     </tr>
   );
