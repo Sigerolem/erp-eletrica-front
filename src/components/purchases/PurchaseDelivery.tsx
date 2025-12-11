@@ -126,10 +126,26 @@ export function PurchaseDelivery() {
           : item
       )
     );
+    setPurchaseItems((prev) =>
+      prev.map((item) =>
+        item.material.pkg_barcode == barcode
+          ? {
+              ...item,
+              amount_delivered: item.amount_delivered + item.material.pkg_size,
+            }
+          : item
+      )
+    );
     try {
-      const input = document.querySelector<HTMLInputElement>(
+      let input = document.querySelector<HTMLInputElement>(
         `#barcode-${barcode}`
       );
+      if (input == null) {
+        input = document.querySelector<HTMLInputElement>(
+          `[name='amountDelivered-${barcode}`
+        );
+      }
+
       if (input == null) {
         console.log(barcode);
         return null;
@@ -341,7 +357,7 @@ export function PurchaseDelivery() {
                 <div className={"flex flex-col gap-1"}>
                   <Input
                     id={`barcode-${item.material.barcode || item.material_id}`}
-                    name={`amountDelivered`}
+                    name={`amountDelivered-${item.material.pkg_barcode}`}
                     label={"Entregue"}
                     value={item.amount_delivered}
                     onKeyPress={handleScanning}

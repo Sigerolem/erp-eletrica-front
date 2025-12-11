@@ -124,7 +124,11 @@ export function PurchaseDataForm({
       {
         material: material,
         material_id: material.id,
-        amount_requested: material.ideal_amount - material.current_amount,
+        amount_requested:
+          Math.ceil(
+            (material.ideal_amount - material.current_amount) /
+              material.pkg_size
+          ) * material.pkg_size,
         old_unit_cost: material.avg_cost,
         new_unit_cost: material.avg_cost,
         purchase_id: purchaseData?.id || undefined,
