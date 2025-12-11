@@ -154,6 +154,7 @@ export function MaterialDataForm({
     const submitData = {
       name,
       barcode: barcode || null,
+      pkg_barcode: pkgBarcode || null,
       min_amount: minAmount,
       ideal_amount: idealAmount,
       pkg_size: pkgSize,
