@@ -1,6 +1,7 @@
 import type { PurchaseStatusType } from "@comp/purchases/Purchases";
 import type { QuotationsStatusType } from "@comp/quotations/Quotations";
 import type { TransactionsStatusType } from "@comp/transactions/Transactions";
+import type { UsersRoleType } from "src/components/users/Users";
 
 export function changeDotsCommas(text: string) {
   return text.replaceAll(",", "*").replaceAll(".", ",").replaceAll("*", ".");
@@ -72,6 +73,17 @@ export function formatTransactionStatusEnum(status: TransactionsStatusType) {
     partial: "Atendido parcialmente",
     completed: "Concluido",
     cancelled: "Cancelado",
+  };
+
+  return TransactionStatusMap[status] || status;
+}
+
+export function formatUserRoleEnum(status: UsersRoleType) {
+  const TransactionStatusMap = {
+    owner: "Master",
+    admin: "Admin",
+    employee: "Funcionário",
+    guest: "Convidado",
   };
 
   return TransactionStatusMap[status] || status;

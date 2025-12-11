@@ -41,6 +41,7 @@ export type TransactionsType = {
 
 export function Transactions() {
   const [transactions, setTransactions] = useState<TransactionsType[]>([]);
+  const [nothingToShow, setNothingToShow] = useState(false);
 
   const TRANSACTION_URL =
     window.location.hostname == "localhost" ? "/pedidos/id#" : "/pedidos/id/#";
@@ -78,6 +79,15 @@ export function Transactions() {
             collumns={[["Código da OS", "Referência da OS"], ["Situação"]]}
           />
           <tbody>
+            {nothingToShow && (
+              <tr>
+                <td colSpan={3} className={"py-2 text-center"}>
+                  <span className={"text-center"}>
+                    Nada para ser exibido aqui
+                  </span>
+                </td>
+              </tr>
+            )}
             {transactions.map((transaction) => (
               <Tr key={transaction.id}>
                 <Td link={`${TRANSACTION_URL}${transaction.id}/`}>

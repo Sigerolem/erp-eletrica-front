@@ -3,6 +3,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { CreateUserModal } from "./CreateUserModal";
 import { Button } from "src/elements/Button";
+import { formatUserRoleEnum } from "src/utils/formating";
 
 export type UsersRoleType = "admin" | "owner" | "employee" | "guest";
 
@@ -63,24 +64,20 @@ export function Users() {
           />
         </header>
         <Table>
-          <THead
-            collumns={[["Nome", "CPF"], ["Login"], ["Celular"], ["Tipo"]]}
-          />
+          <THead collumns={[["Nome", "CPF"], ["Login", "Celular"], ["Tipo"]]} />
           <tbody>
             {users.map((user) => (
               <Tr key={user.id}>
                 <Td link={`${USER_URL}${user.id}/`}>
                   <p>{user.name}</p>
-                  <p className={"text-green-700"}>{user.cpf ?? ""}</p>
+                  <p className={"text-sm font-semibold"}>{user.cpf ?? ""}</p>
                 </Td>
                 <Td link={`${USER_URL}${user.id}/`}>
                   <p>{user.login}</p>
-                </Td>
-                <Td link={`${USER_URL}${user.id}/`}>
                   <p>{user.phone_number}</p>
                 </Td>
                 <Td link={`${USER_URL}${user.id}/`}>
-                  <p>{user.role || ""}</p>
+                  <p>{formatUserRoleEnum(user.role) || ""}</p>
                 </Td>
               </Tr>
             ))}
