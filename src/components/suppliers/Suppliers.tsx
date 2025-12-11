@@ -42,6 +42,8 @@ export function Suppliers() {
     );
   }, []);
 
+  const xSize = window.innerWidth;
+
   return (
     <main>
       {isModalOpen ? (
@@ -58,33 +60,70 @@ export function Suppliers() {
           <Button text="Novo fornecedor" onClick={handleNewSupplier} />
         </header>
         <Table>
-          <THead
-            collumns={[
-              ["Nome", "CNPJ"],
-              ["Email"],
-              ["Telefone", "Celular"],
-              ["Materiais", "atualmente"],
-            ]}
-          />
+          {xSize < 720 ? (
+            <THead collumns={[["Nome", "CNPJ"], ["Info"]]} />
+          ) : (
+            <THead
+              collumns={[
+                ["Nome", "CNPJ"],
+                ["Email"],
+                ["Telefone", "Celular"],
+                ["Materiais", "atualmente"],
+              ]}
+            />
+          )}
           <tbody>
-            {suppliers.map((supplier) => (
-              <Tr key={supplier.id}>
-                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
-                  <p>{supplier.name}</p>
-                  <p className={"text-green-700"}>{supplier.cnpj ?? ""}</p>
-                </Td>
-                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
-                  <p>{supplier.email}</p>
-                </Td>
-                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
-                  <p>{supplier.phone_number}</p>
-                  <p>{supplier.mobile_number}</p>
-                </Td>
-                <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
-                  <p>{supplier.material_count || 0}</p>
-                </Td>
-              </Tr>
-            ))}
+            {suppliers.map((supplier) =>
+              xSize < 720 ? (
+                <Tr key={supplier.id}>
+                  <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
+                    <p>{supplier.name}</p>
+                    <p className={"font-semibold text-sm"}>
+                      {supplier.cnpj ?? ""}
+                    </p>
+                  </Td>
+                  <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
+                    <p className={"font-semibold text-sm"}>
+                      Email:
+                      <span className={"text-base font-medium"}>{` ${
+                        supplier.email || ""
+                      }`}</span>
+                    </p>
+                    <p className={"font-semibold text-sm"}>
+                      Telefone:
+                      <span className={"text-base font-medium"}>{` ${
+                        supplier.phone_number || ""
+                      }`}</span>
+                    </p>
+                    <p className={"font-semibold text-sm"}>
+                      Celular:
+                      <span className={"text-base font-medium"}>{` ${
+                        supplier.mobile_number || ""
+                      }`}</span>
+                    </p>
+                  </Td>
+                </Tr>
+              ) : (
+                <Tr key={supplier.id}>
+                  <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
+                    <p>{supplier.name}</p>
+                    <p className={"font-semibold text-sm"}>
+                      {supplier.cnpj ?? ""}
+                    </p>
+                  </Td>
+                  <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
+                    <p>{supplier.email}</p>
+                  </Td>
+                  <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
+                    <p>{supplier.phone_number}</p>
+                    <p>{supplier.mobile_number}</p>
+                  </Td>
+                  <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
+                    <p>{supplier.material_count || 0}</p>
+                  </Td>
+                </Tr>
+              )
+            )}
           </tbody>
         </Table>
       </div>

@@ -58,7 +58,7 @@ export function CreateSupplierModal({
   return (
     <section
       className={
-        "absolute top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-10 flex flex-col justify-center"
+        "absolute top-0 left-0 w-full h-full md:p-10 not-md:p-6 bg-[#000000AA] z-10 flex flex-col justify-center"
       }
       onClick={() => {
         closeModal();
