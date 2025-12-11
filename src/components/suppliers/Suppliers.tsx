@@ -55,9 +55,13 @@ export function Suppliers() {
         />
       ) : null}
       <div>
-        <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>Lista de fornecedores</h3>
-          <Button text="Novo fornecedor" onClick={handleNewSupplier} />
+        <header className={"flex justify-between items-end mb-2"}>
+          <h3 className={"text-lg font-semibold"}>Lista de fornecedores</h3>
+          <Button
+            text="Novo fornecedor"
+            className={"bg-blue-700 text-white text-sm"}
+            onClick={handleNewSupplier}
+          />
         </header>
         <Table>
           {xSize < 720 ? (

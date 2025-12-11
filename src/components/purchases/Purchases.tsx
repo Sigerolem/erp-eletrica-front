@@ -67,10 +67,13 @@ export function Purchases() {
   return (
     <>
       <div>
-        <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>Lista de compras</h3>
+        <header className={"flex justify-between items-end mb-2"}>
+          <h3 className={"text-lg font-semibold"}>Lista de compras</h3>
           <a href="/compras/nova">
-            <Button text="Nova compra" />
+            <Button
+              text="Nova compra"
+              className={"bg-blue-700 text-white text-sm"}
+            />
           </a>
         </header>
         <Table>

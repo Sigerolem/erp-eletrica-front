@@ -54,10 +54,13 @@ export function Materials() {
   return (
     <>
       <div>
-        <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>Lista de materiais</h3>
+        <header className={"flex justify-between items-end mb-2"}>
+          <h3 className={"text-lg font-semibold"}>Lista de materiais</h3>
           <a href="/materiais/novo">
-            <Button text="Novo material" />
+            <Button
+              text="Novo material"
+              className={"bg-blue-700 text-white text-sm"}
+            />
           </a>
         </header>
         <Table>

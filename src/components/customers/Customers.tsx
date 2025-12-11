@@ -52,9 +52,13 @@ export function Customers() {
         />
       ) : null}
       <div>
-        <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>Lista de clientes</h3>
-          <Button text="Novo cliente" onClick={handleNewCustomer} />
+        <header className={"flex justify-between items-end mb-2"}>
+          <h3 className={"text-lg font-semibold"}>Lista de clientes</h3>
+          <Button
+            text="Novo cliente"
+            onClick={handleNewCustomer}
+            className={"bg-blue-700 text-white not-md:text-sm"}
+          />
         </header>
         <Table>
           <THead collumns={[["Nome", "CNPJ"], ["Celular"]]} />

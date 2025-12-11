@@ -65,9 +65,13 @@ export function Transactions() {
   return (
     <main>
       <div>
-        <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>Lista de pedidos abertos</h3>
-          <Button text="Novo orçamento" onClick={handleNewTransaction} />
+        <header className={"flex justify-between items-end mb-2"}>
+          <h3 className={"text-lg font-semibold"}>Lista de pedidos abertos</h3>
+          {/* <Button
+            text="Novo orçamento"
+            className={"bg-blue-700 text-white text-sm"}
+            onClick={handleNewTransaction}
+          /> */}
         </header>
         <Table>
           <THead

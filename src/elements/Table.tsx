@@ -63,7 +63,7 @@ export function Td({
 export function THead({ collumns }: THeadProps) {
   return (
     <thead>
-      <tr>
+      <tr className={"not-md:text-sm"}>
         {collumns.map((col) => {
           if (col[1] == undefined) {
             return <Th>{col[0]}</Th>;

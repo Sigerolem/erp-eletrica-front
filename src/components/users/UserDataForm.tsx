@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import type { UsersType } from "./Users";
+import type { UsersRoleType, UsersType } from "./Users";
 import type { TargetedSubmitEvent } from "preact";
 import { Input } from "@elements/Input";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
@@ -22,7 +22,7 @@ export function UserDataForm({
   const [cpf, setCpf] = useState("");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState<UsersRoleType>("admin");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
 
@@ -173,13 +173,6 @@ export function UserDataForm({
           name="role"
           errors={validationErrors}
           value={role}
-          onBlur={(e) => {
-            validateStringFieldOnBlur(e, setRole, setValidationErrors, {
-              min: 0,
-              max: 15,
-              required: true,
-            });
-          }}
         />
       </div>
       <Input

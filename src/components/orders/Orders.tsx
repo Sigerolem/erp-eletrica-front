@@ -32,8 +32,8 @@ export function Orders() {
   return (
     <main>
       <div>
-        <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>Lista de ordens abertas</h3>
+        <header className={"flex justify-between items-end mb-2"}>
+          <h3 className={"text-lg font-semibold"}>Lista de ordens abertas</h3>
         </header>
         <Table>
           {xSize < 720 ? (

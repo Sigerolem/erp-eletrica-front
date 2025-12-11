@@ -4,13 +4,15 @@ import { useEffect, useState } from "preact/hooks";
 import { CreateUserModal } from "./CreateUserModal";
 import { Button } from "src/elements/Button";
 
+export type UsersRoleType = "admin" | "owner" | "employee" | "guest";
+
 export type UsersType = {
   id: string;
   cpf: string;
   name: string;
   login: string;
   password: string;
-  role: string;
+  role: UsersRoleType;
   address: string | null;
   phone_number: string | null;
 };
@@ -52,14 +54,13 @@ export function Users() {
         />
       ) : null}
       <div>
-        <header className={"flex justify-between items-center px-2 mb-2"}>
-          <h3 className={"text-xl font-semibold"}>Lista de usuários</h3>
-          <button
-            className={"bg-blue-700 p-2 rounded-md text-white font-semibold"}
+        <header className={"flex justify-between items-end mb-2"}>
+          <h3 className={"text-lg font-semibold"}>Lista de usuários</h3>
+          <Button
+            text="Novo usuário"
+            className={"bg-blue-700 text-white text-sm"}
             onClick={handleNewUser}
-          >
-            Novo usuário
-          </button>
+          />
         </header>
         <Table>
           <THead
