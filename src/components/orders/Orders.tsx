@@ -6,6 +6,7 @@ import { useEffect, useState } from "preact/hooks";
 
 export function Orders() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
+  const [hasNothingToShow, setHasNothingToShow] = useState(false);
 
   const QUOTATION_URL =
     window.location.hostname == "localhost" ? "/ordens/id#" : "/ordens/id/#";
@@ -15,7 +16,11 @@ export function Orders() {
       path: "/quotations/orders",
     }).then((result) => {
       if (result.code == 200 || result.code == 201) {
-        setQuotations(result.data.quotations);
+        if (result.data.quotations.length == 0) {
+          setHasNothingToShow(true);
+        } else {
+          setQuotations(result.data.quotations);
+        }
       } else {
         window.alert("Erro ao buscar ordens de serviço.");
         console.error(result.data, result.code);
@@ -34,6 +39,15 @@ export function Orders() {
             collumns={[["Código"], ["Referência", "Cliente"], ["Situação"]]}
           />
           <tbody>
+            {hasNothingToShow && (
+              <tr>
+                <td colSpan={3} className={"py-2 text-center"}>
+                  <span className={"text-center"}>
+                    Não existe nenhum orçamento para ser exibido aqui
+                  </span>
+                </td>
+              </tr>
+            )}
             {quotations.map((quotation) => (
               <Tr key={quotation.id}>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>

@@ -11,10 +11,13 @@ export function SelectCustomerModal({
   closeModal: () => void;
   cleanError: () => void;
 }) {
+  const xSize = window.innerWidth;
   return (
     <section className={"absolute top-0 left-0 w-full h-full"}>
       <div
-        className={"fixed top-0 left-0 w-full h-full p-32 bg-[#000000AA] z-20"}
+        className={`fixed top-0 left-0 w-full h-full ${
+          xSize < 700 ? "p-8" : "p-32"
+        } bg-[#000000AA] z-20`}
         onClick={closeModal}
       >
         <div

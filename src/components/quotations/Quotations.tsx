@@ -93,6 +93,7 @@ export type QuotationsType = {
 
 export function Quotations() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
+  const [hasNothingToShow, setHasNothingToShow] = useState(false);
 
   const QUOTATION_URL =
     window.location.hostname == "localhost"
@@ -108,7 +109,11 @@ export function Quotations() {
       path: "/quotations/quotes",
     }).then((result) => {
       if (result.code == 200 || result.code == 201) {
-        setQuotations(result.data.quotations);
+        if (result.data.quotations.length == 0) {
+          setHasNothingToShow(true);
+        } else {
+          setQuotations(result.data.quotations);
+        }
       } else {
         window.alert("Erro ao buscar orçamentos.");
         console.error(result.data, result.code);
@@ -135,6 +140,15 @@ export function Quotations() {
             ]}
           />
           <tbody>
+            {hasNothingToShow && (
+              <tr>
+                <td colSpan={3} className={"py-2 text-center"}>
+                  <span className={"text-center"}>
+                    Não existe nenhum orçamento para ser exibido aqui
+                  </span>
+                </td>
+              </tr>
+            )}
             {quotations.map((quotation) => (
               <Tr key={quotation.id}>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
@@ -142,7 +156,9 @@ export function Quotations() {
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                   <p>{quotation.reference}</p>
-                  <p className={"text-green-700"}>{quotation.customer.name}</p>
+                  <p className={"font-semibold text-sm"}>
+                    {quotation.customer.name}
+                  </p>
                 </Td>
                 <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                   <p>{formatQuotationStatusEnum(quotation.status)}</p>
