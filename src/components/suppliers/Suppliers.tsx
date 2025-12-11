@@ -83,23 +83,17 @@ export function Suppliers() {
                     </p>
                   </Td>
                   <Td link={`${SUPPLIER_URL}${supplier.id}/`}>
-                    <p className={"font-semibold text-sm"}>
-                      Email:
-                      <span className={"text-base font-medium"}>{` ${
-                        supplier.email || ""
-                      }`}</span>
+                    <p className={""}>
+                      <span className={"text-sm font-semibold"}>Email:</span>
+                      {` ${supplier.email || ""}`}
                     </p>
-                    <p className={"font-semibold text-sm"}>
-                      Telefone:
-                      <span className={"text-base font-medium"}>{` ${
-                        supplier.phone_number || ""
-                      }`}</span>
+                    <p className={""}>
+                      <span className={"text-sm font-semibold"}>Telefone:</span>
+                      {` ${supplier.phone_number || ""}`}
                     </p>
-                    <p className={"font-semibold text-sm"}>
-                      Celular:
-                      <span className={"text-base font-medium"}>{` ${
-                        supplier.mobile_number || ""
-                      }`}</span>
+                    <p className={""}>
+                      <span className={"text-sm font-semibold"}>Celular:</span>
+                      {` ${supplier.mobile_number || ""}`}
                     </p>
                   </Td>
                 </Tr>

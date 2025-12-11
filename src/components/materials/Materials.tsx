@@ -77,9 +77,7 @@ export function Materials() {
               xSize < 700 ? (
                 <Tr key={material.id}>
                   <Td link={`${MATERIAL_URL}${material.id}/`}>
-                    <p className={""}>
-                      {material.name} iduhasiud daiudhiuadhaduasda audhau{" "}
-                    </p>
+                    <p className={""}>{material.name} </p>
                     <p className={"text-sm font-semibold"}>
                       {material.supplier?.name ?? "Sem Fornecedor"}
                     </p>

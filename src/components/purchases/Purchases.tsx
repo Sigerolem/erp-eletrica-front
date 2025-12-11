@@ -63,6 +63,7 @@ export function Purchases() {
     );
   }, []);
 
+  const xSize = window.innerWidth;
   return (
     <>
       <div>
@@ -73,15 +74,24 @@ export function Purchases() {
           </a>
         </header>
         <Table>
-          <THead
-            collumns={[
-              ["Fornecedor"],
-              ["Status", "Data"],
-              ["Valor"],
-              ["Itens", "comprados"],
-              [""],
-            ]}
-          />
+          {xSize < 720 ? (
+            <THead
+              collumns={[
+                ["Fornecedor", "Data"],
+                ["Status", "Qtd. Materiais"],
+              ]}
+            />
+          ) : (
+            <THead
+              collumns={[
+                ["Fornecedor"],
+                ["Status", "Data"],
+                ["Valor"],
+                ["Itens", "comprados"],
+                [""],
+              ]}
+            />
+          )}
           <tbody>
             {purchases.map((purchase) => {
               const totalCost =
@@ -89,7 +99,37 @@ export function Purchases() {
                 purchase.tax_cost +
                 purchase.purchase_cost;
               const status = formatPurchaseStatusEnum(purchase.status);
-              return (
+              return xSize < 720 ? (
+                <Tr key={purchase.id}>
+                  <Td link={`${PURCHASE_URL}${purchase.id}/`}>
+                    <p className={""}>{purchase.supplier?.name || "null"}</p>
+                    <p>
+                      {new Date(purchase.updated_at).toLocaleDateString(
+                        "pt-BR"
+                      )}
+                    </p>
+                  </Td>
+                  <Td link={`${PURCHASE_URL}${purchase.id}/`}>
+                    <div className={"flex items-center justify-between"}>
+                      <div className={"col-span-1"}>
+                        <p className={"font-semibold text-sm"}>{status}</p>
+                        <p className={"text-sm"}>
+                          Qtd.: {purchase.purchase_items?.length || 0}
+                        </p>
+                      </div>
+                      <Button
+                        text="PDF"
+                        onClick={() =>
+                          fetchPdf(`/purchases/print/${purchase.id}`)
+                        }
+                        className={
+                          "bg-blue-700 text-white p-1.5! text-sm col-span-1 mr-2"
+                        }
+                      />
+                    </div>
+                  </Td>
+                </Tr>
+              ) : (
                 <Tr key={purchase.id}>
                   <Td link={`${PURCHASE_URL}${purchase.id}/`}>
                     <p className={""}>{purchase.supplier?.name || "null"}</p>
