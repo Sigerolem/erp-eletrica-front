@@ -170,6 +170,7 @@ export function Quotations() {
                       onClick={() =>
                         fetchPdf(`/quotations/print/${quotation.id}`)
                       }
+                      className={"bg-blue-700 text-white text-sm p-1!"}
                     />
                     <Button
                       text="PDF"
@@ -178,7 +179,7 @@ export function Quotations() {
                           `/quotations/print/${quotation.id}?mode=hidden`
                         )
                       }
-                      className={"ml-2 bg-blue-700 text-white"}
+                      className={"ml-2 bg-blue-700 text-white text-sm p-1!"}
                     />
                   </Td>
                 </Tr>
