@@ -165,22 +165,24 @@ export function Quotations() {
                   </Td>
                   <Td link={`${QUOTATION_URL}${quotation.id}/`}>
                     <p>{formatQuotationStatusEnum(quotation.status)}</p>
-                    <Button
-                      text="PDF Detalhado"
-                      onClick={() =>
-                        fetchPdf(`/quotations/print/${quotation.id}`)
-                      }
-                      className={"bg-blue-700 text-white text-sm p-1!"}
-                    />
-                    <Button
-                      text="PDF"
-                      onClick={() =>
-                        fetchPdf(
-                          `/quotations/print/${quotation.id}?mode=hidden`
-                        )
-                      }
-                      className={"ml-2 bg-blue-700 text-white text-sm p-1!"}
-                    />
+                    <div className={"flex gap-1"}>
+                      <Button
+                        text="PDF Detalhado"
+                        onClick={() =>
+                          fetchPdf(`/quotations/print/${quotation.id}`)
+                        }
+                        className={"bg-blue-700 text-white text-sm p-1!"}
+                      />
+                      <Button
+                        text="PDF"
+                        onClick={() =>
+                          fetchPdf(
+                            `/quotations/print/${quotation.id}?mode=hidden`
+                          )
+                        }
+                        className={"bg-blue-700 text-white text-sm p-1!"}
+                      />
+                    </div>
                   </Td>
                 </Tr>
               ) : (
