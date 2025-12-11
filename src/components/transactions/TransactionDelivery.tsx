@@ -92,10 +92,25 @@ export function TransactionDelivery() {
           : item
       )
     );
+    setTransactionItems((prev) =>
+      prev.map((item) =>
+        item.material.pkg_barcode == barcode
+          ? {
+              ...item,
+              separated_amount: item.separated_amount + item.material.pkg_size,
+            }
+          : item
+      )
+    );
     try {
-      const input = document.querySelector<HTMLInputElement>(
+      let input = document.querySelector<HTMLInputElement>(
         `#barcode-${barcode}`
       );
+      if (input == null) {
+        input = document.querySelector<HTMLInputElement>(
+          `[name='separatedAmount${barcode}']`
+        );
+      }
       if (input == null) {
         console.log(barcode);
         return null;
@@ -168,17 +183,6 @@ export function TransactionDelivery() {
           }}
         />
         <ListWrapper label="Materiais" doOnClickAdd={() => {}}>
-          {/* <article
-            className={
-              "grid grid-cols-[minmax(0,3fr)_minmax(0,3fr)_minmax(0,2fr)_minmax(0,3fr)_minmax(0,2fr)] px-2 gap-x-2 font-semibold text-gray-700 items-center"
-            }
-          >
-            <p className={""}>Cod. Barra</p>
-            <p className={""}>Nome descritivo</p>
-            <p>Quantidade</p>
-            <p>Valor</p>
-            <p>IPI</p>
-          </article> */}
           {transactionItems.map((item) => {
             return (
               <article
@@ -205,7 +209,7 @@ export function TransactionDelivery() {
                       id={`barcode-${
                         item.material.barcode || item.material_id
                       }`}
-                      name={`separatedAmount`}
+                      name={`separatedAmount${item.material.pkg_barcode}`}
                       label={"Separado"}
                       value={item.separated_amount}
                       onKeyPress={handleScanning}
