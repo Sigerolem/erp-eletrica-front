@@ -60,7 +60,7 @@ export function QuotationDataForm({
   const [toolList, setToolList] = useState("");
   const [privateComments, setPrivateComments] = useState("");
   const [publicComments, setPublicComments] = useState("");
-  const [status, setStatus] = useState<QuotationsStatusType>("draft");
+  const [status, setStatus] = useState<QuotationsStatusType>("q_awaiting");
   const [purchaseOrder, setPurchaseOrder] = useState("");
 
   const [materialCost, setMaterialCost] = useState(0);

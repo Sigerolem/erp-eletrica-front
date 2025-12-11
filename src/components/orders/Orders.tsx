@@ -28,6 +28,7 @@ export function Orders() {
     });
   }, []);
 
+  const xSize = window.innerWidth;
   return (
     <main>
       <div>
@@ -35,35 +36,59 @@ export function Orders() {
           <h3 className={"text-xl font-semibold"}>Lista de ordens abertas</h3>
         </header>
         <Table>
-          <THead
-            collumns={[["Código"], ["Referência", "Cliente"], ["Situação"]]}
-          />
+          {xSize < 720 ? (
+            <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
+          ) : (
+            <THead
+              collumns={[
+                ["Código"],
+                ["Referência", "Cliente"],
+                ["Situação"],
+                [""],
+              ]}
+            />
+          )}
           <tbody>
             {hasNothingToShow && (
               <tr>
                 <td colSpan={3} className={"py-2 text-center"}>
                   <span className={"text-center"}>
-                    Não existe nenhum orçamento para ser exibido aqui
+                    Nada para ser exibido aqui
                   </span>
                 </td>
               </tr>
             )}
-            {quotations.map((quotation) => (
-              <Tr key={quotation.id}>
-                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.slug}</p>
-                </Td>
-                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.reference}</p>
-                  <p className={"font-semibold text-sm"}>
-                    {quotation.customer.name}
-                  </p>
-                </Td>
-                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{formatQuotationStatusEnum(quotation.status)}</p>
-                </Td>
-              </Tr>
-            ))}
+            {quotations.map((quotation) =>
+              xSize < 720 ? (
+                <Tr key={quotation.id}>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{quotation.slug}</p>
+                    <p>{quotation.reference}</p>
+                    <p className={"font-semibold text-sm"}>
+                      {quotation.customer.name}
+                    </p>
+                  </Td>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{formatQuotationStatusEnum(quotation.status)}</p>
+                  </Td>
+                </Tr>
+              ) : (
+                <Tr key={quotation.id}>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{quotation.slug}</p>
+                  </Td>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{quotation.reference}</p>
+                    <p className={"font-semibold text-sm"}>
+                      {quotation.customer.name}
+                    </p>
+                  </Td>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{formatQuotationStatusEnum(quotation.status)}</p>
+                  </Td>
+                </Tr>
+              )
+            )}
           </tbody>
         </Table>
       </div>

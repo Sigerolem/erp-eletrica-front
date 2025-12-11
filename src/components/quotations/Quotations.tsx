@@ -50,7 +50,6 @@ export type QuotationItemsType = {
 };
 
 export type QuotationsStatusType =
-  | "draft"
   | "q_awaiting"
   | "q_approved"
   | "os_awaiting"
@@ -121,6 +120,7 @@ export function Quotations() {
     });
   }, []);
 
+  const xSize = window.innerWidth;
   return (
     <main>
       <div>
@@ -131,55 +131,91 @@ export function Quotations() {
           <Button text="Novo orçamento" onClick={handleNewCustomer} />
         </header>
         <Table>
-          <THead
-            collumns={[
-              ["Código"],
-              ["Referência", "Cliente"],
-              ["Situação"],
-              [""],
-            ]}
-          />
+          {xSize < 720 ? (
+            <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
+          ) : (
+            <THead
+              collumns={[
+                ["Código"],
+                ["Referência", "Cliente"],
+                ["Situação"],
+                [""],
+              ]}
+            />
+          )}
           <tbody>
             {hasNothingToShow && (
               <tr>
                 <td colSpan={3} className={"py-2 text-center"}>
                   <span className={"text-center"}>
-                    Não existe nenhum orçamento para ser exibido aqui
+                    Nada para ser exibido aqui
                   </span>
                 </td>
               </tr>
             )}
-            {quotations.map((quotation) => (
-              <Tr key={quotation.id}>
-                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.slug}</p>
-                </Td>
-                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{quotation.reference}</p>
-                  <p className={"font-semibold text-sm"}>
-                    {quotation.customer.name}
-                  </p>
-                </Td>
-                <Td link={`${QUOTATION_URL}${quotation.id}/`}>
-                  <p>{formatQuotationStatusEnum(quotation.status)}</p>
-                </Td>
-                <Td>
-                  <Button
-                    text="PDF"
-                    onClick={() =>
-                      fetchPdf(`/quotations/print/${quotation.id}`)
-                    }
-                  />
-                  <Button
-                    text="PDF s/ valores"
-                    onClick={() =>
-                      fetchPdf(`/quotations/print/${quotation.id}?mode=hidden`)
-                    }
-                    className={"ml-2 bg-blue-700 text-white"}
-                  />
-                </Td>
-              </Tr>
-            ))}
+            {quotations.map((quotation) =>
+              xSize < 720 ? (
+                <Tr key={quotation.id}>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{quotation.slug}</p>
+                    <p>{quotation.reference}</p>
+                    <p className={"font-semibold text-sm"}>
+                      {quotation.customer.name}
+                    </p>
+                  </Td>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{formatQuotationStatusEnum(quotation.status)}</p>
+                    <Button
+                      text="PDF Detalhado"
+                      onClick={() =>
+                        fetchPdf(`/quotations/print/${quotation.id}`)
+                      }
+                    />
+                    <Button
+                      text="PDF"
+                      onClick={() =>
+                        fetchPdf(
+                          `/quotations/print/${quotation.id}?mode=hidden`
+                        )
+                      }
+                      className={"ml-2 bg-blue-700 text-white"}
+                    />
+                  </Td>
+                </Tr>
+              ) : (
+                <Tr key={quotation.id}>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{quotation.slug}</p>
+                  </Td>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{quotation.reference}</p>
+                    <p className={"font-semibold text-sm"}>
+                      {quotation.customer.name}
+                    </p>
+                  </Td>
+                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                    <p>{formatQuotationStatusEnum(quotation.status)}</p>
+                  </Td>
+                  <Td>
+                    <Button
+                      text="PDF"
+                      onClick={() =>
+                        fetchPdf(`/quotations/print/${quotation.id}`)
+                      }
+                    />
+                    <Button
+                      text="PDF s/ valores"
+                      onClick={() =>
+                        fetchPdf(
+                          `/quotations/print/${quotation.id}?mode=hidden`
+                        )
+                      }
+                      className={"ml-2 bg-blue-700 text-white"}
+                    />
+                  </Td>
+                </Tr>
+              )
+            )}
           </tbody>
         </Table>
       </div>

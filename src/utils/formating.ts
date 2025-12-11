@@ -46,7 +46,6 @@ export function formatPurchaseStatusEnum(status: PurchaseStatusType) {
 
 export function formatQuotationStatusEnum(status: QuotationsStatusType) {
   const QuotationStatusMap = {
-    draft: "Rascunho de Orçamento",
     q_awaiting: "Aguardando Aceite",
     q_approved: "Orçamento Aceito",
     os_awaiting: "Aguardando Atendimento",
