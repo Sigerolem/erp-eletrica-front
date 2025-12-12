@@ -8,7 +8,7 @@ import type { MaterialsType } from "../materials/Materials";
 import { ListWrapper } from "../quotations/lists/ListWrapper";
 import type { TransactionItemsType, TransactionsType } from "./Transactions";
 
-export function TransactionDelivery() {
+export function TransactionReturn() {
   const [transactionItems, setTransactionItems] = useState<
     TransactionItemsType[]
   >([]);
@@ -57,17 +57,26 @@ export function TransactionDelivery() {
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
+    for (const item of transactionItems) {
+      if (item.taken_amount < item.separated_amount + item.returned_amount) {
+        window.alert(
+          "Não é permitido devolver quantidade maior que a entregue"
+        );
+        return null;
+      }
+    }
+
     const result = await fetchWithToken({
       path: `/transactions/${id}`,
       method: "PUT",
       body: JSON.stringify({
-        status: "ongoing",
+        status: "returning",
         quotation_id: transaction?.quotation_id,
         items: transactionItems,
       }),
     });
     if (result.code == 200) {
-      window.alert("Separação salva com sucesso");
+      window.alert("Devolução salva com sucesso");
       window.location.href = `/pedidos`;
       return null;
     }
@@ -184,22 +193,13 @@ export function TransactionDelivery() {
         />
         <ListWrapper label="Materiais" doOnClickAdd={() => {}}>
           {transactionItems.map((item) => {
-            const hasBeenScanned =
-              Object.keys(barcodeLog).includes(
-                item.material.barcode || "void"
-              ) ||
-              Object.keys(barcodeLog).includes(
-                item.material.pkg_barcode || "void"
-              );
             return (
               <article
                 key={item.id}
                 className={`flex flex-col gap-2 py-3 px-2 ${
-                  hasBeenScanned
-                    ? item.separated_amount + item.taken_amount ==
-                      item.expected_amount
-                      ? "bg-green-200"
-                      : "bg-amber-200"
+                  item.separated_amount + item.returned_amount >
+                  item.taken_amount
+                    ? "bg-amber-200"
                     : ""
                 }`}
               >
@@ -217,7 +217,7 @@ export function TransactionDelivery() {
                         item.material.barcode || item.material_id
                       }`}
                       name={`separatedAmount${item.material.pkg_barcode}`}
-                      label={"Separado"}
+                      label={"Devolvendo"}
                       errors={validationErros}
                       value={item.separated_amount}
                       onKeyPress={handleScanning}
@@ -255,9 +255,12 @@ export function TransactionDelivery() {
                     />
 
                     <Input
-                      label={"Pedido"}
-                      name={`amountRequested`}
-                      value={`${item.expected_amount} ${item.material.unit}`}
+                      id={`barcode-${
+                        item.material.barcode || item.material_id
+                      }`}
+                      name={`takenAmount`}
+                      label={"Entregue"}
+                      value={`${item.taken_amount} ${item.material.unit}`}
                       className={"bg-blue-50! text-center font-semibold"}
                       disabled={true}
                     />
@@ -319,18 +322,18 @@ export function TransactionDelivery() {
                     )}
                   </div>
                   <Input
-                    id={`barcode-${item.material.barcode || item.material_id}`}
-                    name={`takenAmount`}
-                    label={"Devolvido"}
-                    value={`${item.returned_amount} ${item.material.unit}`}
+                    label={"Pedido"}
+                    name={`amountRequested`}
+                    value={`${item.expected_amount} ${item.material.unit}`}
                     className={"bg-blue-50! text-center font-semibold"}
                     disabled={true}
                   />
+
                   <Input
                     id={`barcode-${item.material.barcode || item.material_id}`}
                     name={`takenAmount`}
-                    label={"Já entregue"}
-                    value={`${item.taken_amount} ${item.material.unit}`}
+                    label={"Já devolvido"}
+                    value={`${item.returned_amount} ${item.material.unit}`}
                     className={"bg-blue-50! text-center font-semibold"}
                     disabled={true}
                   />
@@ -339,7 +342,7 @@ export function TransactionDelivery() {
             );
           })}
         </ListWrapper>
-        <Button text="Salvar separação" type={"submit"} />
+        <Button text="Salvar devolução" type={"submit"} />
       </DataForm>
     </div>
   );

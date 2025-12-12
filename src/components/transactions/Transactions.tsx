@@ -27,6 +27,8 @@ export type TransactionsStatusType =
   | "awaiting"
   | "ongoing"
   | "partial"
+  | "delivered"
+  | "returning"
   | "completed"
   | "cancelled";
 

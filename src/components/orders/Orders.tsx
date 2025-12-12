@@ -40,12 +40,7 @@ export function Orders() {
             <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
           ) : (
             <THead
-              collumns={[
-                ["Código"],
-                ["Referência", "Cliente"],
-                ["Situação"],
-                [""],
-              ]}
+              collumns={[["Código"], ["Referência", "Cliente"], ["Situação"]]}
             />
           )}
           <tbody>

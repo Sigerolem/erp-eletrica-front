@@ -71,6 +71,8 @@ export function formatTransactionStatusEnum(status: TransactionsStatusType) {
     awaiting: "Aguardando separação",
     ongoing: "Em separação",
     partial: "Atendido parcialmente",
+    delivered: "Entregue",
+    returning: "Em devolução",
     completed: "Concluido",
     cancelled: "Cancelado",
   };

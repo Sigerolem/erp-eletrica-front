@@ -1,9 +1,8 @@
+import { Button } from "@elements/Button";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
-import { Button } from "@elements/Button";
-import type { TransactionsType } from "./Transactions";
 import { TransactionDataForm } from "./TransactionDataForm";
-import { MaterialDataForm } from "../materials/MaterialDataForm";
+import type { TransactionsType } from "./Transactions";
 
 export function TransactionDetails() {
   const [transaction, setTransaction] = useState<TransactionsType | null>(null);
@@ -28,6 +27,11 @@ export function TransactionDetails() {
     window.location.hostname == "localhost"
       ? "/pedidos/separar/id#"
       : "/pedidos/separar/id/#";
+
+  const TRANSACTION_RETURN_URL =
+    window.location.hostname == "localhost"
+      ? "/pedidos/devolver/id#"
+      : "/pedidos/devolver/id/#";
 
   async function handleDataSubmition(
     transactionData: Partial<TransactionsType>
@@ -65,7 +69,7 @@ export function TransactionDetails() {
       path: `/transactions/${transaction?.id}`,
       method: "PATCH",
       body: JSON.stringify({
-        status: "partial",
+        status: "delivered",
         id: transaction?.id,
       }),
     });
@@ -73,6 +77,25 @@ export function TransactionDetails() {
       window.location.href = "/pedidos";
     } else {
       window.alert("Erro ao confirmar a entrega");
+      console.error(data);
+    }
+  }
+
+  async function handleConfirmReturn() {
+    const { code, data } = await fetchWithToken<{
+      transaction: TransactionsType;
+    }>({
+      path: `/transactions/${transaction?.id}`,
+      method: "PATCH",
+      body: JSON.stringify({
+        status: "completed",
+        id: transaction?.id,
+      }),
+    });
+    if (code == 200) {
+      window.location.href = "/pedidos";
+    } else {
+      window.alert("Erro ao confirmar a devolução");
       console.error(data);
     }
   }
@@ -85,18 +108,20 @@ export function TransactionDetails() {
           transactionData={transaction}
         >
           <div className={"flex justify-around"}>
-            {transaction.status !== "draft" && (
-              <a href={`${TRANSACTION_DELIVERY_URL}${transaction.id}`}>
-                <Button
-                  text={
-                    transaction.status == "awaiting"
-                      ? "Iniciar separação"
-                      : "Alterar dados pedido"
-                  }
-                  type={"submit"}
-                />
-              </a>
-            )}
+            {transaction.status !== "draft" &&
+              transaction.status !== "returning" &&
+              transaction.status !== "completed" && (
+                <a href={`${TRANSACTION_DELIVERY_URL}${transaction.id}`}>
+                  <Button
+                    text={
+                      transaction.status == "awaiting"
+                        ? "Iniciar separação"
+                        : "Realizar nova separação"
+                    }
+                    type={"submit"}
+                  />
+                </a>
+              )}
             {transaction.status == "ongoing" && (
               <Button
                 text="Confirmar entrega"
@@ -104,10 +129,20 @@ export function TransactionDetails() {
                 onClick={handleConfirmDelivery}
               />
             )}
-            {transaction.status == "partial" && (
+            {(transaction.status == "completed" ||
+              transaction.status == "delivered") && (
+              <a href={`${TRANSACTION_RETURN_URL}${transaction.id}`}>
+                <Button
+                  text="Registrar devolução"
+                  className={"bg-blue-700 text-white"}
+                />
+              </a>
+            )}
+            {transaction.status == "returning" && (
               <Button
-                text="Confirmar pedido e devolução"
+                text="Confirmar devolução"
                 className={"bg-slate-600 text-white"}
+                onClick={handleConfirmReturn}
               />
             )}
           </div>

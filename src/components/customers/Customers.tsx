@@ -61,16 +61,24 @@ export function Customers() {
           />
         </header>
         <Table>
-          <THead collumns={[["Nome", "CNPJ"], ["Celular"]]} />
+          <THead
+            collumns={[
+              ["Nome", "CNPJ"],
+              ["Celular", "E-mail"],
+            ]}
+          />
           <tbody>
             {customers.map((customer) => (
               <Tr key={customer.id}>
                 <Td link={`${CUSTOMER_URL}${customer.id}/`}>
                   <p>{customer.name}</p>
-                  <p className={"text-green-700"}>{customer.cnpj ?? ""}</p>
+                  <p className={"text-sm font-semibold"}>
+                    {customer.cnpj ?? ""}
+                  </p>
                 </Td>
                 <Td link={`${CUSTOMER_URL}${customer.id}/`}>
                   <p>{customer.phone_number}</p>
+                  <p>{customer.email}</p>
                 </Td>
               </Tr>
             ))}

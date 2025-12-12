@@ -140,7 +140,7 @@ export function QuotationDetails() {
             ) : (
               <></>
             )}
-            <Button type={"submit"} text="Salvar" />
+            <Button type={"submit"} text="Salvar alterações" />
           </div>
         </QuotationDataForm>
       ) : (
