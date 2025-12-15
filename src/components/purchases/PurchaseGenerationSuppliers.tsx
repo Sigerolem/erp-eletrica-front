@@ -42,15 +42,20 @@ export function PurchaseGenerationSuppliers() {
               key={sup.id || "null"}
               href={`/compras${PURCHASE_URL}${sup.id}`}
               className={
-                "flex gap-6 p-2 text-xl font-semibold hover:border-2 hover:border-blue-500 hover:p-1.5 rounded-md"
+                "flex justify-between w-full max-w-3xl p-2 text-xl font-semibold hover:border-2 hover:border-blue-500 hover:p-1.5 rounded-md"
               }
             >
-              <strong className={"text-xl text-blue-900"}>
-                {sup.name || "Sem fornecedor"}:
-              </strong>
-              <span className={""}>
-                {sup.materials} {sup.materials == 1 ? "material" : "materiais"}
-              </span>
+              <div>
+                <strong className={"text-xl text-blue-900"}>
+                  {sup.name || "Sem fornecedor"}:
+                </strong>
+              </div>
+              <div>
+                <span className={" ml-auto"}>
+                  {sup.materials}{" "}
+                  {sup.materials == 1 ? "material" : "materiais"}
+                </span>
+              </div>
             </a>
           ))}
         </section>
