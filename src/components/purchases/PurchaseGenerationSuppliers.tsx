@@ -36,13 +36,13 @@ export function PurchaseGenerationSuppliers() {
             Fornecedores com materiais em baixa quantidade
           </h3>
         </header>
-        <section className={"flex flex-col items-start"}>
+        <section className={"flex flex-col items-start gap-2"}>
           {suppliers.map((sup) => (
             <a
               key={sup.id || "null"}
               href={`/compras${PURCHASE_URL}${sup.id}`}
               className={
-                "flex justify-between w-full max-w-3xl p-2 text-xl font-semibold hover:border-2 hover:border-blue-500 hover:p-1.5 rounded-md"
+                "flex justify-between items-center w-full max-w-3xl p-2 text-xl font-semibold hover:border-2 hover:border-blue-500 hover:p-1.5 rounded-md"
               }
             >
               <div>
