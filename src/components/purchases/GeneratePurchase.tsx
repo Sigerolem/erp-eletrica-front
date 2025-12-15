@@ -201,7 +201,7 @@ export function GeneratePurchase() {
                     className={`flex ${
                       xSize < 500
                         ? "items-end gap-4 col-span-4 w-full h-full"
-                        : "flex-col h-full items-end max-w-full justify-end"
+                        : "flex-col h-full items-stretch max-w-full justify-end"
                     }`}
                   >
                     <Input

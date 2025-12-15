@@ -143,7 +143,7 @@ export function PurchaseItemsList({
               className={`h-full flex ${
                 xSize < 500
                   ? "items-end gap-4 col-span-4"
-                  : "flex-col justify-between items-end"
+                  : "flex-col justify-between items-stretch"
               }`}
             >
               <Input
