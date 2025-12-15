@@ -5,6 +5,7 @@ import { fetchWithToken } from "/src/utils/fetchWithToken";
 import { Table, Td, THead, Tr } from "/src/elements/Table";
 import { BrlStringFromCents } from "@utils/formating";
 import { Button } from "@elements/Button";
+import { Input } from "src/elements/Input";
 
 export type MaterialsType = {
   id: string;
@@ -35,19 +36,20 @@ const MATERIAL_URL =
 
 export function Materials() {
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }).then(
-      ({ code, data }) => {
-        if (code == 200) {
-          setMaterials(data.materials);
-        } else {
-          window.alert("Erro ao buscar a lista de materiais");
-          console.error(data);
-        }
+    fetchWithToken<{ materials: MaterialsType[] }>({
+      path: search == "" ? "/materials" : `/materials?search=${search}`,
+    }).then(({ code, data }) => {
+      if (code == 200) {
+        setMaterials(data.materials);
+      } else {
+        window.alert("Erro ao buscar a lista de materiais");
+        console.error(data);
       }
-    );
-  }, []);
+    });
+  }, [search]);
 
   const xSize = window.innerWidth;
 
@@ -58,11 +60,26 @@ export function Materials() {
           <h3 className={"text-lg font-semibold"}>Lista de materiais</h3>
           <a href="/materiais/novo">
             <Button
-              text="Novo material"
+              text="Cadastrar novo"
               className={"bg-blue-700 text-white text-sm"}
             />
           </a>
         </header>
+        <div className={"mt-4 mb-4 flex items-end gap-2"}>
+          {/* <span
+            className={"bg-slate-600 p-2 rounded-md text-white font-semibold"}
+          >
+            Pesquisa:
+          </span> */}
+          <Input
+            name="search"
+            placeholder={"Pesquise aqui o nome do material"}
+            value={search}
+            onBlur={(e) => {
+              setSearch(e.currentTarget.value);
+            }}
+          />
+        </div>
         <Table>
           {xSize < 700 ? (
             <THead collumns={[["Nome", "Fornecedor"], ["Estoque"]]} />
