@@ -201,7 +201,7 @@ export function PurchaseItemsList({
                 />
               )}
               {!wasReceived && (
-                <div className={""}>
+                <div className={"flex justify-end"}>
                   <Button
                     text="X"
                     className={"bg-red-600 py-1 text-white"}
