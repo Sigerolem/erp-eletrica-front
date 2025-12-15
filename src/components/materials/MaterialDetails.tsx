@@ -23,7 +23,7 @@ export function MaterialDetails() {
   }, []);
 
   async function handleDataSubmition(materialData: Partial<MaterialsType>) {
-    const { code, data } = await fetchWithToken<{ supplier: MaterialsType }>({
+    const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${material?.id}`,
       method: "PUT",
       body: JSON.stringify(materialData),
@@ -44,6 +44,7 @@ export function MaterialDetails() {
     }
 
     if (code == 200 || code == 201) {
+      setMaterial(data.material);
       window.alert("Altterações salvas");
       return null;
     }

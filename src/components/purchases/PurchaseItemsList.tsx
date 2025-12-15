@@ -1,12 +1,7 @@
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type StateUpdater,
-} from "preact/hooks";
-import type { PurchaseItemsType, PurchasesType } from "./Purchases";
-import { Input } from "@elements/Input";
 import { Button } from "@elements/Button";
+import { Input } from "@elements/Input";
+import { useState, type Dispatch, type StateUpdater } from "preact/hooks";
+import type { PurchaseItemsType, PurchasesType } from "./Purchases";
 
 export function PurchaseItemsList({
   purchaseItems,
@@ -17,7 +12,7 @@ export function PurchaseItemsList({
   purchase: Partial<PurchasesType>;
   purchaseItems: Partial<PurchaseItemsType>[];
   setPurchaseItems: Dispatch<StateUpdater<Partial<PurchaseItemsType>[]>>;
-  setItemsWereChanged: Dispatch<StateUpdater<boolean>>;
+  setItemsWereChanged?: Dispatch<StateUpdater<boolean>>;
 }) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -33,7 +28,7 @@ export function PurchaseItemsList({
         }
       })
     );
-    setItemsWereChanged(true);
+    setItemsWereChanged && setItemsWereChanged(true);
   }
 
   function handleUpdateDeliveredAmount(materialId: string, amount: number) {
@@ -46,46 +41,113 @@ export function PurchaseItemsList({
         }
       })
     );
-    setItemsWereChanged(true);
+    setItemsWereChanged && setItemsWereChanged(true);
   }
 
   function handleRemoveItem(materialId: string) {
     setPurchaseItems((prev) =>
       prev.filter((item) => item.material_id !== materialId)
     );
-    setItemsWereChanged(true);
+    setItemsWereChanged && setItemsWereChanged(true);
   }
 
   const wasReceived =
     purchase?.status == "received" || purchase?.status == "finished";
+
+  const xSize = window.innerWidth;
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3 pr-4"}>
-      <header className={"grid grid-cols-5 font-semibold gap-x-4"}>
+      {/* <header className={"grid grid-cols-4 font-semibold gap-x-4"}>
         <span className={"col-span-2"}>Item</span>
-        {!wasReceived && <span>Atual/Ideal</span>}
-        <span>Embalagem</span>
+        {!wasReceived && <span>Estoque</span>}
         <span>Solicitado</span>
         {wasReceived && <span>Recebido</span>}
-      </header>
+      </header> */}
 
       {purchaseItems.map((item) => {
         if (item.material == undefined) {
           return;
         }
         return (
-          <div className={"grid grid-cols-5 items-center gap-x-4"}>
-            <span className={"col-span-2"}>{item.material.name}</span>
-            {!wasReceived && (
-              <span>
-                {item.material.current_amount}
-                {" / "}
-                {item.material.ideal_amount}
-              </span>
-            )}
-            <span>{item.material.pkg_size}</span>
-            <div className={"flex gap-2 items-center justify-stretch"}>
+          <article
+            className={"w-full grid grid-cols-4 items-center gap-x-2 gap-y-1"}
+          >
+            <div
+              className={`${
+                xSize < 500
+                  ? "col-span-4"
+                  : wasReceived
+                  ? "col-span-3"
+                  : "col-span-2"
+              }`}
+            >
               <Input
-                label=""
+                name="name"
+                label="Material"
+                className={"bg-blue-50!"}
+                value={item.material.name}
+                disabled={true}
+              />
+              <div className={`${"flex gap-2"}`}>
+                <Input
+                  name="pkgSize"
+                  label="Embalagem"
+                  value={item.material.pkg_size}
+                  className={"bg-blue-50!"}
+                  disabled={true}
+                />
+                {wasReceived && (
+                  <Input
+                    name="idealAmount"
+                    label="Ideal"
+                    value={item.material.ideal_amount}
+                    className={"bg-blue-50!"}
+                    disabled={true}
+                  />
+                )}
+                {xSize < 500 && (
+                  <Input
+                    name="currentAmount"
+                    label="Disponível"
+                    value={
+                      item.material.current_amount -
+                      item.material.reserved_amount
+                    }
+                    className={"bg-blue-50!"}
+                    disabled={true}
+                  />
+                )}
+              </div>
+            </div>
+            {!wasReceived && xSize >= 500 && (
+              <div>
+                <Input
+                  name="currentAmount"
+                  label="Disponível"
+                  value={
+                    item.material.current_amount - item.material.reserved_amount
+                  }
+                  className={"bg-blue-50!"}
+                  disabled={true}
+                />
+                <Input
+                  name="currentAmount"
+                  label="Ideal"
+                  value={item.material.ideal_amount}
+                  className={"bg-blue-50!"}
+                  disabled={true}
+                />
+              </div>
+            )}
+            <div
+              className={`h-full flex ${
+                xSize < 500
+                  ? "items-end gap-4 col-span-4"
+                  : "flex-col justify-between items-end"
+              }`}
+            >
+              <Input
+                label="Pedido"
                 name={item.material.id}
                 value={item.amount_requested ?? 0}
                 onBlur={(e) => {
@@ -107,10 +169,39 @@ export function PurchaseItemsList({
                   );
                 }}
                 errors={validationErrors}
-                className={"min-w-5"}
+                disabled={wasReceived}
+                className={wasReceived ? "bg-blue-50!" : ""}
               />
+              {wasReceived && (
+                <Input
+                  label="Recebido"
+                  name={`${item.material_id}-delivered`}
+                  value={item.amount_delivered ?? 0}
+                  onBlur={(e) => {
+                    const value = e.currentTarget.value;
+                    if (isNaN(parseInt(value))) {
+                      setValidationErrors((prev) => ({
+                        ...prev,
+                        [`${item.material_id}-delivered` || ""]:
+                          "Digite um valor válido",
+                      }));
+                    } else {
+                      setValidationErrors((prev) => {
+                        delete prev[item.material_id || ""];
+                        return { ...prev };
+                      });
+                    }
+                    handleUpdateDeliveredAmount(
+                      item.material_id || "",
+                      parseInt(value)
+                    );
+                  }}
+                  errors={validationErrors}
+                  className={"min-w-5"}
+                />
+              )}
               {!wasReceived && (
-                <div className={"ml-1 pr-4"}>
+                <div className={""}>
                   <Button
                     text="X"
                     className={"bg-red-600 py-1 text-white"}
@@ -121,35 +212,7 @@ export function PurchaseItemsList({
                 </div>
               )}
             </div>
-            {wasReceived && (
-              <Input
-                label=""
-                name={`${item.material_id}-delivered`}
-                value={item.amount_delivered ?? 0}
-                onBlur={(e) => {
-                  const value = e.currentTarget.value;
-                  if (isNaN(parseInt(value))) {
-                    setValidationErrors((prev) => ({
-                      ...prev,
-                      [`${item.material_id}-delivered` || ""]:
-                        "Digite um valor válido",
-                    }));
-                  } else {
-                    setValidationErrors((prev) => {
-                      delete prev[item.material_id || ""];
-                      return { ...prev };
-                    });
-                  }
-                  handleUpdateDeliveredAmount(
-                    item.material_id || "",
-                    parseInt(value)
-                  );
-                }}
-                errors={validationErrors}
-                className={"min-w-5"}
-              />
-            )}
-          </div>
+          </article>
         );
       })}
     </div>

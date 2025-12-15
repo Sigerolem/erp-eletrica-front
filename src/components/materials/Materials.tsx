@@ -21,6 +21,7 @@ export type MaterialsType = {
   reserved_amount: number;
   current_amount: number;
   tracked_amount: number;
+  purchase_amount: number;
   avg_cost: number;
   profit: number;
   value: number;
@@ -55,7 +56,7 @@ export function Materials() {
 
   return (
     <>
-      <div>
+      <div className={"pb-20 h-full"}>
         <header className={"flex justify-between items-end mb-2"}>
           <h3 className={"text-lg font-semibold"}>Lista de materiais</h3>
           <a href="/materiais/novo">
@@ -92,7 +93,7 @@ export function Materials() {
               ]}
             />
           )}
-          <tbody>
+          <tbody className={"overflow-scroll"}>
             {materials.map((material) =>
               xSize < 700 ? (
                 <Tr key={material.id}>

@@ -56,7 +56,12 @@ export function PurchaseDelivery() {
         const purchase = result.data.purchase;
         setNF(purchase.nf || "");
         setSupplier(purchase.supplier);
-        setPurchaseItems(result.data.purchase.purchase_items);
+        setPurchaseItems(
+          result.data.purchase.purchase_items.map((item) => ({
+            ...item,
+            new_clean_cost: item.material.clean_cost,
+          }))
+        );
       } else {
         window.alert("Erro ao se comunicar com o servidor.");
       }

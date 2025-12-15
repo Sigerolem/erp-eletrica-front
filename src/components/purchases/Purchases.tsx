@@ -19,6 +19,7 @@ export type PurchaseItemsType = {
   id: string;
   material_id: string;
   purchase_id: string;
+  purchase: PurchasesType;
   material: MaterialsType;
   amount_requested: number;
   amount_delivered: number;
@@ -48,12 +49,16 @@ const PURCHASE_URL =
 
 export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);
+  const [hasNothingToShow, setHasNothingToShow] = useState(false);
 
   useEffect(() => {
     fetchWithToken<{ purchases: PurchasesType[] }>({ path: "/purchases" }).then(
       ({ code, data }) => {
         if (code == 200) {
           setPurchases(data.purchases);
+          if (data.purchases.length == 0) {
+            setHasNothingToShow(true);
+          }
         } else {
           window.alert("Erro ao buscar a lista de materiais");
           console.error(data);
@@ -66,11 +71,17 @@ export function Purchases() {
   return (
     <>
       <div>
-        <header className={"flex justify-between items-end mb-2"}>
+        <header className={"flex justify-between items-end mb-2 gap-1"}>
           <h3 className={"text-lg font-semibold"}>Lista de compras</h3>
           <a href="/compras/nova">
             <Button
               text="Nova compra"
+              className={"bg-blue-700 text-white text-sm"}
+            />
+          </a>
+          <a href="/compras/gerar">
+            <Button
+              text="Compras necessárias"
               className={"bg-blue-700 text-white text-sm"}
             />
           </a>
@@ -95,6 +106,15 @@ export function Purchases() {
             />
           )}
           <tbody>
+            {hasNothingToShow && (
+              <tr>
+                <td colSpan={3} className={"py-2 text-center"}>
+                  <span className={"text-center"}>
+                    Nada para ser exibido aqui
+                  </span>
+                </td>
+              </tr>
+            )}
             {purchases.map((purchase) => {
               const totalCost =
                 purchase.delivery_cost +

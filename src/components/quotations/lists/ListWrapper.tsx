@@ -6,24 +6,26 @@ export function ListWrapper({
   children,
 }: {
   label: string;
-  doOnClickAdd: () => void;
+  doOnClickAdd?: () => void;
   children: ReactNode | ReactNode[];
 }) {
   return (
     <div>
       <header className={"flex items-center justify-start gap-2 pb-1"}>
         <span className={"font-semibold text-xl"}>{label}</span>
-        <button
-          type={"button"}
-          className={
-            "bg-blue-800 px-2 shadow-md rounded-md text-2xl text-white font-semibold"
-          }
-          onClick={() => {
-            doOnClickAdd();
-          }}
-        >
-          +
-        </button>
+        {doOnClickAdd && (
+          <button
+            type={"button"}
+            className={
+              "bg-blue-800 px-2 shadow-md rounded-md text-2xl text-white font-semibold"
+            }
+            onClick={() => {
+              doOnClickAdd();
+            }}
+          >
+            +
+          </button>
+        )}
         {/* <button
           className={
             "bg-slate-600 shadow-md text-white rounded-md flex items-center justify-center"
