@@ -50,8 +50,8 @@ export function PurchaseGenerationSuppliers() {
                   {sup.name || "Sem fornecedor"}:
                 </strong>
               </div>
-              <div>
-                <span className={" ml-auto"}>
+              <div className={"min-w-30 text-right"}>
+                <span className={""}>
                   {sup.materials}{" "}
                   {sup.materials == 1 ? "material" : "materiais"}
                 </span>
