@@ -29,12 +29,16 @@ export function MaterialDetails() {
       body: JSON.stringify(materialData),
     });
 
-    if (code == 409) {
+    if (code == 409 && typeof data.error == "string") {
       const errors = {} as { [key: string]: string };
-      if (data.message.includes("entity.name")) {
+      if (data.error.includes("entity.name")) {
         errors.name = "Esse nome já foi utilizado";
-      } else if (data.message.includes("entity.cnpj")) {
+      } else if (data.error.includes("entity.cnpj")) {
         errors.cnpj = "Esse CNPJ já foi cadastrado";
+      } else if (data.error.includes("entity.barcode")) {
+        errors.barcode = "Esse codigo já foi cadastrado";
+      } else if (data.error.includes("entity.pkg_barcode")) {
+        errors.pkg_barcode = "Esse codigo já foi cadastrado";
       }
       return errors;
     }

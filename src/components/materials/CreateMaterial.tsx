@@ -21,12 +21,12 @@ export function CreateMaterial() {
     if (code == 201) {
       const material = data.material;
       window.alert(`${material.name} foi cadastrado com sucesso!`);
-      window.location.reload(); //funciona?
+      window.location.reload();
       return null;
     }
-    console.log(code, data);
     if (code == 409) {
       let erro = {} as { [key: string]: string };
+      console.log(typeof data.error);
       if (typeof data.error == "string") {
         if (data.error.includes("name")) {
           erro = {
@@ -40,7 +40,7 @@ export function CreateMaterial() {
             pkg_barcode: "Esse codigo de barras ja está cadastrado",
           };
         }
-        if (data.error.includes("barcode")) {
+        if (data.error.includes("entity.barcode")) {
           erro = {
             ...erro,
             barcode: "Esse codigo de barras ja está cadastrado",
