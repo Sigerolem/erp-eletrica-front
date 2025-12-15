@@ -4,9 +4,8 @@ import { Button } from "@elements/Button";
 import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
 import { Table, Td, THead, Tr } from "src/elements/Table";
-import { fetchWithToken } from "src/utils/fetchWithToken";
-import { CreatePurchaseModal } from "./CreatePurchaseModal";
 import { fetchPdf } from "src/utils/fetchPdf";
+import { fetchWithToken } from "src/utils/fetchWithToken";
 
 export type PurchaseStatusType =
   | "draft"

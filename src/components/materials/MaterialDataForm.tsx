@@ -205,7 +205,7 @@ export function MaterialDataForm({
         />
         <Input
           label="Código de barras da caixa"
-          name="barcode"
+          name="pkg_barcode"
           value={pkgBarcode}
           onBlur={(e) => {
             validateStringFieldOnBlur(e, setPkgBarcode, setValidationErrors, {

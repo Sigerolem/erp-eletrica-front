@@ -129,7 +129,6 @@ export function PurchaseDataForm({
             (material.ideal_amount - material.current_amount) /
               material.pkg_size
           ) * material.pkg_size,
-        old_unit_cost: material.avg_cost,
         new_unit_cost: material.avg_cost,
         purchase_id: purchaseData?.id || undefined,
         amount_delivered: 0,
