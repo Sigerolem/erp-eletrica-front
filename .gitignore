@@ -1,6 +1,5 @@
 # build output
-dist/**/*
-!dist/_headers
+dist/
 
 # generated types
 .astro/
