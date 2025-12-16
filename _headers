@@ -2,4 +2,4 @@
   Cache-Control: public, max-age=86400, immutable 
 
 /index.html
-  Cache-Control: public, max-age=60 
+  Cache-Control: public, max-age=60
