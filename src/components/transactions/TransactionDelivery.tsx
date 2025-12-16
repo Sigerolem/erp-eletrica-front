@@ -21,6 +21,7 @@ export function TransactionDelivery() {
   const [barcodeLog, setbarcodeLog] = useState<{
     [key: string]: number;
   }>({});
+  const [isSearchingBarcode, setIsSearchingBarcode] = useState(false);
 
   useEffect(() => {
     const path = new URL(window.location.href);
@@ -76,7 +77,39 @@ export function TransactionDelivery() {
     return null;
   }
 
-  function focusOnScannedItem(barcode: string) {
+  async function updateScannedItemAmount(code: string) {
+    let itemWasFoundHere = true;
+    setTransactionItems((prev) =>
+      prev.map((item) => {
+        if (item.material.barcode == code) {
+          itemWasFoundHere = true;
+          return { ...item, separated_amount: item.separated_amount + 1 };
+        }
+        return item;
+      })
+    );
+    setTransactionItems((prev) =>
+      prev.map((item) => {
+        if (item.material.pkg_barcode == code) {
+          itemWasFoundHere = true;
+          return {
+            ...item,
+            separated_amount: item.separated_amount + item.material.pkg_size,
+          };
+        }
+        return item;
+      })
+    );
+    if (itemWasFoundHere) {
+      return;
+    }
+    const result = await fetchWithToken<{ material: MaterialsType }>({
+      path: `/materials/scan/${code}`,
+    });
+    console.log("aham: ", result.code, result.data);
+  }
+
+  async function focusOnScannedItem(barcode: string) {
     setbarcodeLog((prev) => {
       if (Object.keys(prev).includes(barcode)) {
         return { ...prev, [barcode]: prev[barcode] + 1 };
@@ -84,24 +117,6 @@ export function TransactionDelivery() {
         return { ...prev, [barcode]: 1 };
       }
     });
-
-    setTransactionItems((prev) =>
-      prev.map((item) =>
-        item.material.barcode == barcode
-          ? { ...item, separated_amount: item.separated_amount + 1 }
-          : item
-      )
-    );
-    setTransactionItems((prev) =>
-      prev.map((item) =>
-        item.material.pkg_barcode == barcode
-          ? {
-              ...item,
-              separated_amount: item.separated_amount + item.material.pkg_size,
-            }
-          : item
-      )
-    );
     try {
       let input = document.querySelector<HTMLInputElement>(
         `#barcode-${barcode}`
@@ -112,7 +127,7 @@ export function TransactionDelivery() {
         );
       }
       if (input == null) {
-        console.log(barcode);
+        setIsSearchingBarcode(true);
         return null;
       }
       input.focus();
@@ -145,11 +160,12 @@ export function TransactionDelivery() {
     }
   }
 
-  function handleScanning(e: KeyboardEvent) {
+  async function handleScanning(e: KeyboardEvent) {
     const input = e.currentTarget as HTMLInputElement;
     if (e.key == "Enter") {
       e.preventDefault();
       if (input.value.length > 7) {
+        await updateScannedItemAmount(input.value);
         focusOnScannedItem(input.value);
       } else {
         try {
