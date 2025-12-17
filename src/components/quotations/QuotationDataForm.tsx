@@ -233,6 +233,7 @@ export function QuotationDataForm({
       taken_amount: 0,
       is_private: false,
       quotation_id: quotationData?.id,
+      id: new Date().toISOString(),
     };
     setOccasionalMaterials((prev) => [...prev, newOccMaterial]);
   }
@@ -249,6 +250,7 @@ export function QuotationDataForm({
       taken_amount: 0,
       is_private: false,
       quotation_id: quotationData?.id,
+      id: new Date().toISOString(),
     };
     setServiceItems((prev) => [...prev, newService]);
   }
@@ -265,9 +267,12 @@ export function QuotationDataForm({
       taken_amount: 0,
       is_private: false,
       quotation_id: quotationData?.id,
+      id: new Date().toISOString(),
     };
     setExpenses((prev) => [...prev, newService]);
   }
+
+  const xSize = window.innerWidth;
 
   return (
     <DataForm onSubmit={onFormSubmit}>
@@ -283,7 +288,11 @@ export function QuotationDataForm({
         }}
         errors={validationErrors}
       />
-      <div className={"flex gap-4 items-end"}>
+      <div
+        className={`grid gap-3 items-end ${
+          xSize < 800 ? "grid-cols-2" : "grid-cols-4"
+        }`}
+      >
         <Input
           label="Tempo esperado"
           name="expectedDuration"

@@ -49,44 +49,43 @@ export function ExceptionalItemsList({
     setItems(itemsList);
   }, [itemsList]);
 
-  function handleDeleteItem({ createdAt }: { createdAt: string }) {
+  function handleDeleteItem({ id }: { id: string }) {
     const errors = Object.keys(validationErrors);
     errors.forEach((error) => {
-      if (error.includes(`-${createdAt}`)) {
+      if (error.includes(`-${id}`)) {
         setValidationErrors((prev) => {
           delete prev[error];
           return prev;
         });
       }
     });
-    setItemsList((prev) => [
-      ...prev.filter((item) => createdAt !== item.created_at),
-    ]);
+    setItemsList((prev) => [...prev.filter((item) => id !== item.id)]);
   }
 
   function handleUpdateItemInt({
-    created_at,
+    id,
     value,
     propName,
   }: {
-    created_at: string;
+    id: string;
     value: string;
     propName: string;
   }) {
+    console.log(id);
     if (isNaN(parseInt(value || "0"))) {
       setValidationErrors((prev) => ({
         ...prev,
-        [`${propName}-${created_at}`]: "Digite um valor válido",
+        [`${propName}-${id}`]: "Digite um valor válido",
       }));
     } else {
       setValidationErrors((prev) => {
-        delete prev[`${propName}-${created_at}`];
+        delete prev[`${propName}-${id}`];
         return { ...prev };
       });
     }
     setItemsList((prev) =>
       prev.map((item) => {
-        if (item.created_at == created_at) {
+        if (item.id == id) {
           return { ...item, [propName]: parseInt(value || "0") };
         } else {
           return item;
@@ -99,16 +98,16 @@ export function ExceptionalItemsList({
   function handleUpdateItemCurrency({
     value,
     propName,
-    created_at,
+    id,
   }: {
     value: string;
     propName: "unit_cost" | "unit_value" | "unit_profit";
-    created_at: string;
+    id: string;
   }) {
     handleUpdateListItemValues({
       value,
       propName,
-      created_at,
+      id,
       itemsList,
       setItemsList,
       setValidationErrors,
@@ -117,7 +116,7 @@ export function ExceptionalItemsList({
 
   return (
     <div className={"px-2 flex flex-col gap-3 pb-3"}>
-      {xSize >= 720 && (
+      {xSize >= 1000 && (
         <header className={"grid grid-cols-8 gap-x-4 font-semibold"}>
           <span className={"col-span-3"}>Nome/Descrição</span>
           <span>Unidade</span>
@@ -134,20 +133,20 @@ export function ExceptionalItemsList({
         }
         return (
           <div
-            key={item.created_at}
+            key={item.id}
             className={`grid gap-x-4 items-end ${
-              xSize < 720 ? "grid-cols-4" : "grid-cols-8"
+              xSize < 1000 ? "grid-cols-4" : "grid-cols-8"
             } ${index > 0 && "border-t border-gray-400"}`}
           >
             <div className={"col-span-3 pt-2"}>
               <Input
-                label={xSize < 720 ? "Nome" : ""}
-                name={`name-${item.created_at}`}
+                label={xSize < 1000 ? "Nome" : ""}
+                name={`name-${item.id}`}
                 value={item.name}
                 onBlur={(e) => {
                   setItemsList((prev) => [
                     ...prev.map((mapItem) => {
-                      if (item.created_at == mapItem.created_at) {
+                      if (item.id == mapItem.id) {
                         return { ...mapItem, name: e.currentTarget.value };
                       } else {
                         return { ...mapItem };
@@ -163,7 +162,7 @@ export function ExceptionalItemsList({
               doOnSelect={(value) => {
                 setItemsList((prev) => [
                   ...prev.map((mapItem) => {
-                    if (item.created_at == mapItem.created_at) {
+                    if (item.id == mapItem.id) {
                       return { ...mapItem, unit: value };
                     } else {
                       return { ...mapItem };
@@ -172,81 +171,97 @@ export function ExceptionalItemsList({
                 ]);
               }}
             />
-            <Input
-              name={`unit_cost-${item.created_at}`}
-              label={xSize < 720 ? "Custo Unit." : ""}
-              value={BrlStringFromCents(item.unit_cost)}
-              onBlur={(e) => {
-                const value = e.currentTarget.value;
-                handleUpdateItemCurrency({
-                  value,
-                  propName: "unit_cost",
-                  created_at: item.created_at!,
-                });
-              }}
-              errors={validationErrors}
-              className={"min-w-5"}
-            />
-            <Input
-              label={xSize < 720 ? "Lucro" : ""}
-              name={`unit_profit-${item.created_at}`}
-              value={`${(item.unit_profit! / 100)
-                .toFixed(2)
-                .replaceAll(",", "")
-                .replaceAll(".", ",")} %`}
-              onBlur={(e) => {
-                const value = e.currentTarget.value;
-                handleUpdateItemCurrency({
-                  value,
-                  propName: "unit_profit",
-                  created_at: item.created_at!,
-                });
-              }}
-              errors={validationErrors}
-              className={"min-w-5"}
-            />
-            <Input
-              name={`unit_value-${item.created_at}`}
-              label={xSize < 720 ? "Valor Unit." : ""}
-              value={BrlStringFromCents(item.unit_value)}
-              onBlur={(e) => {
-                const value = e.currentTarget.value;
-                handleUpdateItemCurrency({
-                  value,
-                  propName: "unit_value",
-                  created_at: item.created_at!,
-                });
-              }}
-              errors={validationErrors}
-              className={"min-w-5"}
-            />
-
-            <div className={"flex gap-2 items-end justify-stretch"}>
+            <div
+              className={
+                xSize < 500
+                  ? "col-span-4 flex gap-2 mt-3"
+                  : "col-span-2 flex gap-2 mt-3"
+              }
+            >
               <Input
-                label={xSize < 720 ? "Qtd. Eesperada" : ""}
-                name={`expected_amount-${item.created_at}`}
-                value={item.expected_amount}
+                name={`unit_cost-${item.id}`}
+                label={xSize < 1000 ? "Custo Unit." : ""}
+                value={BrlStringFromCents(item.unit_cost)}
                 onBlur={(e) => {
                   const value = e.currentTarget.value;
-                  handleUpdateItemInt({
+                  handleUpdateItemCurrency({
                     value,
-                    propName: "expected_amount",
-                    created_at: item.created_at!,
+                    propName: "unit_cost",
+                    id: item.id!,
                   });
                 }}
                 errors={validationErrors}
-                className={"min-w-4"}
+                className={"min-w-5"}
               />
-              <Button
-                text="X"
-                className={"bg-red-600 py-1 text-white"}
-                onClick={() => {
-                  if (item.id) {
-                    deleteItem((prev) => [...prev, item.id!]);
-                  }
-                  handleDeleteItem({ createdAt: item.created_at! });
+              <Input
+                label={xSize < 1000 ? "Lucro" : ""}
+                name={`unit_profit-${item.id}`}
+                value={`${(item.unit_profit! / 100)
+                  .toFixed(2)
+                  .replaceAll(",", "")
+                  .replaceAll(".", ",")} %`}
+                onBlur={(e) => {
+                  const value = e.currentTarget.value;
+                  handleUpdateItemCurrency({
+                    value,
+                    propName: "unit_profit",
+                    id: item.id!,
+                  });
                 }}
+                errors={validationErrors}
+                className={"min-w-5"}
               />
+            </div>
+            <div
+              className={
+                xSize < 500
+                  ? "col-span-4 grid grid-cols-2 mt-3 gap-2 items-end"
+                  : "col-span-2 grid grid-cols-2 mt-3 gap-2 items-end"
+              }
+            >
+              <Input
+                name={`unit_value-${item.id}`}
+                label={xSize < 1000 ? "Valor Unit." : ""}
+                value={BrlStringFromCents(item.unit_value)}
+                onBlur={(e) => {
+                  const value = e.currentTarget.value;
+                  handleUpdateItemCurrency({
+                    value,
+                    propName: "unit_value",
+                    id: item.id!,
+                  });
+                }}
+                errors={validationErrors}
+                className={"min-w-5"}
+              />
+
+              <div className={"flex gap-2 items-end justify-stretch"}>
+                <Input
+                  label={xSize < 1000 ? "Qtd. Eesperada" : ""}
+                  name={`expected_amount-${item.id}`}
+                  value={item.expected_amount}
+                  onBlur={(e) => {
+                    const value = e.currentTarget.value;
+                    handleUpdateItemInt({
+                      value,
+                      propName: "expected_amount",
+                      id: item.id!,
+                    });
+                  }}
+                  errors={validationErrors}
+                  className={"min-w-4"}
+                />
+                <Button
+                  text="X"
+                  className={"bg-red-600 py-1 text-white"}
+                  onClick={() => {
+                    if (item.id) {
+                      deleteItem((prev) => [...prev, item.id!]);
+                    }
+                    handleDeleteItem({ id: item.id! });
+                  }}
+                />
+              </div>
             </div>
           </div>
         );

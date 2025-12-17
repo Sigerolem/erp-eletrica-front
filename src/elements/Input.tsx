@@ -9,7 +9,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ label, errors, name, className, ...rest }: InputProps) {
   return (
-    <div className="flex max-w-full flex-col flex-1 relative min-w-20">
+    <div className="flex max-w-full flex-col flex-1 relative min-w-16">
       {label !== undefined && label !== "" && (
         <label className="mb-0.5 font-semibold pl-1 not-md:text-sm">
           {label}

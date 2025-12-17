@@ -122,7 +122,7 @@ export function InventoryItemsList({
       })
     );
   }
-
+  const xSize = window.innerWidth;
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3"}>
       {/* <header className={"grid grid-cols-4 font-semibold"}>
@@ -140,9 +140,11 @@ export function InventoryItemsList({
         return (
           <div
             key={`${item.created_at}-${item.material_id}`}
-            className={"grid grid-cols-4 gap-4 items-end"}
+            className={
+              "grid grid-cols-4 gap-3 items-end border-t border-gray-400 first-of-type:border-t-0"
+            }
           >
-            <div className={"col-span-2"}>
+            <div className={xSize < 800 ? "col-span-4" : "col-span-2"}>
               <Input
                 label="Nome descritivo"
                 name={`name-${item.material_id}`}
@@ -151,41 +153,49 @@ export function InventoryItemsList({
                 className={"min-w-5 bg-blue-50!"}
               />
             </div>
-            <Input
-              label="Quantidade esperada"
-              name={`expected_amount-${item.material_id}`}
-              value={item.expected_amount}
-              onBlur={(e) => {
-                const value = e.currentTarget.value;
-                handleUpdateItemInt({
-                  value,
-                  material_id: item.material_id!,
-                  propName: "expected_amount",
-                });
-              }}
-              errors={validationErrors}
-              className={"min-w-5"}
-            />
-            <div className={"flex gap-2 items-end justify-stretch"}>
+            <div
+              className={
+                xSize < 800
+                  ? "col-span-4 grid grid-cols-2 gap-2"
+                  : "col-span-2 grid grid-cols-2 gap-2"
+              }
+            >
               <Input
-                label="Quantidade real"
-                name={`real_amount-${item.material_id}`}
-                value={(item.taken_amount || 0) - (item.returned_amount || 0)}
-                className={"min-w-5 bg-blue-50!"}
+                label="Quantidade esperada"
+                name={`expected_amount-${item.material_id}`}
+                value={item.expected_amount}
+                onBlur={(e) => {
+                  const value = e.currentTarget.value;
+                  handleUpdateItemInt({
+                    value,
+                    material_id: item.material_id!,
+                    propName: "expected_amount",
+                  });
+                }}
+                errors={validationErrors}
+                className={"min-w-5"}
               />
-              <div className={"ml-1"}>
-                <Button
-                  text="X"
-                  className={"bg-red-600 py-1 text-white"}
-                  onClick={() => {
-                    if (item.id) {
-                      deleteItem((prev) => [...prev, item.id!]);
-                    }
-                    handleDeleteItem({
-                      matId: item.material_id!,
-                    });
-                  }}
+              <div className={"flex gap-2 items-end justify-stretch"}>
+                <Input
+                  label="Quantidade real"
+                  name={`real_amount-${item.material_id}`}
+                  value={(item.taken_amount || 0) - (item.returned_amount || 0)}
+                  className={"min-w-5 bg-blue-50!"}
                 />
+                <div className={"ml-1"}>
+                  <Button
+                    text="X"
+                    className={"bg-red-600 py-1 text-white"}
+                    onClick={() => {
+                      if (item.id) {
+                        deleteItem((prev) => [...prev, item.id!]);
+                      }
+                      handleDeleteItem({
+                        matId: item.material_id!,
+                      });
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
