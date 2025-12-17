@@ -17,6 +17,7 @@ export type CustomersType = {
 
 export function Customers() {
   const [customers, setCustomers] = useState<CustomersType[]>([]);
+  const [isFetching, setIsFetching] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const CUSTOMER_URL =
@@ -31,6 +32,7 @@ export function Customers() {
   useEffect(() => {
     fetchWithToken<{ customers: CustomersType[] }>({ path: "/customers" }).then(
       (result) => {
+        setIsFetching(false);
         if (result.code == 200 || result.code == 201) {
           setCustomers(result.data.customers);
         } else {
@@ -84,6 +86,17 @@ export function Customers() {
             ))}
           </tbody>
         </Table>
+        {isFetching && (
+          <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
+            Carregando...
+          </span>
+        )}
+        {!isFetching && customers.length == 0 && (
+          <span className={"text-xl block mt-8 font-semibold"}>
+            Nada encontrado para exibir aqui. Tente recarregar a página ou fazer
+            um novo cadastro.
+          </span>
+        )}
       </div>
     </main>
   );

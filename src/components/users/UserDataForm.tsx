@@ -4,6 +4,7 @@ import type { TargetedSubmitEvent } from "preact";
 import { Input } from "@elements/Input";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
 import { DataForm } from "@elements/DataForm";
+import { RoleSelector } from "src/elements/RoleSelector";
 
 export function UserDataForm({
   userData,
@@ -168,11 +169,10 @@ export function UserDataForm({
             });
           }}
         />
-        <Input
+        <RoleSelector
           label="Função"
-          name="role"
-          errors={validationErrors}
           value={role}
+          doOnSelect={(v) => setRole(v as UsersRoleType)}
         />
       </div>
       <Input

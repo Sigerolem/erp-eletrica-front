@@ -207,16 +207,28 @@ export function TransactionDelivery() {
               Object.keys(barcodeLog).includes(
                 item.material.pkg_barcode || "void"
               );
+            let color = "";
+            color =
+              item.separated_amount == item.expected_amount
+                ? "bg-green-200"
+                : color;
+            color =
+              item.separated_amount > item.expected_amount
+                ? "bg-blue-200"
+                : color;
+            color =
+              item.separated_amount < item.expected_amount
+                ? "bg-yellow-200"
+                : color;
+            color =
+              item.expected_amount == 0 && item.separated_amount > 0
+                ? "bg-amber-300"
+                : color;
             return (
               <article
                 key={item.id}
                 className={`flex flex-col gap-2 py-3 px-2 ${
-                  hasBeenScanned
-                    ? item.separated_amount + item.taken_amount ==
-                      item.expected_amount
-                      ? "bg-green-200"
-                      : "bg-amber-200"
-                    : ""
+                  hasBeenScanned && color
                 }`}
               >
                 <div className={"grid grid-cols-[2fr_1fr] gap-x-2"}>

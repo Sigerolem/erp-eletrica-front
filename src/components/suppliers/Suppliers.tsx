@@ -19,6 +19,7 @@ export type SuppliersType = {
 export function Suppliers() {
   const [suppliers, setSuppliers] = useState<SuppliersType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   function handleNewSupplier() {
     setIsModalOpen(true);
@@ -32,6 +33,7 @@ export function Suppliers() {
   useEffect(() => {
     fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
       (result) => {
+        setIsFetching(false);
         if (result.code == 200 || result.code == 201) {
           setSuppliers(result.data.suppliers);
         } else {
@@ -124,6 +126,17 @@ export function Suppliers() {
             )}
           </tbody>
         </Table>
+        {isFetching && (
+          <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
+            Carregando...
+          </span>
+        )}
+        {!isFetching && suppliers.length == 0 && (
+          <span className={"text-xl block mt-8 font-semibold"}>
+            Nada encontrado para exibir aqui. Tente recarregar a página ou fazer
+            um novo cadastro.
+          </span>
+        )}
       </div>
     </main>
   );

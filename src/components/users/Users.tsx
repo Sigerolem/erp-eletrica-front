@@ -21,6 +21,7 @@ export type UsersType = {
 export function Users() {
   const [users, setUsers] = useState<UsersType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   const USER_URL =
     window.location.hostname == "localhost"
@@ -34,6 +35,7 @@ export function Users() {
   useEffect(() => {
     fetchWithToken<{ users: UsersType[] }>({ path: "/users" }).then(
       (result) => {
+        setIsFetching(false);
         if (result.code == 200 || result.code == 201) {
           setUsers(result.data.users);
         } else {
@@ -83,6 +85,17 @@ export function Users() {
             ))}
           </tbody>
         </Table>
+        {isFetching && (
+          <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
+            Carregando...
+          </span>
+        )}
+        {!isFetching && users.length == 0 && (
+          <span className={"text-xl block mt-8 font-semibold"}>
+            Nada encontrado para exibir aqui. Tente recarregar a página ou fazer
+            um novo cadastro.
+          </span>
+        )}
       </div>
       <Button
         text="Logoff"

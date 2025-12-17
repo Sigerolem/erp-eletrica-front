@@ -49,16 +49,14 @@ const PURCHASE_URL =
 
 export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);
-  const [hasNothingToShow, setHasNothingToShow] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
     fetchWithToken<{ purchases: PurchasesType[] }>({ path: "/purchases" }).then(
       ({ code, data }) => {
+        setIsFetching(false);
         if (code == 200) {
           setPurchases(data.purchases);
-          if (data.purchases.length == 0) {
-            setHasNothingToShow(true);
-          }
         } else {
           window.alert("Erro ao buscar a lista de materiais");
           console.error(data);
@@ -106,15 +104,6 @@ export function Purchases() {
             />
           )}
           <tbody>
-            {hasNothingToShow && (
-              <tr>
-                <td colSpan={3} className={"py-2 text-center"}>
-                  <span className={"text-center"}>
-                    Nada para ser exibido aqui
-                  </span>
-                </td>
-              </tr>
-            )}
             {purchases.map((purchase) => {
               const totalCost =
                 purchase.delivery_cost +
@@ -183,6 +172,17 @@ export function Purchases() {
             })}
           </tbody>
         </Table>
+        {isFetching && (
+          <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
+            Carregando...
+          </span>
+        )}
+        {!isFetching && purchases.length == 0 && (
+          <span className={"text-xl block mt-8 font-semibold"}>
+            Nada encontrado para exibir aqui. Tente recarregar a página ou fazer
+            um novo cadastro.
+          </span>
+        )}
       </div>
     </>
   );

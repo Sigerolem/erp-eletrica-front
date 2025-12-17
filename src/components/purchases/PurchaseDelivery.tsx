@@ -285,15 +285,36 @@ export function PurchaseDelivery() {
           {purchaseItems.map((item) => {
             let totalVal = item.amount_delivered * item.new_clean_cost;
             totalVal = totalVal * (item.ipi / 100_00);
+            const hasBeenScanned =
+              Object.keys(barcodeLog).includes(
+                item.material.barcode || "void"
+              ) ||
+              Object.keys(barcodeLog).includes(
+                item.material.pkg_barcode || "void"
+              );
+            let color = "";
+            color =
+              item.amount_delivered == item.amount_requested
+                ? "bg-green-200"
+                : color;
+            color =
+              item.amount_delivered > item.amount_requested
+                ? "bg-blue-200"
+                : color;
+            color =
+              item.amount_delivered < item.amount_requested
+                ? "bg-yellow-200"
+                : color;
+            color =
+              item.amount_requested == 0 && item.amount_delivered > 0
+                ? "bg-amber-300"
+                : color;
+
             return (
               <article
                 key={item.id}
                 className={`grid grid-cols-[minmax(0,4fr)_minmax(0,4fr)_minmax(0,2fr)_minmax(0,3fr)_minmax(0,2fr)] gap-x-2 p-2 py-3 items-center ${
-                  Object.keys(barcodeLog).includes(item.material.barcode!)
-                    ? item.amount_delivered == item.amount_requested
-                      ? "bg-green-200"
-                      : "bg-amber-200"
-                    : ""
+                  hasBeenScanned && color
                 }`}
               >
                 <div className={"flex flex-col gap-4 min-h-30"}>

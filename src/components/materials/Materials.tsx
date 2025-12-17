@@ -37,12 +37,14 @@ const MATERIAL_URL =
 
 export function Materials() {
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
+  const [isFetching, setIsFetching] = useState(true);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchWithToken<{ materials: MaterialsType[] }>({
       path: search == "" ? "/materials" : `/materials?search=${search}`,
     }).then(({ code, data }) => {
+      setIsFetching(false);
       if (code == 200) {
         setMaterials(data.materials);
       } else {
@@ -175,6 +177,17 @@ export function Materials() {
             )}
           </tbody>
         </Table>
+        {isFetching && (
+          <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
+            Carregando...
+          </span>
+        )}
+        {!isFetching && materials.length == 0 && (
+          <span className={"text-xl block mt-8 font-semibold"}>
+            Nada encontrado para exibir aqui. Tente recarregar a página ou fazer
+            um novo cadastro.
+          </span>
+        )}
       </div>
     </>
   );

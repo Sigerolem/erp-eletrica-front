@@ -43,7 +43,7 @@ export type TransactionsType = {
 
 export function Transactions() {
   const [transactions, setTransactions] = useState<TransactionsType[]>([]);
-  const [nothingToShow, setNothingToShow] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   const TRANSACTION_URL =
     window.location.hostname == "localhost" ? "/pedidos/id#" : "/pedidos/id/#";
@@ -56,6 +56,7 @@ export function Transactions() {
     fetchWithToken<{ transactions: TransactionsType[] }>({
       path: "/transactions",
     }).then((result) => {
+      setIsFetching(false);
       if (result.code == 200 || result.code == 201) {
         setTransactions(result.data.transactions);
       } else {
@@ -81,15 +82,6 @@ export function Transactions() {
             collumns={[["Código da OS", "Referência da OS"], ["Situação"]]}
           />
           <tbody>
-            {nothingToShow && (
-              <tr>
-                <td colSpan={3} className={"py-2 text-center"}>
-                  <span className={"text-center"}>
-                    Nada para ser exibido aqui
-                  </span>
-                </td>
-              </tr>
-            )}
             {transactions.map((transaction) => (
               <Tr key={transaction.id}>
                 <Td link={`${TRANSACTION_URL}${transaction.id}/`}>
@@ -103,6 +95,17 @@ export function Transactions() {
             ))}
           </tbody>
         </Table>
+        {isFetching && (
+          <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
+            Carregando...
+          </span>
+        )}
+        {!isFetching && transactions.length == 0 && (
+          <span className={"text-xl block mt-8 font-semibold"}>
+            Nada encontrado para exibir aqui. Tente recarregar a página ou fazer
+            um novo cadastro.
+          </span>
+        )}
       </div>
     </main>
   );

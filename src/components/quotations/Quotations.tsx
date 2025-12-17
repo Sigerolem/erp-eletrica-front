@@ -92,7 +92,7 @@ export type QuotationsType = {
 
 export function Quotations() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
-  const [hasNothingToShow, setHasNothingToShow] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   const QUOTATION_URL =
     window.location.hostname == "localhost"
@@ -107,12 +107,9 @@ export function Quotations() {
     fetchWithToken<{ quotations: QuotationsType[] }>({
       path: "/quotations/quotes",
     }).then((result) => {
+      setIsFetching(false);
       if (result.code == 200 || result.code == 201) {
-        if (result.data.quotations.length == 0) {
-          setHasNothingToShow(true);
-        } else {
-          setQuotations(result.data.quotations);
-        }
+        setQuotations(result.data.quotations);
       } else {
         window.alert("Erro ao buscar orçamentos.");
         console.error(result.data, result.code);
@@ -146,15 +143,6 @@ export function Quotations() {
             />
           )}
           <tbody>
-            {hasNothingToShow && (
-              <tr>
-                <td colSpan={3} className={"py-2 text-center"}>
-                  <span className={"text-center"}>
-                    Nada para ser exibido aqui
-                  </span>
-                </td>
-              </tr>
-            )}
             {quotations.map((quotation) =>
               xSize < 720 ? (
                 <Tr key={quotation.id}>
@@ -223,6 +211,17 @@ export function Quotations() {
             )}
           </tbody>
         </Table>
+        {isFetching && (
+          <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
+            Carregando...
+          </span>
+        )}
+        {!isFetching && quotations.length == 0 && (
+          <span className={"text-xl block mt-8 font-semibold"}>
+            Nada encontrado para exibir aqui. Tente recarregar a página ou fazer
+            um novo cadastro.
+          </span>
+        )}
       </div>
     </main>
   );
