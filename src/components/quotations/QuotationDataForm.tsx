@@ -26,7 +26,6 @@ import {
   BrlStringFromCents,
   formatQuotationStatusEnum,
 } from "@utils/formating";
-import { Button } from "src/elements/Button";
 
 export function QuotationDataForm({
   quotationData,
@@ -78,7 +77,7 @@ export function QuotationDataForm({
   const [customerSelected, setCustomerSelected] =
     useState<CustomersType | null>(null);
   const [quoteMaterials, setQuoteMaterials] = useState<
-    Partial<QuotationItemsType>[]
+    Partial<QuotationMaterialsType>[]
   >([]);
   const [occasionalMaterials, setOccasionalMaterials] = useState<
     Partial<QuotationItemsType>[]
@@ -120,6 +119,8 @@ export function QuotationDataForm({
         quotationData.items.filter((item) => item.type === "expense")
       );
     }
+    setMaterialsToDelete([]);
+    setItemsToDelete([]);
   }, [quotationData]);
 
   useEffect(() => {
@@ -357,7 +358,7 @@ export function QuotationDataForm({
           label="Desconto Serviço"
           name="ser_discount"
           errors={validationErrors}
-          value={(matDiscount / 100_00).toLocaleString("pt-br", {
+          value={(serDiscount / 100_00).toLocaleString("pt-br", {
             maximumFractionDigits: 2,
             unit: "percent",
             unitDisplay: "short",

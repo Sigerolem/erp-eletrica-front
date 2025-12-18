@@ -7,6 +7,7 @@ import { Textarea } from "src/elements/TextArea";
 import type { MaterialsType } from "../materials/Materials";
 import { ListWrapper } from "../quotations/lists/ListWrapper";
 import type { TransactionItemsType, TransactionsType } from "./Transactions";
+import type { QuotationMaterialsType } from "../quotations/Quotations";
 
 export function TransactionDelivery() {
   const [transactionItems, setTransactionItems] = useState<
@@ -64,7 +65,11 @@ export function TransactionDelivery() {
       body: JSON.stringify({
         status: "ongoing",
         quotation_id: transaction?.quotation_id,
-        items: transactionItems,
+        items: transactionItems.map((item) =>
+          item.id.includes("null-")
+            ? { ...item, id: undefined, created_at: undefined }
+            : item
+        ),
       }),
     });
     if (result.code == 200) {
@@ -77,8 +82,33 @@ export function TransactionDelivery() {
     return null;
   }
 
+  async function handleMaterialBarcodeUpdate(
+    materialId: string,
+    barcode: string
+  ) {
+    const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
+      path: `/materials/${materialId}`,
+      method: "PUT",
+      body: JSON.stringify({ barcode: barcode }),
+    });
+    if (code == 200) {
+      setTransactionItems((prev) =>
+        prev.map((item) =>
+          item.material_id == materialId
+            ? { ...item, material: { ...item.material, barcode } }
+            : item
+        )
+      );
+    } else if (code == 409) {
+      window.alert("Codigo de barras já cadastrado");
+    } else {
+      window.alert("Erro ao se comunicar com o servidor");
+      window.location.reload();
+    }
+  }
+
   async function updateScannedItemAmount(code: string) {
-    let itemWasFoundHere = true;
+    let itemWasFoundHere = false;
     setTransactionItems((prev) =>
       prev.map((item) => {
         if (item.material.barcode == code) {
@@ -101,22 +131,46 @@ export function TransactionDelivery() {
       })
     );
     if (itemWasFoundHere) {
-      return;
+      return true;
     }
+    setIsSearchingBarcode(true);
     const result = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/scan/${code}`,
     });
-    console.log("aham: ", result.code, result.data);
+    setIsSearchingBarcode(false);
+    if (result.code == 200) {
+      const material = result.data.material;
+      setTransactionItems((prev) => [
+        {
+          id: `null-${material.id}`,
+          material: material,
+          material_id: material.id,
+          created_at: "",
+          expected_amount: 0,
+          returned_amount: 0,
+          name: material.name,
+          separated_amount: 1,
+          taken_amount: 0,
+          transaction_id: transaction!.id,
+          unit_cost: material.avg_cost,
+          unit_profit: material.profit,
+          unit_value: material.value,
+          quotation_material: {
+            name: material.name,
+            quotation_id: transaction?.quotation_id,
+            material_id: material.id,
+            unit_value: material.value,
+          } as QuotationMaterialsType,
+        },
+        ...prev,
+      ]);
+      return true;
+    } else {
+      window.alert(`Nenhum material encontrado com codigo de barras '${code}'`);
+    }
   }
 
   async function focusOnScannedItem(barcode: string) {
-    setbarcodeLog((prev) => {
-      if (Object.keys(prev).includes(barcode)) {
-        return { ...prev, [barcode]: prev[barcode] + 1 };
-      } else {
-        return { ...prev, [barcode]: 1 };
-      }
-    });
     try {
       let input = document.querySelector<HTMLInputElement>(
         `#barcode-${barcode}`
@@ -127,46 +181,43 @@ export function TransactionDelivery() {
         );
       }
       if (input == null) {
-        setIsSearchingBarcode(true);
         return null;
       }
-      input.focus();
+      input.blur();
       setTimeout(() => {
         input.select();
       }, 50);
     } catch (error) {}
   }
 
-  async function handleMaterialBarcodeUpdate(
-    materialId: string,
-    barcode: string
-  ) {
-    const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
-      path: `/materials/${materialId}`,
-      method: "PUT",
-      body: JSON.stringify({ barcode: barcode }),
-    });
-    if (code == 200) {
-      setTransactionItems((prev) =>
-        prev.map((item) =>
-          item.material_id == materialId
-            ? { ...item, material: { ...item.material, barcode } }
-            : item
-        )
-      );
-    } else {
-      window.alert("Erro ao se comunicar com o servidor");
-      window.location.reload();
-    }
-  }
-
-  async function handleScanning(e: KeyboardEvent) {
+  async function handleScanning(e: KeyboardEvent, value: string) {
     const input = e.currentTarget as HTMLInputElement;
     if (e.key == "Enter") {
       e.preventDefault();
-      if (input.value.length > 7) {
-        await updateScannedItemAmount(input.value);
-        focusOnScannedItem(input.value);
+      if (input.value.length > 6) {
+        setbarcodeLog((prev) => {
+          if (Object.keys(prev).includes(input.value)) {
+            return { ...prev, [input.value]: prev[input.value] + 1 };
+          } else {
+            return { ...prev, [input.value]: 1 };
+          }
+        });
+        const result = await updateScannedItemAmount(input.value);
+        if (result) {
+          focusOnScannedItem(value);
+        } else {
+          try {
+            const scanInput =
+              document.querySelector<HTMLInputElement>("#scanInput");
+            if (scanInput) {
+              setTimeout(() => {
+                scanInput.focus();
+              }, 50);
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
       } else {
         try {
           const scanInput =
@@ -183,6 +234,7 @@ export function TransactionDelivery() {
     }
   }
 
+  console.log(transactionItems);
   return (
     <div>
       <DataForm onSubmit={handleSubmit}>
@@ -190,11 +242,11 @@ export function TransactionDelivery() {
           name="scan"
           id={"scanInput"}
           label="Scanear código"
-          onKeyPress={(e) => {
+          onKeyPress={async (e) => {
             if (e.key == "Enter") {
-              e.preventDefault();
-              focusOnScannedItem(e.currentTarget.value);
-              e.currentTarget.value = "";
+              const input = e.currentTarget;
+              await handleScanning(e, input.value);
+              input.value = "";
             }
           }}
         />
@@ -226,7 +278,7 @@ export function TransactionDelivery() {
                 : color;
             return (
               <article
-                key={item.id}
+                key={item.material_id}
                 className={`flex flex-col gap-2 py-3 px-2 ${
                   hasBeenScanned && color
                 }`}
@@ -244,11 +296,15 @@ export function TransactionDelivery() {
                       id={`barcode-${
                         item.material.barcode || item.material_id
                       }`}
-                      name={`separatedAmount${item.material.pkg_barcode}`}
+                      name={`separatedAmount${
+                        item.material.pkg_barcode || item.material_id
+                      }`}
                       label={"Separado"}
                       errors={validationErros}
                       value={item.separated_amount}
-                      onKeyPress={handleScanning}
+                      onKeyPress={async (e) => {
+                        await handleScanning(e, e.currentTarget.value);
+                      }}
                       className={"text-center font-semibold"}
                       onBlur={(e) => {
                         if (e.currentTarget.value.length > 7) {
@@ -260,15 +316,13 @@ export function TransactionDelivery() {
                         if (isNaN(val)) {
                           setValidationErrors((prev) => ({
                             ...prev,
-                            [`separatedAmount${item.material.pkg_barcode}`]:
+                            [`separatedAmount${item.material_id}`]:
                               "Preencha um valor valido",
                           }));
                           val = 0;
                         } else {
                           setValidationErrors((prev) => {
-                            delete prev[
-                              `separatedAmount${item.material.pkg_barcode}`
-                            ];
+                            delete prev[`separatedAmount${item.material_id}`];
                             return prev;
                           });
                         }
@@ -281,7 +335,6 @@ export function TransactionDelivery() {
                         ]);
                       }}
                     />
-
                     <Input
                       label={"Pedido"}
                       name={`amountRequested`}
