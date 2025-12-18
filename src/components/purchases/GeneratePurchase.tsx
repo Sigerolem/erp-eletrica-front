@@ -238,7 +238,10 @@ export function GeneratePurchase() {
                         <Input
                           name={`hasPurchase-${item.material_id}`}
                           label="Tem compra"
-                          value={item.material!.ideal_amount}
+                          value={
+                            purchaseMap.get(item.material_id!)?.requested ||
+                            purchaseMap.get(item.material_id!)?.delivered
+                          }
                           className={"bg-red-200! font-semibold"}
                           disabled={true}
                           errors={{
