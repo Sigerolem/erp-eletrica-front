@@ -175,7 +175,6 @@ export function MaterialDataForm({
     setValidationErrors((prev) => ({ ...prev, ...errors }));
   }
 
-  console.log(materialData);
   return (
     <form onSubmit={onFormSubmit} className={"flex flex-col gap-3 w-ful"}>
       <Input

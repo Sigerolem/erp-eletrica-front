@@ -234,7 +234,6 @@ export function TransactionDelivery() {
     }
   }
 
-  console.log(transactionItems);
   return (
     <div>
       <DataForm onSubmit={handleSubmit}>

@@ -16,6 +16,8 @@ import type { SuppliersType } from "../suppliers/Suppliers";
 import type { PurchaseItemsType, PurchasesType } from "./Purchases";
 
 export function PurchaseDelivery() {
+  const [isSearchingBarcode, setIsSearchingBarcode] = useState(false);
+
   const [materialBeingUpdated, setMaterialBeingUpdated] = useState("");
   const [validationErros, setValidationErrors] = useState<{
     [key: string]: string;
@@ -81,11 +83,11 @@ export function PurchaseDelivery() {
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     if (nf == "") {
-      // window.alert("Preencha o número da NF");
+      window.alert("Preencha o numero da NF");
       setValidationErrors((prev) => ({ ...prev, nf: "Campo obrigarório" }));
       return;
     }
-    const purchaseData: Partial<PurchasesType> = {
+    const purchaseData = {
       status: "received",
       is_tracked: isTracked,
       nf,
@@ -98,6 +100,8 @@ export function PurchaseDelivery() {
         new_unit_cost: Math.round(
           item.new_clean_cost * (1 + item.ipi / 100_00)
         ),
+        id: item.id.includes("null-") ? undefined : item.id,
+        purchase: undefined,
       })),
     };
     const result = await fetchWithToken({
@@ -113,53 +117,6 @@ export function PurchaseDelivery() {
 
     console.error(result.code, result.data);
     return null;
-  }
-
-  function focusOnScannedItem(barcode: string) {
-    setbarcodeLog((prev) => {
-      if (Object.keys(prev).includes(barcode)) {
-        return { ...prev, [barcode]: prev[barcode] + 1 };
-      } else {
-        return { ...prev, [barcode]: 1 };
-      }
-    });
-
-    setPurchaseItems((prev) =>
-      prev.map((item) =>
-        item.material.barcode == barcode
-          ? { ...item, amount_delivered: item.amount_delivered + 1 }
-          : item
-      )
-    );
-    setPurchaseItems((prev) =>
-      prev.map((item) =>
-        item.material.pkg_barcode == barcode
-          ? {
-              ...item,
-              amount_delivered: item.amount_delivered + item.material.pkg_size,
-            }
-          : item
-      )
-    );
-    try {
-      let input = document.querySelector<HTMLInputElement>(
-        `#barcode-${barcode}`
-      );
-      if (input == null) {
-        input = document.querySelector<HTMLInputElement>(
-          `[name='amountDelivered-${barcode}`
-        );
-      }
-
-      if (input == null) {
-        console.log(barcode);
-        return null;
-      }
-      input.focus();
-      setTimeout(() => {
-        input.select();
-      }, 50);
-    } catch (error) {}
   }
 
   async function handleMaterialBarcodeUpdate(
@@ -190,12 +147,103 @@ export function PurchaseDelivery() {
     }
   }
 
-  function handleScanning(e: KeyboardEvent) {
-    const input = e.currentTarget as HTMLInputElement;
+  async function updateScannedItemAmount(barcode: string) {
+    let itemWasFoundHere = false;
+    setPurchaseItems((prev) =>
+      prev.map((item) => {
+        if (item.material.barcode == barcode) {
+          itemWasFoundHere = true;
+          return { ...item, amount_delivered: item.amount_delivered + 1 };
+        }
+        return item;
+      })
+    );
+    setPurchaseItems((prev) =>
+      prev.map((item) => {
+        if (item.material.pkg_barcode == barcode) {
+          itemWasFoundHere = true;
+          return {
+            ...item,
+            amount_delivered: item.amount_delivered + item.material.pkg_size,
+          };
+        }
+        return item;
+      })
+    );
+    if (itemWasFoundHere) {
+      return true;
+    }
+    setIsSearchingBarcode(true);
+    const result = await fetchWithToken<{ material: MaterialsType }>({
+      path: `/materials/scan/${barcode}`,
+    });
+    setIsSearchingBarcode(false);
+    if (result.code == 200) {
+      const material = result.data.material;
+      setPurchaseItems((prev) => [
+        {
+          amount_delivered: 1,
+          amount_requested: 0,
+          ipi: material.ipi,
+          material: material,
+          material_id: material.id,
+          new_clean_cost: material.clean_cost,
+          new_unit_cost: 0,
+          purchase_id: id,
+          old_unit_cost: material.avg_cost,
+          old_clean_cost: material.clean_cost,
+          id: `null-${material.id}`,
+          purchase: {} as PurchasesType,
+        },
+        ...prev,
+      ]);
+      return true;
+    } else {
+      window.alert(
+        `Nenhum material encontrado com codigo de barras '${barcode}'`
+      );
+    }
+  }
+
+  function focusOnScannedItem(barcode: string) {
+    try {
+      let input = document.querySelector<HTMLInputElement>(
+        `#barcode-${barcode}`
+      );
+      if (input == null) {
+        input = document.querySelector<HTMLInputElement>(
+          `[name='amountDelivered-${barcode}`
+        );
+      }
+      if (input == null) {
+        return null;
+      }
+      input.focus();
+      setTimeout(() => {
+        input.select();
+      }, 50);
+    } catch (error) {}
+  }
+
+  async function handleScanning(e: KeyboardEvent) {
     if (e.key == "Enter") {
       e.preventDefault();
-      if (input.value.length > 7) {
-        focusOnScannedItem(input.value);
+      const input = e.currentTarget as HTMLInputElement;
+      const value = input.value;
+      if (input.value.length > 6) {
+        setbarcodeLog((prev) => {
+          if (Object.keys(prev).includes(value)) {
+            return { ...prev, [value]: prev[value] + 1 };
+          } else {
+            return { ...prev, [value]: 1 };
+          }
+        });
+        const result = await updateScannedItemAmount(value);
+        if (result) {
+          focusOnScannedItem(value);
+        }
+      } else {
+        input.blur();
       }
     }
   }
@@ -230,7 +278,7 @@ export function PurchaseDelivery() {
           <Input
             value={nf}
             name="nf"
-            label="NF"
+            label="Número da NF"
             onBlur={(e) => {
               validateStringFieldOnBlur(e, setNF, setValidationErrors, {
                 required: true,
@@ -262,26 +310,15 @@ export function PurchaseDelivery() {
         <Input
           name="scan"
           label="Scanear código"
-          onKeyPress={(e) => {
+          onKeyPress={async (e) => {
             if (e.key == "Enter") {
-              e.preventDefault();
-              focusOnScannedItem(e.currentTarget.value);
-              e.currentTarget.value = "";
+              const input = e.currentTarget;
+              await handleScanning(e);
+              input.value = "";
             }
           }}
         />
         <ListWrapper label="Materiais" doOnClickAdd={() => {}}>
-          {/* <article
-            className={
-              "grid grid-cols-[minmax(0,3fr)_minmax(0,3fr)_minmax(0,2fr)_minmax(0,3fr)_minmax(0,2fr)] px-2 gap-x-2 font-semibold text-gray-700 items-center"
-            }
-          >
-            <p className={""}>Cod. Barra</p>
-            <p className={""}>Nome descritivo</p>
-            <p>Quantidade</p>
-            <p>Valor</p>
-            <p>IPI</p>
-          </article> */}
           {purchaseItems.map((item) => {
             let totalVal = item.amount_delivered * item.new_clean_cost;
             totalVal = totalVal * (item.ipi / 100_00);
@@ -312,7 +349,7 @@ export function PurchaseDelivery() {
 
             return (
               <article
-                key={item.id}
+                key={item.material_id}
                 className={`grid grid-cols-[minmax(0,4fr)_minmax(0,4fr)_minmax(0,2fr)_minmax(0,3fr)_minmax(0,2fr)] gap-x-2 p-2 py-3 items-center ${
                   hasBeenScanned && color
                 }`}
@@ -342,17 +379,6 @@ export function PurchaseDelivery() {
                   />
                   {materialBeingUpdated == item.material_id ? (
                     <div className={"flex gap-2"}>
-                      {/* <Button
-                        text="Salvar"
-                        className={"bg-blue-700 text-white text-sm p-1! mb-6"}
-                        onClick={(e) => {
-                          handleMaterialBarcodeUpdate(
-                            item.material_id,
-                            e.currentTarget.value.trim()
-                          );
-                          setMaterialBeingUpdated("");
-                        }}
-                      /> */}
                       <Button
                         text="Cancelar"
                         className={"bg-red-700 text-white text-sm p-1! mb-6"}
@@ -383,10 +409,14 @@ export function PurchaseDelivery() {
                 <div className={"flex flex-col gap-1"}>
                   <Input
                     id={`barcode-${item.material.barcode || item.material_id}`}
-                    name={`amountDelivered-${item.material.pkg_barcode}`}
+                    name={`amountDelivered-${
+                      item.material.pkg_barcode || item.material_id
+                    }`}
                     label={"Entregue"}
                     value={item.amount_delivered}
-                    onKeyPress={handleScanning}
+                    onKeyPress={async (e) => {
+                      await handleScanning(e);
+                    }}
                     className={"text-center font-semibold"}
                     onBlur={(e) => {
                       if (e.currentTarget.value.length > 7) {
