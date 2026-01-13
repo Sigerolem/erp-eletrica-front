@@ -239,13 +239,13 @@ export function MaterialDataForm({
       {materialData != undefined && (
         <div className={"flex gap-4"}>
           <Input
-            label="Quantidade atual"
-            name="currentAmount"
-            value={currentAmount}
+            label="Quantidade reservada"
+            name="reservedAmount"
+            value={reservedAmount}
             onBlur={(e) => {
               validateIntFieldOnBlur(
                 e,
-                setCurrentAmount,
+                setReservedAmount,
                 setValidationErrors,
                 {}
               );
@@ -291,13 +291,13 @@ export function MaterialDataForm({
           errors={validationErrors}
         />
         <Input
-          label="Quantidade reservada"
-          name="reservedAmount"
-          value={reservedAmount}
+          label="Quantidade atual"
+          name="currentAmount"
+          value={currentAmount}
           onBlur={(e) => {
             validateIntFieldOnBlur(
               e,
-              setReservedAmount,
+              setCurrentAmount,
               setValidationErrors,
               {}
             );
