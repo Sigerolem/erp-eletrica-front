@@ -33,10 +33,11 @@ export async function fetchWithToken<T>({
   }
 
   try {
+    const DOMAIN = import.meta.env.PUBLIC_VPS_DOMAIN ?? "regism.site";
     const url =
       window.location.hostname == "localhost"
         ? "http://localhost:3000"
-        : "https://sigerolem.vps-kinghost.net";
+        : `https://vps.${DOMAIN}`;
     response = await fetch(`${url}${path}`, {
       method,
       headers: {
