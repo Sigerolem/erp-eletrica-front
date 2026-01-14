@@ -37,7 +37,7 @@ export async function fetchWithToken<T>({
     const url =
       window.location.hostname == "localhost"
         ? "http://localhost:3000"
-        : `https://vps.${DOMAIN}`;
+        : `https://vps.${DOMAIN}/api`;
     response = await fetch(`${url}${path}`, {
       method,
       headers: {

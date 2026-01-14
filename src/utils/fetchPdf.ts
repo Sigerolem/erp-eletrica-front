@@ -4,7 +4,7 @@ export async function fetchPdf(path: string) {
     const url =
       window.location.hostname == "localhost"
         ? "http://localhost:3000"
-        : `https://vps.${DOMAIN}`;
+        : `https://vps.${DOMAIN}/api`;
     const response = await fetch(`${url}${path}`, {
       method: "GET",
       headers: {
