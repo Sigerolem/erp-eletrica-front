@@ -1,10 +1,10 @@
 export async function fetchPdf(path: string) {
   try {
-    const DOMAIN = import.meta.env.PUBLIC_VPS_DOMAIN ?? "regism.site";
+    const DOMAIN = import.meta.env.PUBLIC_VPS_DOMAIN ?? "eseletrica.com.br";
     const url =
       window.location.hostname == "localhost"
         ? "http://localhost:3000"
-        : `https://vps.${DOMAIN}/api`;
+        : `https://sistema.${DOMAIN}/api`;
     const response = await fetch(`${url}${path}`, {
       method: "GET",
       headers: {
