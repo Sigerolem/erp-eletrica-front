@@ -1,0 +1,36 @@
+name: Build e Deploy na VPS
+
+on:
+  push:
+    branches:
+      - main # Ou 'master', dependendo do seu branch principal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      # 1. Conecta via SSH e executa os comandos de Deploy
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3 # Ação popular para SSH
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Navega até o diretório do projeto
+            cd ${{ secrets.APP_PATH }}
+
+            export PATH="/root/.nvm/versions/node/v24.6.0/bin:$PATH"
+
+            # Puxa a última versão do código
+            GIT_SSH_COMMAND="ssh -i ~/.ssh/vpsToGithub" git pull origin main
+
+            # Instala dependências e faz o build
+            pnpm install
+            pnpm build
+
+            rm -rf /var/www/erp-eletrica-front/*
+            cp -r dist/* /var/www/erp-eletrica-front/
