@@ -29,6 +29,17 @@ export function PurchaseDetails() {
     });
   }, []);
 
+  async function handleDeletePurchase() {
+    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+      path: `/purchases/${id}`,
+      method: "DELETE",
+    });
+    if (code === 200) {
+      window.alert("Compra deletada com sucesso.");
+      window.location.href = "/compras";
+    }
+  }
+
   async function handleConfirmDraft() {
     const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/status/${id}`,
@@ -104,23 +115,39 @@ export function PurchaseDetails() {
           doOnSubmit={handleDataSubmition}
           purchaseData={purchase}
         >
-          <div className={""}>
+          <div className={"flex items-center justify-between gap-8 w-full"}>
             {purchase.id !== "" && purchase.status == "draft" && (
-              <Button
-                text={"Confirmar rascunho"}
-                type={"button"}
-                className={"bg-slate-700 flex-1 text-white"}
-                onClick={handleConfirmDraft}
-              />
+              <>
+                <Button
+                  text={"Deletar compra"}
+                  type={"button"}
+                  className={"bg-red-700 flex-1 text-white"}
+                  onClick={handleDeletePurchase}
+                />
+                <Button
+                  text={"Confirmar rascunho"}
+                  type={"button"}
+                  className={"bg-slate-700 flex-1 text-white"}
+                  onClick={handleConfirmDraft}
+                />
+              </>
             )}
 
             {purchase.id !== "" && purchase.status == "requested" && (
-              <Button
-                text={"Confirmar compra"}
-                type={"button"}
-                className={"bg-slate-700 flex-1 text-white"}
-                onClick={handleConfirmPurchase}
-              />
+              <>
+                <Button
+                  text={"Deletar compra"}
+                  type={"button"}
+                  className={"bg-red-700 flex-1 text-white"}
+                  onClick={handleDeletePurchase}
+                />
+                <Button
+                  text={"Confirmar compra"}
+                  type={"button"}
+                  className={"bg-slate-700 flex-1 text-white"}
+                  onClick={handleConfirmPurchase}
+                />
+              </>
             )}
 
             {purchase.id !== "" && purchase.status == "received" && (

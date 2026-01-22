@@ -19,6 +19,7 @@ import {
   validateStringFieldOnBlur,
 } from "@utils/inputValidation";
 import { Checkbox } from "@elements/Checkbox";
+import type { ReactNode } from "preact/compat";
 
 export function PurchaseDataForm({
   purchaseData,
@@ -29,7 +30,7 @@ export function PurchaseDataForm({
   doOnSubmit: (purchaseData: Partial<PurchasesType>) => Promise<{
     [key: string]: string;
   } | null>;
-  children?: JSX.Element;
+  children?: ReactNode;
 }) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -83,7 +84,7 @@ export function PurchaseDataForm({
         } else {
           window.alert("Erro ao se comunicar com o servidor.");
         }
-      }
+      },
     );
     fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }).then(
       ({ code, data }) => {
@@ -92,7 +93,7 @@ export function PurchaseDataForm({
         } else {
           window.alert("Erro ao se comunicar com o servidor.");
         }
-      }
+      },
     );
   }, []);
 
@@ -127,7 +128,7 @@ export function PurchaseDataForm({
         amount_requested:
           Math.ceil(
             (material.ideal_amount - material.current_amount) /
-              material.pkg_size
+              material.pkg_size,
           ) * material.pkg_size,
         new_unit_cost: material.avg_cost,
         purchase_id: purchaseData?.id || undefined,
@@ -216,7 +217,7 @@ export function PurchaseDataForm({
                   e,
                   setPurchaseCost,
                   setValidationErrors,
-                  { removeFromString: "R$" }
+                  { removeFromString: "R$" },
                 );
               }}
               errors={validationErrors}
@@ -230,7 +231,7 @@ export function PurchaseDataForm({
                   e,
                   setDeliveryCost,
                   setValidationErrors,
-                  { removeFromString: "R$" }
+                  { removeFromString: "R$" },
                 );
               }}
               errors={validationErrors}
