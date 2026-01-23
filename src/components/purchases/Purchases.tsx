@@ -24,6 +24,7 @@ export type PurchaseItemsType = {
   amount_requested: number;
   amount_delivered: number;
   old_unit_cost: number;
+  profit: number;
   new_unit_cost: number;
   new_clean_cost: number;
   old_clean_cost: number;
@@ -61,7 +62,7 @@ export function Purchases() {
           window.alert("Erro ao buscar a lista de materiais");
           console.error(data);
         }
-      }
+      },
     );
   }, []);
 
@@ -116,7 +117,7 @@ export function Purchases() {
                     <p className={""}>{purchase.supplier?.name || "null"}</p>
                     <p>
                       {new Date(purchase.updated_at).toLocaleDateString(
-                        "pt-BR"
+                        "pt-BR",
                       )}
                     </p>
                   </Td>
@@ -149,7 +150,7 @@ export function Purchases() {
                     <p>{status}</p>
                     <p>
                       {new Date(purchase.updated_at).toLocaleDateString(
-                        "pt-BR"
+                        "pt-BR",
                       )}
                     </p>
                   </Td>

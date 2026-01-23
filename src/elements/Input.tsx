@@ -11,7 +11,7 @@ export function Input({ label, errors, name, className, ...rest }: InputProps) {
   return (
     <div className="flex max-w-full flex-col flex-1 relative min-w-16">
       {label !== undefined && label !== "" && (
-        <label className="mb-0.5 font-semibold pl-1 not-md:text-sm">
+        <label className="sm:mb-0.5 font-semibold pl-1 not-md:text-sm">
           {label}
         </label>
       )}
@@ -30,7 +30,7 @@ export function Input({ label, errors, name, className, ...rest }: InputProps) {
         }}
         name={name}
         {...rest}
-        className={`border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+        className={`border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
           className || ""
         } ${errors?.[name] ? "border-red-500" : ""}`}
       />

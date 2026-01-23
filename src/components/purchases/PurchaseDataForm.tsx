@@ -20,6 +20,7 @@ import {
 } from "@utils/inputValidation";
 import { Checkbox } from "@elements/Checkbox";
 import type { ReactNode } from "preact/compat";
+import { ReceivedItemsList } from "./ReceivedItemsList";
 
 export function PurchaseDataForm({
   purchaseData,
@@ -113,6 +114,21 @@ export function PurchaseDataForm({
     }
   }, [purchaseData]);
 
+  useEffect(() => {
+    if (status !== "received" && purchaseItems.length > 0) {
+      return;
+    }
+    let pItems = purchaseItems.map((item) => item as PurchaseItemsType);
+    let [newPurchaseCost, newTaxCost] = [0, 0];
+    pItems.forEach((item) => {
+      newPurchaseCost += item.amount_delivered * item.new_unit_cost;
+      newTaxCost +=
+        item.amount_delivered * (item.new_unit_cost - item.new_clean_cost);
+    });
+    setPurchaseCost(Math.round(newPurchaseCost + deliveryCost));
+    setTaxCost(Math.round(newTaxCost));
+  }, [purchaseItems]);
+
   const isThereChange =
     purchaseData?.is_tracked != isTracked ||
     purchaseData?.purchase_cost != purchaseCost ||
@@ -134,6 +150,7 @@ export function PurchaseDataForm({
         purchase_id: purchaseData?.id || undefined,
         amount_delivered: 0,
         ipi: material.ipi,
+        profit: material.profit,
         old_clean_cost: material.clean_cost,
         new_clean_cost: material.clean_cost,
       },
@@ -209,7 +226,7 @@ export function PurchaseDataForm({
           </div>
           <div className={"flex gap-4"}>
             <Input
-              label="Custo"
+              label="Valor total NF"
               name="purchaseCost"
               value={BrlStringFromCents(purchaseCost)}
               onBlur={(e) => {
@@ -221,29 +238,51 @@ export function PurchaseDataForm({
                 );
               }}
               errors={validationErrors}
+              disabled={true}
+              className={"bg-blue-50! font-semibold"}
+            />
+            <Input
+              label="Produtos + IPI"
+              name="taxCost"
+              value={BrlStringFromCents(purchaseCost - deliveryCost)}
+              onBlur={(e) => {
+                validateFloatFieldOnBlur(e, setTaxCost, setValidationErrors, {
+                  removeFromString: "R$",
+                });
+              }}
+              errors={validationErrors}
+              disabled={true}
+              className={"bg-blue-50!"}
             />
             <Input
               label="Frete"
               name="deliveryCost"
               value={BrlStringFromCents(deliveryCost)}
               onBlur={(e) => {
-                validateFloatFieldOnBlur(
-                  e,
-                  setDeliveryCost,
-                  setValidationErrors,
-                  { removeFromString: "R$" },
+                let val = parseFloat(
+                  e.currentTarget.value
+                    .replaceAll("R$", "")
+                    .replaceAll(".", "")
+                    .replaceAll(",", ".")
+                    .trim(),
                 );
-              }}
-              errors={validationErrors}
-            />
-            <Input
-              label="Impostos"
-              name="taxCost"
-              value={BrlStringFromCents(taxCost)}
-              onBlur={(e) => {
-                validateFloatFieldOnBlur(e, setTaxCost, setValidationErrors, {
-                  removeFromString: "R$",
+                if (isNaN(val)) {
+                  val = 0;
+                }
+                val = Math.round(val * 100);
+                setDeliveryCost(val);
+                let pItems = purchaseItems.map(
+                  (item) => item as PurchaseItemsType,
+                );
+                let [newPurchaseCost, newTaxCost] = [0, 0];
+                pItems.forEach((item) => {
+                  newPurchaseCost += item.amount_delivered * item.new_unit_cost;
+                  newTaxCost +=
+                    item.amount_delivered *
+                    (item.new_unit_cost - item.new_clean_cost);
                 });
+                setPurchaseCost(Math.round(newPurchaseCost + val));
+                setTaxCost(Math.round(newTaxCost));
               }}
               errors={validationErrors}
             />
@@ -318,12 +357,28 @@ export function PurchaseDataForm({
       <div
         className={"bg-slate-100 border border-slate-400 py-1 rounded-md mb-4"}
       >
-        <PurchaseItemsList
-          purchase={purchaseData!}
-          purchaseItems={purchaseItems}
-          setPurchaseItems={setPurchaseItems}
-          setItemsWereChanged={setItemsWereChanged}
-        />
+        {purchaseData?.status == "received" ? (
+          <ReceivedItemsList
+            purchase={{
+              ...purchaseData,
+              delivery_cost: deliveryCost,
+              purchase_cost: purchaseCost,
+              tax_cost: taxCost,
+            }}
+            purchaseItems={purchaseItems.map(
+              (item) => ({ ...item }) as PurchaseItemsType,
+            )}
+            setPurchaseItems={setPurchaseItems}
+            setItemsWereChanged={setItemsWereChanged}
+          />
+        ) : (
+          <PurchaseItemsList
+            purchase={purchaseData!}
+            purchaseItems={purchaseItems}
+            setPurchaseItems={setPurchaseItems}
+            setItemsWereChanged={setItemsWereChanged}
+          />
+        )}
       </div>
       <div className={"flex gap-2"}>
         {itemsWereChanged || isThereChange ? (

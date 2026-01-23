@@ -27,13 +27,8 @@ input {
   background-color: white;
   padding: 4px;
   border-radius: .25rem;
+  line-height: 1.4rem;
 }
-
-/* input[type="checkbox"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-} */
 
 body {
   margin: 0;

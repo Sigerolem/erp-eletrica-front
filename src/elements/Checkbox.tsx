@@ -17,8 +17,11 @@ export function Checkbox({
   ...rest
 }: CheckboxProps) {
   return (
-    <div className="flex flex-col gap-1 items-start">
-      <label htmlFor={name} className={"font-semibold"}>
+    <div className="flex flex-col gap-0.5 items-start">
+      <label
+        htmlFor={name}
+        className={"font-semibold pl-1 not-sm:-mb-0.5 not-md:text-sm"}
+      >
         {label}
       </label>
       <input

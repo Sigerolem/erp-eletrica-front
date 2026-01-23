@@ -70,7 +70,8 @@ export function GeneratePurchase() {
             old_clean_cost: material.clean_cost,
             old_unit_cost: material.avg_cost,
             material,
-          })
+            profit: material.profit,
+          }),
         );
         setPurchaseItems(newItems);
         setSupplier(data.supplier);
@@ -225,8 +226,8 @@ export function GeneratePurchase() {
                           prev.map((i) =>
                             i.material_id == item.material_id
                               ? { ...i, amount_requested: parseInt(value) }
-                              : i
-                          )
+                              : i,
+                          ),
                         );
                       }}
                       errors={validationErrors}
@@ -247,7 +248,7 @@ export function GeneratePurchase() {
                           errors={{
                             [`hasPurchase-${item.material_id}`]: `${formatPurchaseStatusEnum(
                               purchaseMap.get(item.material_id!)?.status ||
-                                "draft"
+                                "draft",
                             )}`,
                           }}
                         />

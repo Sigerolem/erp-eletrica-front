@@ -90,13 +90,6 @@ export function QuotationDataForm({
   useEffect(() => {
     if (quotationData) {
       setStatus(quotationData.status);
-      setToolList(quotationData.tool_list);
-      setReference(quotationData.reference);
-      setDescription(quotationData.description);
-      setExpectedDuration(quotationData.expected_duration);
-      setPrivateComments(quotationData.private_comments);
-      setPublicComments(quotationData.public_comments);
-      setPurchaseOrder(quotationData.purchase_order);
       setMaterialCost(quotationData.material_cost);
       setMaterialValue(quotationData.material_value);
       setServiceCost(quotationData.service_cost);
@@ -105,6 +98,13 @@ export function QuotationDataForm({
       setDirectValue(quotationData.direct_value);
       setSerDiscount(quotationData.ser_discount);
       setMatDiscount(quotationData.mat_discount);
+      setPurchaseOrder(quotationData.purchase_order);
+      setToolList(quotationData.tool_list);
+      setReference(quotationData.reference);
+      setDescription(quotationData.description);
+      setExpectedDuration(quotationData.expected_duration);
+      setPrivateComments(quotationData.private_comments);
+      setPublicComments(quotationData.public_comments);
       setCustomerSelected(quotationData.customer);
       setQuoteMaterials(quotationData.materials);
       setOccasionalMaterials(

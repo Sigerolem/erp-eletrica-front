@@ -35,16 +35,16 @@ export function PurchaseDelivery() {
     purchaseItems.reduce(
       (acc, item) =>
         acc + (item.ipi / 100_00) * item.amount_delivered * item.new_clean_cost,
-      0
-    )
+      0,
+    ),
   );
   const purchaseCost = Math.round(
     taxCost +
       deliveryCost +
       purchaseItems.reduce(
         (acc, item) => acc + item.amount_delivered * item.new_clean_cost,
-        0
-      )
+        0,
+      ),
   );
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export function PurchaseDelivery() {
           result.data.purchase.purchase_items.map((item) => ({
             ...item,
             new_clean_cost: item.material.clean_cost,
-          }))
+          })),
         );
       } else {
         window.alert("Erro ao se comunicar com o servidor.");
@@ -75,7 +75,7 @@ export function PurchaseDelivery() {
       return;
     }
     const input = document.querySelector(
-      `[name=barcode-${materialBeingUpdated}]`
+      `[name=barcode-${materialBeingUpdated}]`,
     ) as HTMLInputElement;
     input.focus();
   }, [materialBeingUpdated]);
@@ -98,7 +98,7 @@ export function PurchaseDelivery() {
       purchase_items: purchaseItems.map((item) => ({
         ...item,
         new_unit_cost: Math.round(
-          item.new_clean_cost * (1 + item.ipi / 100_00)
+          item.new_clean_cost * (1 + item.ipi / 100_00),
         ),
         id: item.id.includes("null-") ? undefined : item.id,
         purchase: undefined,
@@ -121,7 +121,7 @@ export function PurchaseDelivery() {
 
   async function handleMaterialBarcodeUpdate(
     materialId: string,
-    barcode: string
+    barcode: string,
   ) {
     const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${materialId}`,
@@ -136,7 +136,7 @@ export function PurchaseDelivery() {
                 ...item,
                 material: { ...item.material, barcode: data.material.barcode },
               }
-            : item
+            : item,
         ),
       ]);
     } else if (code == 409) {
@@ -156,7 +156,7 @@ export function PurchaseDelivery() {
           return { ...item, amount_delivered: item.amount_delivered + 1 };
         }
         return item;
-      })
+      }),
     );
     setPurchaseItems((prev) =>
       prev.map((item) => {
@@ -168,7 +168,7 @@ export function PurchaseDelivery() {
           };
         }
         return item;
-      })
+      }),
     );
     if (itemWasFoundHere) {
       return true;
@@ -190,6 +190,7 @@ export function PurchaseDelivery() {
           new_clean_cost: material.clean_cost,
           new_unit_cost: 0,
           purchase_id: id,
+          profit: material.profit,
           old_unit_cost: material.avg_cost,
           old_clean_cost: material.clean_cost,
           id: `null-${material.id}`,
@@ -200,7 +201,7 @@ export function PurchaseDelivery() {
       return true;
     } else {
       window.alert(
-        `Nenhum material encontrado com codigo de barras '${barcode}'`
+        `Nenhum material encontrado com codigo de barras '${barcode}'`,
       );
     }
   }
@@ -208,11 +209,11 @@ export function PurchaseDelivery() {
   function focusOnScannedItem(barcode: string) {
     try {
       let input = document.querySelector<HTMLInputElement>(
-        `#barcode-${barcode}`
+        `#barcode-${barcode}`,
       );
       if (input == null) {
         input = document.querySelector<HTMLInputElement>(
-          `[name='amountDelivered-${barcode}`
+          `[name='amountDelivered-${barcode}`,
         );
       }
       if (input == null) {
@@ -296,7 +297,7 @@ export function PurchaseDelivery() {
                 e,
                 setDeliveryCost,
                 setValidationErrors,
-                { removeFromString: "R$" }
+                { removeFromString: "R$" },
               );
             }}
           />
@@ -324,10 +325,10 @@ export function PurchaseDelivery() {
             totalVal = totalVal * (item.ipi / 100_00);
             const hasBeenScanned =
               Object.keys(barcodeLog).includes(
-                item.material.barcode || "void"
+                item.material.barcode || "void",
               ) ||
               Object.keys(barcodeLog).includes(
-                item.material.pkg_barcode || "void"
+                item.material.pkg_barcode || "void",
               );
             let color = "";
             color =
@@ -371,7 +372,7 @@ export function PurchaseDelivery() {
                         e.preventDefault();
                         handleMaterialBarcodeUpdate(
                           item.material_id,
-                          e.currentTarget.value.trim()
+                          e.currentTarget.value.trim(),
                         );
                         setMaterialBeingUpdated("");
                       }
@@ -432,7 +433,7 @@ export function PurchaseDelivery() {
                         ...prev.map((pItem) =>
                           pItem.material_id == item.material_id
                             ? { ...pItem, amount_delivered: val }
-                            : pItem
+                            : pItem,
                         ),
                       ]);
                     }}
@@ -456,7 +457,7 @@ export function PurchaseDelivery() {
                           .replaceAll("R$", "")
                           .replaceAll(".", "")
                           .replaceAll(",", ".")
-                          .trim()
+                          .trim(),
                       );
                       if (isNaN(val)) {
                         val = 0;
@@ -466,7 +467,7 @@ export function PurchaseDelivery() {
                         ...prev.map((pItem) =>
                           pItem.material_id == item.material_id
                             ? { ...pItem, new_clean_cost: val }
-                            : pItem
+                            : pItem,
                         ),
                       ]);
                     }}
@@ -475,7 +476,7 @@ export function PurchaseDelivery() {
                     label={"Valor Total"}
                     name={`totalValue`}
                     value={BrlStringFromCents(
-                      item.amount_delivered * item.new_clean_cost
+                      item.amount_delivered * item.new_clean_cost,
                     )}
                     className={"bg-blue-50!"}
                     disabled={true}
@@ -496,7 +497,7 @@ export function PurchaseDelivery() {
                           .replaceAll("%", "")
                           .replaceAll(".", "")
                           .replaceAll(",", ".")
-                          .trim()
+                          .trim(),
                       );
                       if (isNaN(val)) {
                         val = 0;
@@ -506,7 +507,7 @@ export function PurchaseDelivery() {
                         ...prev.map((pItem) =>
                           pItem.material_id == item.material_id
                             ? { ...pItem, ipi: val }
-                            : pItem
+                            : pItem,
                         ),
                       ]);
                     }}
