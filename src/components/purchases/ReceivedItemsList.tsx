@@ -23,10 +23,6 @@ export function ReceivedItemsList({
     [key: string]: string;
   }>({});
 
-  useEffect(() => {
-    console.log("refresh");
-  }, [purchaseItems]);
-
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3 pr-4"}>
       {purchaseItems.map((item) => {
@@ -36,12 +32,6 @@ export function ReceivedItemsList({
             (totalVal / (purchase.purchase_cost - purchase.delivery_cost)),
         );
         deliveryShare = isNaN(deliveryShare) ? 0 : deliveryShare;
-        console.log(
-          totalVal,
-          deliveryShare,
-          purchase.delivery_cost,
-          totalVal / (purchase.purchase_cost - purchase.delivery_cost),
-        );
         const newUnitVal = Math.round(
           item.new_unit_cost + deliveryShare / (item.amount_delivered || 1),
         );

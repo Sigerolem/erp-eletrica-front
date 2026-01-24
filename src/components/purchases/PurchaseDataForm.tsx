@@ -197,6 +197,8 @@ export function PurchaseDataForm({
     }
   }
 
+  console.log(purchaseCost, taxCost, deliveryCost, purchaseData);
+
   const showCostsBool =
     purchaseData?.status == "finished" || purchaseData?.status == "received";
 
