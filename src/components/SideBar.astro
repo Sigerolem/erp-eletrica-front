@@ -11,6 +11,7 @@ const routes = [
   { name: "Orçamentos", path: "/orcamentos/" },
   { name: "Ordens", path: "/ordens/" },
   { name: "Pedidos", path: "/pedidos/" },
+  { name: "Serviços", path: "/servicos/" },
 ];
 ---
 
@@ -39,7 +40,7 @@ const routes = [
       //   document.location.href = "login/";
       // }
       const userNameSpan = document.getElementById(
-        "userName"
+        "userName",
       ) as HTMLSpanElement;
       userNameSpan.innerText = name || "";
     });
