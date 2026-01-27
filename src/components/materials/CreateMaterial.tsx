@@ -1,14 +1,10 @@
+import { Button } from "@elements/Button";
 import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type StateUpdater,
+  useEffect
 } from "preact/hooks";
-import { fetchWithToken } from "/src/utils/fetchWithToken";
 import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
-import { Button } from "@elements/Button";
-import { createWindowElement } from "astro/runtime/client/dev-toolbar/apps/utils/window.js";
+import { fetchWithToken } from "/src/utils/fetchWithToken";
 
 export function CreateMaterial() {
   async function onFormSubmit(materialData: Partial<MaterialsType>) {

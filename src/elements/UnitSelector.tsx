@@ -15,7 +15,7 @@ export function UnitSelector({
         {label}
       </label>
       <select
-        className={"bg-white border border-slate-300 p-2 rounded-md"}
+        className={"bg-white border border-slate-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"}
         onChange={(e) => {
           doOnSelect(e.currentTarget.value);
         }}

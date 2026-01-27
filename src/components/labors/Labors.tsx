@@ -1,10 +1,6 @@
 import { Button } from "@elements/Button";
-import { BrlStringFromCents } from "@utils/formating";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { Input } from "src/elements/Input";
-import { Table, Td, THead, Tr } from "/src/elements/Table";
+import { useEffect, useState } from "preact/hooks";
 import { fetchWithToken } from "/src/utils/fetchWithToken";
-import { UnitSelector } from "src/elements/UnitSelector";
 import { LaborRow } from "./LaborRow";
 
 export type LaborsType = {
@@ -19,11 +15,8 @@ export type LaborsType = {
 
 export function Labors() {
   const [labors, setLabors] = useState<LaborsType[]>([]);
-  const serverLabors = useRef<Map<string, LaborsType>>(
-    new Map<string, LaborsType>(),
-  );
+  const [serverLabors, setServerLabors] = useState<{ [key: string]: LaborsType }>({});
   const [isFetching, setIsFetching] = useState(true);
-  const [diffFound, setDiffFound] = useState(false);
 
   useEffect(() => {
     fetchWithToken<{ labors: LaborsType[] }>({
@@ -33,7 +26,7 @@ export function Labors() {
       if (code == 200) {
         setLabors(data.labors);
         data.labors.forEach((labor) =>
-          serverLabors.current.set(labor.id, labor),
+          setServerLabors(prev => ({ ...prev, [labor.id]: labor })),
         );
       } else {
         window.alert("Erro ao buscar a lista de materiais");
@@ -41,6 +34,10 @@ export function Labors() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    setLabors(Object.values(serverLabors))
+  }, [serverLabors])
 
   const xSize = window.innerWidth;
 
@@ -69,20 +66,22 @@ export function Labors() {
             }}
           />
         </header>
-        <Table>
-          <THead
-            collumns={[
-              ["Nome", "Unidade"],
-              ["Custo", "Valor"],
-            ]}
-          />
+        {/* <header>
+          <div>
+            <span>Nome</span>
+            <span>Unidade</span>
+          </div>
+          <div>
+            <span>Custo</span>
+            <span>Valor</span>
+          </div>
+        </header> */}
+        <div className={"rounded-lg overflow-hidden"}>
 
-          <tbody className={"overflow-scroll"}>
-            {labors.map((labor) => {
-              return <LaborRow labor={labor} />;
-            })}
-          </tbody>
-        </Table>
+          {labors.map((labor) => {
+            return <LaborRow labor={labor} setLabors={setLabors} serverLabors={serverLabors} setServerLabors={setServerLabors} />;
+          })}
+        </div>
         {isFetching && (
           <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
             Carregando...
