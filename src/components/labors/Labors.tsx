@@ -29,7 +29,7 @@ export function Labors() {
           setServerLabors(prev => ({ ...prev, [labor.id]: labor })),
         );
       } else {
-        window.alert("Erro ao buscar a lista de materiais");
+        window.alert("Erro ao buscar a lista de serviços");
         console.error(data);
       }
     });

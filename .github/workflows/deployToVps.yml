@@ -23,7 +23,7 @@ jobs:
             # Navega até o diretório do projeto
             cd ${{ secrets.APP_PATH }}
 
-            export PATH="/root/.nvm/versions/node/v24.6.0/bin:$PATH"
+            export PATH="/root/.nvm/versions/node/v24.13.0/bin:$PATH"
 
             # Puxa a última versão do código
             #GIT_SSH_COMMAND="ssh -i ~/.ssh/vpsToGithub" git pull origin main
