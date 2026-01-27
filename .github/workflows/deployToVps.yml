@@ -26,7 +26,8 @@ jobs:
             export PATH="/root/.nvm/versions/node/v24.6.0/bin:$PATH"
 
             # Puxa a última versão do código
-            GIT_SSH_COMMAND="ssh -i ~/.ssh/vpsToGithub" git pull origin main
+            #GIT_SSH_COMMAND="ssh -i ~/.ssh/vpsToGithub" git pull origin main
+            git pull origin main
 
             # Instala dependências e faz o build
             pnpm install
