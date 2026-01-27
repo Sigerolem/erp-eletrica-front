@@ -25,7 +25,7 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const loginButton = document.getElementById(
-      "loginButton"
+      "loginButton",
     ) as HTMLButtonElement;
     const loginForm = document.getElementById("loginForm") as HTMLFormElement;
     const loginInput = document.getElementById("login") as HTMLInputElement;
@@ -52,10 +52,11 @@
   });
 
   async function loginFetch(login: string, password: string) {
+    const DOMAIN = import.meta.env.PUBLIC_SERVER_DOMAIN;
     const loginUrl =
       window.location.hostname == "localhost"
         ? "http://localhost:3000/auth/login"
-        : "https://sistema.eseletrica.com.br/api/auth/login";
+        : `https://${DOMAIN ?? "sistema.eseletrica.com.br"}/api/auth/login`;
     fetch(loginUrl, {
       method: "POST",
       headers: {
