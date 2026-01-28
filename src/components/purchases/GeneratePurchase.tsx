@@ -30,6 +30,8 @@ export function GeneratePurchase() {
     Partial<PurchaseItemsType>[]
   >([]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const PURCHASE_URL =
     window.location.hostname == "localhost" ? "/compras/id#" : "/compras/id/#";
 
@@ -86,6 +88,7 @@ export function GeneratePurchase() {
   }
 
   async function handleDataSubmition() {
+    setIsSubmitting(true)
     const { data, code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: "/purchases/create",
       method: "POST",
@@ -98,12 +101,14 @@ export function GeneratePurchase() {
 
     if (code == 201) {
       window.alert("Compra criada com sucesso!");
+      setIsSubmitting(false)
       window.location.href = "/compras";
       return;
     }
 
     window.alert("Erro ao salvar a compra");
     console.error(code, data);
+    setIsSubmitting(false)
   }
 
   const xSize = window.innerWidth;
@@ -199,11 +204,10 @@ export function GeneratePurchase() {
                     </div>
                   )}
                   <div
-                    className={`flex ${
-                      xSize < 500
-                        ? "items-end gap-4 col-span-4 w-full h-full"
-                        : "flex-col h-full items-stretch max-w-full justify-end"
-                    }`}
+                    className={`flex ${xSize < 500
+                      ? "items-end gap-4 col-span-4 w-full h-full"
+                      : "flex-col h-full items-stretch max-w-full justify-end"
+                      }`}
                   >
                     <Input
                       label="Pedido"
@@ -248,7 +252,7 @@ export function GeneratePurchase() {
                           errors={{
                             [`hasPurchase-${item.material_id}`]: `${formatPurchaseStatusEnum(
                               purchaseMap.get(item.material_id!)?.status ||
-                                "draft",
+                              "draft",
                             )}`,
                           }}
                         />
@@ -270,7 +274,7 @@ export function GeneratePurchase() {
             </ListWrapper>
           </DataForm>
           {supplier && (
-            <Button text="Criar compra" onClick={handleDataSubmition} />
+            <Button text="Criar compra" onClick={handleDataSubmition} disabled={isSubmitting} />
           )}
         </section>
       ) : (
