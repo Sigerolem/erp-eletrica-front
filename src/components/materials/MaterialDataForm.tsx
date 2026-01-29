@@ -39,9 +39,7 @@ export function MaterialDataForm({
     [key: string]: string;
   }>({});
   const [isSupModalOpen, setIsSupModalOpen] = useState(false);
-  const [suppliersList, setSuppliersList] = useState<
-    { id: string; name: string }[]
-  >([]);
+  const [suppliersList, setSuppliersList] = useState<SuppliersType[]>([]);
   const [name, setName] = useState("");
   const [barcode, setBarcode] = useState("");
   const [pkgBarcode, setPkgBarcode] = useState("");
@@ -109,12 +107,7 @@ export function MaterialDataForm({
     fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
       ({ code, data }) => {
         if (code === 200) {
-          setSuppliersList([
-            ...data.suppliers.map((supplier) => ({
-              id: supplier.id,
-              name: supplier.name,
-            })),
-          ]);
+          setSuppliersList(data.suppliers);
         }
       }
     );
@@ -381,8 +374,8 @@ export function MaterialDataForm({
       <div className={"flex gap-4 mt-4 justify-evenly items-end"}>
         {children}
         {materialData?.is_disabled === false &&
-        materialData.reserved_amount == 0 &&
-        materialData.current_amount == 0 ? (
+          materialData.reserved_amount == 0 &&
+          materialData.current_amount == 0 ? (
           <Button
             text="Excluir material"
             type={"button"}
