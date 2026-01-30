@@ -123,7 +123,7 @@ export function SelectSupplierModal({
                   handleSupplierSelect(supplier);
                 }}
                 className={
-                  "bg-blue-50 border border-gray-400 flex-1 flex justify-baseline shadow-sm!"
+                  "bg-blue-50 border border-gray-400 flex-1 text-left shadow-sm! "
                 }
               />
             ))}
