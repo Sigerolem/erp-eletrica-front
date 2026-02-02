@@ -70,13 +70,21 @@
         }
         return response.json();
       })
-      .then((data: { token: string; name: string; role: string }) => {
-        localStorage.setItem("apiToken", data.token);
-        localStorage.setItem("apiName", data.name);
-        localStorage.setItem("apiRole", data.role);
-        localStorage.setItem("apiTokenDate", new Date().toLocaleDateString());
-        window.location.href = "/";
-      })
+      .then(
+        (data: {
+          token: string;
+          name: string;
+          role: string;
+          permissions: string;
+        }) => {
+          localStorage.setItem("apiToken", data.token);
+          localStorage.setItem("apiName", data.name);
+          localStorage.setItem("apiRole", data.role);
+          localStorage.setItem("apiPermissions", data.permissions);
+          localStorage.setItem("apiTokenDate", new Date().toLocaleDateString());
+          window.location.href = "/";
+        },
+      )
       .catch((error: Error) => {
         alert("Login failed!");
         console.error(error);

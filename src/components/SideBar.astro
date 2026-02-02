@@ -1,21 +1,22 @@
 ---
-import { NavButton } from "/src/elements/NavButton";
+import { SideBarMenu } from "@comp/SideBarMenu";
 
 const routes = [
   { name: "Dashboard", path: "/" },
-  { name: "Materiais", path: "/materiais/" },
-  { name: "Fornecedores", path: "/fornecedores/" },
-  { name: "Compras", path: "/compras/" },
-  { name: "Usuários", path: "/usuarios/" },
-  { name: "Clientes", path: "/clientes/" },
-  { name: "Orçamentos", path: "/orcamentos/" },
-  { name: "Ordens", path: "/ordens/" },
-  { name: "Pedidos", path: "/pedidos/" },
-  { name: "Serviços", path: "/servicos/" },
+  { name: "Materiais", path: "/materiais/", permissionNeeded: 2 },
+  { name: "Fornecedores", path: "/fornecedores/", permissionNeeded: 1 },
+  { name: "Compras", path: "/compras/", permissionNeeded: 3 },
+  { name: "Usuários", path: "/usuarios/", permissionNeeded: 0 },
+  { name: "Clientes", path: "/clientes/", permissionNeeded: 4 },
+  { name: "Orçamentos", path: "/orcamentos/", permissionNeeded: 5 },
+  { name: "Ordens", path: "/ordens/", permissionNeeded: 6 },
+  { name: "Pedidos", path: "/pedidos/", permissionNeeded: 7 },
+  { name: "Serviços", path: "/servicos/", permissionNeeded: 8 },
 ];
 ---
 
 <aside
+  id="sideBar"
   class="bg-slate-800 p-4 gap-3 flex md:flex-col navBar md:fixed md:h-full not-md:w-full not-md:overflow-scroll"
 >
   <div
@@ -27,18 +28,15 @@ const routes = [
       >...</span
     >
   </div>
-  {
-    routes.map((route) => {
-      return <NavButton name={route.name} path={route.path} client:load />;
-    })
-  }
+  <SideBarMenu routes={routes} client:load />
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const role = localStorage.getItem("apiRole");
+      const permissions = localStorage.getItem("apiPermissions");
       const name = localStorage.getItem("apiName");
-      // if (role == undefined) {
-      //   document.location.href = "login/";
-      // }
+      if (role == undefined || permissions == undefined) {
+        document.location.href = "login/";
+      }
       const userNameSpan = document.getElementById(
         "userName",
       ) as HTMLSpanElement;
