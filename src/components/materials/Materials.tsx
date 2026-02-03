@@ -6,6 +6,7 @@ import { Table, Td, THead, Tr } from "/src/elements/Table";
 import { BrlStringFromCents } from "@utils/formating";
 import { Button } from "@elements/Button";
 import { Input } from "src/elements/Input";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export type MaterialsType = {
   id: string;
@@ -39,14 +40,28 @@ export function Materials() {
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [search, setSearch] = useState("");
+  const [userCanEditMaterial, setUserCanEditMaterial] =
+    useState<boolean>(false);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "material", "W")
+    ) {
+      setUserCanEditMaterial(true);
+    }
+
     fetchWithToken<{ materials: MaterialsType[] }>({
       path: search == "" ? "/materials" : `/materials?search=${search}`,
     }).then(({ code, data }) => {
       setIsFetching(false);
       if (code == 200) {
         setMaterials(data.materials);
+      } else if (code == 403) {
+        window.location.href = "/";
       } else {
         window.alert("Erro ao buscar a lista de materiais");
         console.error(data);
@@ -61,12 +76,14 @@ export function Materials() {
       <div className={"pb-20 h-full"}>
         <header className={"flex justify-between items-end mb-2"}>
           <h3 className={"text-lg font-semibold"}>Lista de materiais</h3>
-          <a href="/materiais/novo">
-            <Button
-              text="Cadastrar novo"
-              className={"bg-blue-700 text-white text-sm"}
-            />
-          </a>
+          {userCanEditMaterial && (
+            <a href="/materiais/novo">
+              <Button
+                text="Cadastrar novo"
+                className={"bg-blue-700 text-white text-sm"}
+              />
+            </a>
+          )}
         </header>
         <div className={"mt-4 mb-4 flex items-end gap-2"}>
           {/* <span
@@ -173,7 +190,7 @@ export function Materials() {
                     </p>
                   </Td>
                 </Tr>
-              )
+              ),
             )}
           </tbody>
         </Table>

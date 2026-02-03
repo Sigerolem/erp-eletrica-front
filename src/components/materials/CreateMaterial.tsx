@@ -1,12 +1,23 @@
 import { Button } from "@elements/Button";
-import {
-  useEffect
-} from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
 import { fetchWithToken } from "/src/utils/fetchWithToken";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function CreateMaterial() {
+  useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "material", "W")
+    ) {
+      window.location.href = "/materiais";
+    }
+  }, []);
+
   async function onFormSubmit(materialData: Partial<MaterialsType>) {
     const { data, code } = await fetchWithToken<{ material: MaterialsType }>({
       path: "/materials/create",

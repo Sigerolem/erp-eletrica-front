@@ -1,10 +1,18 @@
-import { useEffect, useState, type Dispatch, type StateUpdater } from "preact/hooks";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type StateUpdater,
+} from "preact/hooks";
 import { Button } from "src/elements/Button";
 import { Input } from "src/elements/Input";
 import { UnitSelector } from "src/elements/UnitSelector";
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { BrlStringFromCents } from "src/utils/formating";
-import { validateFloatFieldOnBlur, validateStringFieldOnBlur } from "src/utils/inputValidation";
+import {
+  validateFloatFieldOnBlur,
+  validateStringFieldOnBlur,
+} from "src/utils/inputValidation";
 import type { LaborsType } from "./Labors";
 import { hasPermission } from "src/utils/permissionLogic";
 
@@ -15,7 +23,12 @@ interface Props {
   setServerLabors: Dispatch<StateUpdater<{ [key: string]: LaborsType }>>;
 }
 
-export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Props) {
+export function LaborRow({
+  labor,
+  serverLabors,
+  setServerLabors,
+  setLabors,
+}: Props) {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
@@ -34,17 +47,23 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
     }
     const role = localStorage.getItem("apiRole");
     const permission = localStorage.getItem("apiPermissions");
-    if (role == "owner" || hasPermission(permission ?? "----------------", "labor", 'W')) {
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "labor", "W")
+    ) {
       setUserCanEditLabor(true);
     }
-    if (role == "owner" || hasPermission(permission ?? "----------------", "labor", 'D')) {
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "labor", "D")
+    ) {
       setUserCanDeleteLabor(true);
     }
     setName(labor.name);
     setUnit(labor.unit);
     setCost(labor.cost);
     setValue(labor.value);
-    setProfit(labor.profit)
+    setProfit(labor.profit);
   }, [labor]);
 
   async function handleCreate() {
@@ -60,11 +79,11 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
       }),
     });
     if (code == 201) {
-      setServerLabors(prev => ({ ...prev, [data.labor.id]: data.labor }))
-      return
+      setServerLabors((prev) => ({ ...prev, [data.labor.id]: data.labor }));
+      return;
     }
-    window.alert('Erro ao salvar serviço')
-    console.error(data)
+    window.alert("Erro ao salvar serviço");
+    console.error(data);
   }
 
   async function handleUpdate() {
@@ -80,11 +99,11 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
       }),
     });
     if (code == 200) {
-      setServerLabors(prev => ({ ...prev, [data.labor.id]: data.labor }))
-      return
+      setServerLabors((prev) => ({ ...prev, [data.labor.id]: data.labor }));
+      return;
     }
-    window.alert('Erro ao atualizar serviço')
-    console.error(data)
+    window.alert("Erro ao atualizar serviço");
+    console.error(data);
   }
 
   async function handleDelete() {
@@ -93,54 +112,58 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
       method: "DELETE",
     });
     if (code == 200) {
-      setServerLabors(prev => {
-        delete prev[labor.id]
-        return { ...prev }
-      })
-      return
+      setServerLabors((prev) => {
+        delete prev[labor.id];
+        return { ...prev };
+      });
+      return;
     }
-    window.alert('Erro ao apagar serviço')
-    console.error(data)
+    window.alert("Erro ao apagar serviço");
+    console.error(data);
   }
 
   const originalLabor = serverLabors[labor.id];
   if (!originalLabor) {
-    setBgColor("bg-green-100")
+    setBgColor("bg-green-100");
   } else {
-    let diffFound = false
+    let diffFound = false;
     if (originalLabor.name != name) {
-      diffFound = true
+      diffFound = true;
     }
     if (originalLabor.unit != unit) {
-      diffFound = true
+      diffFound = true;
     }
     if (originalLabor.cost != cost) {
-      diffFound = true
+      diffFound = true;
     }
     if (originalLabor.value != value) {
-      diffFound = true
+      diffFound = true;
     }
     if (originalLabor.profit != profit) {
-      diffFound = true
+      diffFound = true;
     }
     if (diffFound) {
-      setBgColor("bg-blue-200")
+      setBgColor("bg-blue-200");
     } else {
-      setBgColor("bg-blue-100")
+      setBgColor("bg-blue-100");
     }
   }
 
   return (
-    <article key={labor.id} className={`${bgColor} flex flex-col gap-2 p-4 not-first:border-t not-first:border-slate-600`}>
+    <article
+      key={labor.id}
+      className={`${bgColor} flex flex-col gap-2 p-4 not-first:border-t not-first:border-slate-600`}
+    >
       <div className={"flex gap-2"}>
         <Input
           label={"Nome"}
           name={`${labor.id}-name`}
-          value={name} onBlur={(e) => {
+          value={name}
+          onBlur={(e) => {
             validateStringFieldOnBlur(e, setName, setValidationErrors, {
               min: 2,
-              required: true
-            })
+              required: true,
+            });
           }}
           disabled={!userCanEditLabor}
           className={!userCanEditLabor ? "bg-blue-50!" : ""}
@@ -149,9 +172,10 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
           label={"Unidade"}
           value={unit}
           type={"service"}
-          doOnSelect={(value) => { setUnit(value); }}
+          doOnSelect={(value) => {
+            setUnit(value);
+          }}
           disabled={!userCanEditLabor}
-
         />
       </div>
       <div className={"flex gap-2"}>
@@ -168,7 +192,10 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
           name={`${labor.id}-cost`}
           value={BrlStringFromCents(cost)}
           onBlur={(e) => {
-            validateFloatFieldOnBlur(e, setCost, setValidationErrors, { min: 0, removeFromString: 'R$' })
+            validateFloatFieldOnBlur(e, setCost, setValidationErrors, {
+              min: 0,
+              removeFromString: "R$",
+            });
           }}
           className={!userCanEditLabor ? "bg-blue-50!" : ""}
           disabled={!userCanEditLabor}
@@ -178,28 +205,33 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
           name={`${labor.id}-value`}
           value={BrlStringFromCents(value)}
           onBlur={(e) => {
-            validateFloatFieldOnBlur(e, setValue, setValidationErrors, { min: 0, removeFromString: 'R$' })
+            validateFloatFieldOnBlur(e, setValue, setValidationErrors, {
+              min: 0,
+              removeFromString: "R$",
+            });
           }}
           className={!userCanEditLabor ? "bg-blue-50!" : ""}
           disabled={!userCanEditLabor}
         />
       </div>
       <div className={"w-full flex justify-end gap-2"}>
-        {
-          !originalLabor ?
+        {!originalLabor ? (
+          <Button
+            text="Cancelar"
+            className={"bg-red-700 text-white text-sm mt-4"}
+            onClick={() => {
+              setLabors((prev) => prev.filter((lab) => lab.id != labor.id));
+            }}
+          />
+        ) : (
+          userCanDeleteLabor && (
             <Button
-              text="Cancelar"
+              text="Excluir"
               className={"bg-red-700 text-white text-sm mt-4"}
-              onClick={() => { setLabors(prev => prev.filter(lab => lab.id != labor.id)) }}
+              onClick={handleDelete}
             />
-            : userCanDeleteLabor && (
-              <Button
-                text="Excluir"
-                className={"bg-red-700 text-white text-sm mt-4"}
-                onClick={handleDelete}
-              />
-            )
-        }
+          )
+        )}
         {!originalLabor && (
           <Button
             text="Salvar"

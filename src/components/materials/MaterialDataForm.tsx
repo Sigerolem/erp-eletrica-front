@@ -21,11 +21,12 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { Button } from "@elements/Button";
 import { UnitSelector } from "src/elements/UnitSelector";
+import { hasPermission } from "src/utils/permissionLogic";
 
 interface MaterialDataFormProps {
   materialData?: MaterialsType;
   doOnSubmit: (
-    material: Partial<MaterialsType>
+    material: Partial<MaterialsType>,
   ) => Promise<{ [key: string]: string } | null>;
   children: JSX.Element;
 }
@@ -61,7 +62,24 @@ export function MaterialDataForm({
     name: string;
   } | null>(null);
 
+  const [userCanEditMaterial, setUserCanEditMaterial] = useState(false);
+  const [userCanDeleteMaterial, setUserCanDeleteMaterial] = useState(false);
+
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "material", "W")
+    ) {
+      setUserCanEditMaterial(true);
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "material", "D")
+    ) {
+      setUserCanDeleteMaterial(true);
+    }
     if (materialData) {
       setName(materialData.name);
       setBarcode(materialData.barcode || "");
@@ -109,7 +127,7 @@ export function MaterialDataForm({
         if (code === 200) {
           setSuppliersList(data.suppliers);
         }
-      }
+      },
     );
   }, []);
 
@@ -181,6 +199,8 @@ export function MaterialDataForm({
             required: true,
           });
         }}
+        disabled={!userCanEditMaterial}
+        className={!userCanEditMaterial ? "bg-blue-50!" : ""}
         errors={validationErrors}
       />
       <div className={"flex gap-4"}>
@@ -194,6 +214,8 @@ export function MaterialDataForm({
               max: 100,
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -206,6 +228,8 @@ export function MaterialDataForm({
               max: 100,
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
       </div>
@@ -216,6 +240,7 @@ export function MaterialDataForm({
           doOnSelect={(value) => {
             setUnit(value);
           }}
+          disabled={!userCanEditMaterial}
         />
         <Input
           label="Qtd. na embalagem"
@@ -226,6 +251,8 @@ export function MaterialDataForm({
               min: 1,
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
       </div>
@@ -240,9 +267,11 @@ export function MaterialDataForm({
                 e,
                 setReservedAmount,
                 setValidationErrors,
-                {}
+                {},
               );
             }}
+            disabled={!userCanEditMaterial}
+            className={!userCanEditMaterial ? "bg-blue-50!" : ""}
             errors={validationErrors}
           />
           <Input
@@ -254,9 +283,11 @@ export function MaterialDataForm({
                 e,
                 setTrackedAmount,
                 setValidationErrors,
-                {}
+                {},
               );
             }}
+            disabled={!userCanEditMaterial}
+            className={!userCanEditMaterial ? "bg-blue-50!" : ""}
             errors={validationErrors}
           />
         </div>
@@ -270,6 +301,8 @@ export function MaterialDataForm({
           onBlur={(e) => {
             validateIntFieldOnBlur(e, setMinAmount, setValidationErrors, {});
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -281,6 +314,8 @@ export function MaterialDataForm({
               min: minAmount,
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -292,9 +327,11 @@ export function MaterialDataForm({
               e,
               setCurrentAmount,
               setValidationErrors,
-              {}
+              {},
             );
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -304,8 +341,9 @@ export function MaterialDataForm({
             e.currentTarget.blur();
             setIsSupModalOpen(true);
           }}
-          className={"cursor-pointer"}
           value={supplierSelected === null ? "" : supplierSelected.name}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : "cursor-pointer"}
           errors={validationErrors}
         />
         <Input
@@ -317,6 +355,8 @@ export function MaterialDataForm({
               removeFromString: " %",
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -329,6 +369,8 @@ export function MaterialDataForm({
               min: 0,
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -342,6 +384,8 @@ export function MaterialDataForm({
               min: 0,
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -354,6 +398,8 @@ export function MaterialDataForm({
               removeFromString: " %",
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
         <Input
@@ -367,6 +413,8 @@ export function MaterialDataForm({
               min: 0,
             });
           }}
+          disabled={!userCanEditMaterial}
+          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
           errors={validationErrors}
         />
       </div>
@@ -374,8 +422,9 @@ export function MaterialDataForm({
       <div className={"flex gap-4 mt-4 justify-evenly items-end"}>
         {children}
         {materialData?.is_disabled === false &&
-          materialData.reserved_amount == 0 &&
-          materialData.current_amount == 0 ? (
+        materialData.reserved_amount == 0 &&
+        materialData.current_amount == 0 &&
+        userCanDeleteMaterial ? (
           <Button
             text="Excluir material"
             type={"button"}

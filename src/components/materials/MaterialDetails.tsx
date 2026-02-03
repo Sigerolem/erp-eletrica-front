@@ -3,21 +3,47 @@ import { useEffect, useState } from "preact/hooks";
 import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
 import { Button } from "@elements/Button";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function MaterialDetails() {
   const [material, setMaterial] = useState<MaterialsType | null>(null);
+  const [userCanEditMaterial, setUserCanEditMaterial] =
+    useState<boolean>(false);
 
   useEffect(() => {
-    const path = new URL(window.location.href);
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
 
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "material", "R")
+    ) {
+      window.location.href = "/";
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "material", "W")
+    ) {
+      setUserCanEditMaterial(true);
+    }
+
+    const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
-    // : path.pathname.replace("/materiais/id/", "");
 
     fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${id}`,
     }).then((result) => {
       if (result.code == 200) {
         setMaterial(result.data.material);
+      } else if (result.code == 403) {
+        window.location.href = "/";
+      } else if (result.code == 404) {
+        window.alert("Material não encontrado");
+        window.location.href = "/materiais";
+      } else {
+        window.alert("Erro ao buscar o material");
+        console.error(result);
       }
     });
   }, []);
@@ -59,7 +85,11 @@ export function MaterialDetails() {
           doOnSubmit={handleDataSubmition}
           materialData={material}
         >
-          <Button text="Salvar" type={"submit"} />
+          {userCanEditMaterial ? (
+            <Button text="Salvar" type={"submit"} />
+          ) : (
+            <></>
+          )}
         </MaterialDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
