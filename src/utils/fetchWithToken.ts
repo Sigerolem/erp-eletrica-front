@@ -4,7 +4,7 @@ interface SuccessResponse<T> {
 }
 
 interface ErrorResponse {
-  code: 400 | 401 | 402 | 404 | 409 | 500 | 501;
+  code: 400 | 401 | 402 | 403 | 404 | 409 | 500 | 501;
   data: { error: Error | string; message: string };
 }
 
@@ -59,6 +59,12 @@ export async function fetchWithToken<T>({
     window.location.href = "/login";
     console.warn("Unauthorized", data);
     return { code: 401, data: { error: data, message: "Unauthorized" } };
+  }
+
+  if (response.status == 403) {
+    console.warn("Forbidden", data);
+    window.alert("Você não tem permissão para realizar essa ação!");
+    return { code: 403, data: { error: data, message: "Forbidden" } };
   }
 
   if (response.status == 200 || response.status == 201) {
