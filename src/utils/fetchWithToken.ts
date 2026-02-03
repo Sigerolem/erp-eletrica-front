@@ -63,7 +63,7 @@ export async function fetchWithToken<T>({
 
   if (response.status == 403) {
     console.warn("Forbidden", data);
-    window.alert("Você não tem permissão para realizar essa ação!");
+    window.alert("Você não tem permissão para realizar essa ação.");
     return { code: 403, data: { error: data, message: "Forbidden" } };
   }
 
