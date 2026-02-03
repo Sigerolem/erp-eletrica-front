@@ -3,6 +3,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { CreateCustomerModal } from "./CreateCustomerModal";
 import { Button } from "@elements/Button";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export type CustomersType = {
   id: string;
@@ -19,6 +20,7 @@ export function Customers() {
   const [customers, setCustomers] = useState<CustomersType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userCanCreateCustomer, setUserCanCreateCustomer] = useState(false);
 
   const CUSTOMER_URL =
     window.location.hostname == "localhost"
@@ -30,11 +32,18 @@ export function Customers() {
   }
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (role == "owner" || hasPermission(permission ?? "----------------", "customer", 'W')) {
+      setUserCanCreateCustomer(true);
+    }
     fetchWithToken<{ customers: CustomersType[] }>({ path: "/customers" }).then(
       (result) => {
         setIsFetching(false);
         if (result.code == 200 || result.code == 201) {
           setCustomers(result.data.customers);
+        } else if (result.code == 403) {
+          window.location.href = "/";
         } else {
           window.alert("Erro ao buscar clientes.");
           console.error(result.data, result.code);
@@ -56,11 +65,13 @@ export function Customers() {
       <div>
         <header className={"flex justify-between items-end mb-2"}>
           <h3 className={"text-lg font-semibold"}>Lista de clientes</h3>
-          <Button
-            text="Novo cliente"
-            onClick={handleNewCustomer}
-            className={"bg-blue-700 text-white not-md:text-sm"}
-          />
+          {userCanCreateCustomer && (
+            <Button
+              text="Novo cliente"
+              onClick={handleNewCustomer}
+              className={"bg-blue-700 text-white not-md:text-sm"}
+            />
+          )}
         </header>
         <Table>
           <THead

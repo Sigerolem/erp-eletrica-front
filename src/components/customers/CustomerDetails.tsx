@@ -15,6 +15,8 @@ export function CustomerDetails() {
     }).then((result) => {
       if (result.code == 200) {
         setCustomer(result.data.customer);
+      } else if (result.code == 403) {
+        window.location.href = "/";
       }
     });
   }, []);
