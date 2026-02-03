@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { fetchWithToken } from "src/utils/fetchWithToken";
+import { hasPermission } from "src/utils/permissionLogic";
 
 type SupsNeedingPurchase = {
   id: string;
@@ -14,12 +15,23 @@ export function PurchaseGenerationSuppliers() {
   const [suppliers, setSuppliers] = useState<SupsNeedingPurchase[]>([]);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      window.location.href = "/compras";
+      return;
+    }
+
     fetchWithToken<{ suppliers: SupsNeedingPurchase[] }>({
       path: "/suppliers/need-purchase",
     }).then(({ code, data }) => {
       if (code == 200) {
-        console.log(data);
         setSuppliers(data.suppliers);
+      } else if (code == 403) {
+        window.location.href = "/compras";
       } else {
         window.alert("Erro ao buscar a lista de materiais");
         console.error(data);

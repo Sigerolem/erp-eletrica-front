@@ -14,6 +14,7 @@ export function Checkbox({
   name,
   checked,
   setChecked,
+  className,
   ...rest
 }: CheckboxProps) {
   return (
@@ -33,7 +34,8 @@ export function Checkbox({
           setChecked(e.currentTarget.checked);
         }}
         className={
-          "min-w-8 min-h-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          "min-w-8 min-h-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 " +
+          className
         }
         onKeyPress={(e) => {
           if (e.key == "Enter") {

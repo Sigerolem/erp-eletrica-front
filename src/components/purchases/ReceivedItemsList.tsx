@@ -6,7 +6,8 @@ import {
   type StateUpdater,
 } from "preact/hooks";
 import type { PurchaseItemsType, PurchasesType } from "./Purchases";
-import { BrlStringFromCents } from "src/utils/formating";
+import { BrlStringFromCents } from "@utils/formating";
+import { hasPermission } from "@utils/permissionLogic";
 
 export function ReceivedItemsList({
   purchase,
@@ -22,6 +23,19 @@ export function ReceivedItemsList({
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+
+  const [userCanEditPurchase, setUserCanEditPurchase] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      setUserCanEditPurchase(true);
+    }
+  }, []);
 
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3 pr-4"}>
@@ -63,7 +77,6 @@ export function ReceivedItemsList({
                 label={"Entregue"}
                 name={`amountDelivered`}
                 value={item.amount_delivered}
-                className={"text-center font-semibold"}
                 onBlur={(e) => {
                   if (e.currentTarget.value.length > 7) {
                     e.currentTarget.value = item.amount_delivered.toString();
@@ -81,6 +94,12 @@ export function ReceivedItemsList({
                     ),
                   ]);
                 }}
+                disabled={!userCanEditPurchase}
+                className={
+                  !userCanEditPurchase
+                    ? "bg-blue-50! text-center font-semibold"
+                    : "text-center font-semibold"
+                }
               />
               <Input
                 label={"Pedido"}
@@ -126,6 +145,8 @@ export function ReceivedItemsList({
                     ),
                   ]);
                 }}
+                disabled={!userCanEditPurchase}
+                className={!userCanEditPurchase ? "bg-blue-50!" : ""}
               />
               <Input
                 label={"Custo c/ IPI"}
@@ -177,6 +198,8 @@ export function ReceivedItemsList({
                     ),
                   ]);
                 }}
+                disabled={!userCanEditPurchase}
+                className={!userCanEditPurchase ? "bg-blue-50!" : ""}
               />
               <Input
                 label={"Valor IPI"}
@@ -227,6 +250,8 @@ export function ReceivedItemsList({
                   ]);
                   setItemsWereChanged(true);
                 }}
+                disabled={!userCanEditPurchase}
+                className={!userCanEditPurchase ? "bg-blue-50!" : ""}
               />
               <Input
                 label={"Custo diluído"}

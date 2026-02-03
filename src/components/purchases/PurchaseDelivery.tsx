@@ -14,6 +14,7 @@ import type { MaterialsType } from "../materials/Materials";
 import { ListWrapper } from "../quotations/lists/ListWrapper";
 import type { SuppliersType } from "../suppliers/Suppliers";
 import type { PurchaseItemsType, PurchasesType } from "./Purchases";
+import { hasPermission } from "@utils/permissionLogic";
 
 export function PurchaseDelivery() {
   const [isSearchingBarcode, setIsSearchingBarcode] = useState(false);
@@ -48,6 +49,16 @@ export function PurchaseDelivery() {
   );
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      window.location.href = "/compras";
+      return;
+    }
+
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
     setId(id);
@@ -318,6 +329,7 @@ export function PurchaseDelivery() {
               input.value = "";
             }
           }}
+          disabled={isSearchingBarcode}
         />
         <ListWrapper label="Materiais" doOnClickAdd={() => {}}>
           {purchaseItems.map((item) => {

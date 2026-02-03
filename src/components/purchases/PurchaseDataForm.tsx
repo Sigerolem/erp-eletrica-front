@@ -21,6 +21,7 @@ import {
 import { Checkbox } from "@elements/Checkbox";
 import type { ReactNode } from "preact/compat";
 import { ReceivedItemsList } from "./ReceivedItemsList";
+import { hasPermission } from "@utils/permissionLogic";
 
 export function PurchaseDataForm({
   purchaseData,
@@ -56,6 +57,7 @@ export function PurchaseDataForm({
   const [purchaseCost, setPurchaseCost] = useState(0);
   const [deliveryCost, setDeliveryCost] = useState(0);
   const [taxCost, setTaxCost] = useState(0);
+  const [userCanEditPurchase, setUserCanEditPurchase] = useState(false);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -78,6 +80,22 @@ export function PurchaseDataForm({
   }, [isSupModalOpen, isMatModalOpen]);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "purchase", "R")
+    ) {
+      window.location.href = "/compras";
+      return;
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      setUserCanEditPurchase(true);
+    }
+
     fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
       ({ code, data }) => {
         if (code == 200) {
@@ -136,6 +154,10 @@ export function PurchaseDataForm({
     purchaseData?.tax_cost != taxCost;
 
   function handleNewPurchaseMaterial(material: MaterialsType) {
+    if (purchaseItems.find((item) => item.material_id == material.id)) {
+      window.alert("Material já adicionado.");
+      return;
+    }
     setPurchaseItems((prev) => [
       ...prev,
       {
@@ -215,6 +237,8 @@ export function PurchaseDataForm({
                   max: 50,
                 });
               }}
+              disabled={!userCanEditPurchase}
+              className={userCanEditPurchase ? "" : "bg-blue-50!"}
               errors={validationErrors}
             />
             <Checkbox
@@ -222,6 +246,8 @@ export function PurchaseDataForm({
               name="isTracked"
               checked={isTracked}
               setChecked={setIsTracked}
+              disabled={!userCanEditPurchase}
+              className={userCanEditPurchase ? "" : "bg-blue-50!"}
             />
           </div>
           <div className={"flex gap-4"}>
@@ -284,6 +310,8 @@ export function PurchaseDataForm({
                 setPurchaseCost(Math.round(newPurchaseCost + val));
                 setTaxCost(Math.round(newTaxCost));
               }}
+              disabled={!userCanEditPurchase}
+              className={userCanEditPurchase ? "" : "bg-blue-50!"}
               errors={validationErrors}
             />
           </div>
@@ -298,13 +326,12 @@ export function PurchaseDataForm({
             setIsSupModalOpen(true);
           }}
           errors={validationErrors}
-          disabled={
-            purchaseData?.status == "shipped" ||
-            purchaseData?.status == "received" ||
-            purchaseData?.status == "finished" ||
-            purchaseData?.status == "cancelled"
+          disabled={status !== "draft" || !userCanEditPurchase}
+          className={
+            status != "draft" || !userCanEditPurchase
+              ? "bg-blue-50!"
+              : undefined
           }
-          className={status == "draft" ? undefined : "bg-blue-50!"}
         />
         <Input
           label="Status"

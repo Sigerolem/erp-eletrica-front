@@ -1,12 +1,24 @@
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { Button } from "@elements/Button";
-import { useState } from "preact/hooks";
-import { fetchWithToken } from "src/utils/fetchWithToken";
+import { useEffect, useState } from "preact/hooks";
+import { fetchWithToken } from "@utils/fetchWithToken";
 import { PurchaseDataForm } from "./PurchaseDataForm";
 import type { PurchasesType } from "./Purchases";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function CreatePurchase() {
   const [purchases, setPurchases] = useState<Partial<PurchasesType>[]>([]);
+
+  useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      window.location.href = "/compras";
+    }
+  }, []);
 
   async function onFormSubmit(purchaseData: Partial<PurchasesType>) {
     const basicSupplier = purchaseData.supplier as SuppliersType;

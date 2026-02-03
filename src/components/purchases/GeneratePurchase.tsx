@@ -14,6 +14,7 @@ import { PurchaseItemsList } from "./PurchaseItemsList";
 import type { SuppliersType } from "../suppliers/Suppliers";
 import { Input } from "src/elements/Input";
 import { formatPurchaseStatusEnum } from "src/utils/formating";
+import { hasPermission } from "@utils/permissionLogic";
 
 const purchaseMap = new Map<
   string,
@@ -32,10 +33,17 @@ export function GeneratePurchase() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const PURCHASE_URL =
-    window.location.hostname == "localhost" ? "/compras/id#" : "/compras/id/#";
-
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      window.location.href = "/compras";
+      return;
+    }
+
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
     setId(id);
@@ -88,7 +96,7 @@ export function GeneratePurchase() {
   }
 
   async function handleDataSubmition() {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     const { data, code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: "/purchases/create",
       method: "POST",
@@ -101,14 +109,14 @@ export function GeneratePurchase() {
 
     if (code == 201) {
       window.alert("Compra criada com sucesso!");
-      setIsSubmitting(false)
+      setIsSubmitting(false);
       window.location.href = "/compras";
       return;
     }
 
     window.alert("Erro ao salvar a compra");
     console.error(code, data);
-    setIsSubmitting(false)
+    setIsSubmitting(false);
   }
 
   const xSize = window.innerWidth;
@@ -204,10 +212,11 @@ export function GeneratePurchase() {
                     </div>
                   )}
                   <div
-                    className={`flex ${xSize < 500
-                      ? "items-end gap-4 col-span-4 w-full h-full"
-                      : "flex-col h-full items-stretch max-w-full justify-end"
-                      }`}
+                    className={`flex ${
+                      xSize < 500
+                        ? "items-end gap-4 col-span-4 w-full h-full"
+                        : "flex-col h-full items-stretch max-w-full justify-end"
+                    }`}
                   >
                     <Input
                       label="Pedido"
@@ -252,7 +261,7 @@ export function GeneratePurchase() {
                           errors={{
                             [`hasPurchase-${item.material_id}`]: `${formatPurchaseStatusEnum(
                               purchaseMap.get(item.material_id!)?.status ||
-                              "draft",
+                                "draft",
                             )}`,
                           }}
                         />
@@ -274,7 +283,11 @@ export function GeneratePurchase() {
             </ListWrapper>
           </DataForm>
           {supplier && (
-            <Button text="Criar compra" onClick={handleDataSubmition} disabled={isSubmitting} />
+            <Button
+              text="Criar compra"
+              onClick={handleDataSubmition}
+              disabled={isSubmitting}
+            />
           )}
         </section>
       ) : (

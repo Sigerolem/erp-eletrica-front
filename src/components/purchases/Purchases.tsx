@@ -6,6 +6,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Table, Td, THead, Tr } from "src/elements/Table";
 import { fetchPdf } from "src/utils/fetchPdf";
 import { fetchWithToken } from "src/utils/fetchWithToken";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export type PurchaseStatusType =
   | "draft"
@@ -51,8 +52,24 @@ const PURCHASE_URL =
 export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
+  const [userCanCreatePurchase, setUserCanCreatePurchase] = useState(false);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "purchase", "R")
+    ) {
+      window.location.href = "/";
+      return;
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      setUserCanCreatePurchase(true);
+    }
     fetchWithToken<{ purchases: PurchasesType[] }>({ path: "/purchases" }).then(
       ({ code, data }) => {
         setIsFetching(false);
@@ -72,18 +89,22 @@ export function Purchases() {
       <div>
         <header className={"flex justify-between items-end mb-2 gap-1"}>
           <h3 className={"text-lg font-semibold"}>Lista de compras</h3>
-          <a href="/compras/nova">
-            <Button
-              text="Nova compra"
-              className={"bg-blue-700 text-white text-sm"}
-            />
-          </a>
-          <a href="/compras/gerar">
-            <Button
-              text="Compras necessárias"
-              className={"bg-blue-700 text-white text-sm"}
-            />
-          </a>
+          {userCanCreatePurchase && (
+            <>
+              <a href="/compras/nova">
+                <Button
+                  text="Nova compra"
+                  className={"bg-blue-700 text-white text-sm"}
+                />
+              </a>
+              <a href="/compras/gerar">
+                <Button
+                  text="Compras necessárias"
+                  className={"bg-blue-700 text-white text-sm"}
+                />
+              </a>
+            </>
+          )}
         </header>
         <Table>
           {xSize < 720 ? (

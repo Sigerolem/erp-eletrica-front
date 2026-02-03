@@ -1,7 +1,13 @@
 import { Button } from "@elements/Button";
 import { Input } from "@elements/Input";
-import { useState, type Dispatch, type StateUpdater } from "preact/hooks";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type StateUpdater,
+} from "preact/hooks";
 import type { PurchaseItemsType, PurchasesType } from "./Purchases";
+import { hasPermission } from "@utils/permissionLogic";
 
 export function PurchaseItemsList({
   purchaseItems,
@@ -17,18 +23,33 @@ export function PurchaseItemsList({
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+  const [userCanEditPurchase, setUserCanEditPurchase] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "purchase", "W")
+    ) {
+      setUserCanEditPurchase(true);
+    }
+  }, []);
 
   function handleUpdateRequestedAmount(materialId: string, amount: number) {
+    let old: number;
     setPurchaseItems((prev) =>
       prev.map((item) => {
         if (item.material_id == materialId) {
+          item.amount_requested != amount &&
+            setItemsWereChanged &&
+            setItemsWereChanged(true);
           return { ...item, amount_requested: amount };
         } else {
           return { ...item };
         }
-      })
+      }),
     );
-    setItemsWereChanged && setItemsWereChanged(true);
   }
 
   function handleUpdateDeliveredAmount(materialId: string, amount: number) {
@@ -39,14 +60,14 @@ export function PurchaseItemsList({
         } else {
           return { ...item };
         }
-      })
+      }),
     );
     setItemsWereChanged && setItemsWereChanged(true);
   }
 
   function handleRemoveItem(materialId: string) {
     setPurchaseItems((prev) =>
-      prev.filter((item) => item.material_id !== materialId)
+      prev.filter((item) => item.material_id !== materialId),
     );
     setItemsWereChanged && setItemsWereChanged(true);
   }
@@ -77,8 +98,8 @@ export function PurchaseItemsList({
                 xSize < 500
                   ? "col-span-4"
                   : wasReceived
-                  ? "col-span-3"
-                  : "col-span-2"
+                    ? "col-span-3"
+                    : "col-span-2"
               }`}
             >
               <Input
@@ -165,12 +186,14 @@ export function PurchaseItemsList({
                   }
                   handleUpdateRequestedAmount(
                     item.material_id || "",
-                    parseInt(value)
+                    parseInt(value),
                   );
                 }}
                 errors={validationErrors}
-                disabled={wasReceived}
-                className={wasReceived ? "bg-blue-50!" : ""}
+                disabled={wasReceived || !userCanEditPurchase}
+                className={
+                  wasReceived || !userCanEditPurchase ? "bg-blue-50!" : ""
+                }
               />
               {wasReceived && (
                 <Input
@@ -193,14 +216,17 @@ export function PurchaseItemsList({
                     }
                     handleUpdateDeliveredAmount(
                       item.material_id || "",
-                      parseInt(value)
+                      parseInt(value),
                     );
                   }}
+                  disabled={!userCanEditPurchase}
+                  className={
+                    !userCanEditPurchase ? "bg-blue-50! min-w-5" : "min-w-5"
+                  }
                   errors={validationErrors}
-                  className={"min-w-5"}
                 />
               )}
-              {!wasReceived && (
+              {!wasReceived && userCanEditPurchase && (
                 <div className={"flex justify-end"}>
                   <Button
                     text="X"
