@@ -14,6 +14,7 @@ export type UsersType = {
   login: string;
   password: string;
   role: UsersRoleType;
+  permissions: string;
   address: string | null;
   phone_number: string | null;
 };

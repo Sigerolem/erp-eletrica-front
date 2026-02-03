@@ -5,6 +5,7 @@ import { Input } from "@elements/Input";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
 import { DataForm } from "@elements/DataForm";
 import { RoleSelector } from "src/elements/RoleSelector";
+import { PermissionSelector } from "src/elements/PermissionSelector";
 
 export function UserDataForm({
   userData,
@@ -26,13 +27,15 @@ export function UserDataForm({
   const [role, setRole] = useState<UsersRoleType>("admin");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-
+  const [permissions, setPermissions] = useState<string>("-----------------");
+  console.log(permissions)
   useEffect(() => {
     if (userData) {
       setName(userData.name);
       setCpf(userData.cpf);
       setLogin(userData.login);
       setRole(userData.role);
+      setPermissions(userData.permissions);
       setPhoneNumber(userData.phone_number || "");
       setAddress(userData.address || "");
     }
@@ -76,6 +79,7 @@ export function UserDataForm({
       login,
       password: password as string | undefined,
       role,
+      permissions
     };
 
     if (password == "") {
@@ -172,7 +176,14 @@ export function UserDataForm({
         <RoleSelector
           label="Função"
           value={role}
-          doOnSelect={(v) => setRole(v as UsersRoleType)}
+          doOnSelect={(v) => {
+            if (v === "owner") {
+              setPermissions("M".repeat(15));
+            } else {
+              setPermissions("-".repeat(15))
+            }
+            setRole(v as UsersRoleType)
+          }}
         />
       </div>
       <Input
@@ -189,6 +200,67 @@ export function UserDataForm({
           });
         }}
       />
+      {
+        role !== "owner" && (
+          <div className={"grid grid-cols-4 gap-2 not-sm:grid-cols-2"}>
+            <PermissionSelector
+              label="Usuários"
+              value={permissions}
+              index={0}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Fornecedores"
+              value={permissions}
+              index={1}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Materiais"
+              value={permissions}
+              index={2}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Compras"
+              value={permissions}
+              index={3}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Clientes"
+              value={permissions}
+              index={4}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Orçamentos"
+              value={permissions}
+              index={5}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Ordens"
+              value={permissions}
+              index={6}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Pedidos"
+              value={permissions}
+              index={7}
+              setPermissions={setPermissions}
+            />
+            <PermissionSelector
+              label="Serviços"
+              value={permissions}
+              index={8}
+              setPermissions={setPermissions}
+            />
+          </div>
+        )
+      }
+
       <div className={"flex gap-4 justify-end"}>
         <button
           className={

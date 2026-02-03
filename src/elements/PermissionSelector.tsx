@@ -1,11 +1,15 @@
+import type { Dispatch, StateUpdater } from "preact/hooks";
+
 export function PermissionSelector({
   label,
-  doOnSelect,
+  setPermissions,
+  index,
   value,
 }: {
   label?: string;
+  index: number;
   value: string;
-  doOnSelect: (value: string) => void;
+  setPermissions: Dispatch<StateUpdater<string>>
 }) {
   return (
     <div className={"flex flex-col"}>
@@ -15,9 +19,10 @@ export function PermissionSelector({
       <select
         className={"bg-white border border-slate-300 p-2 rounded-md"}
         onChange={(e) => {
-          doOnSelect(e.currentTarget.value);
+          const newPermission = e.currentTarget.value;
+          setPermissions(prev => prev.split('').map((value, i) => i == index ? newPermission : value).join(''))
         }}
-        value={value}
+        value={value[index]}
       >
         <optgroup label={"Selecione:"}>
           <option value="-">Nenhum</option>
