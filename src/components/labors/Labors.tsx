@@ -2,6 +2,7 @@ import { Button } from "@elements/Button";
 import { useEffect, useState } from "preact/hooks";
 import { fetchWithToken } from "/src/utils/fetchWithToken";
 import { LaborRow } from "./LaborRow";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export type LaborsType = {
   id: string;
@@ -17,8 +18,14 @@ export function Labors() {
   const [labors, setLabors] = useState<LaborsType[]>([]);
   const [serverLabors, setServerLabors] = useState<{ [key: string]: LaborsType }>({});
   const [isFetching, setIsFetching] = useState(true);
+  const [userCanCreateLabor, setUserCanCreateLabor] = useState(false);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (role == "owner" || hasPermission(permission ?? "----------------", "labor", 'W')) {
+      setUserCanCreateLabor(true);
+    }
     fetchWithToken<{ labors: LaborsType[] }>({
       path: "/labors",
     }).then(({ code, data }) => {
@@ -28,6 +35,8 @@ export function Labors() {
         data.labors.forEach((labor) =>
           setServerLabors(prev => ({ ...prev, [labor.id]: labor })),
         );
+      } else if (code == 403) {
+        window.location.href = "/";
       } else {
         window.alert("Erro ao buscar a lista de serviços");
         console.error(data);
@@ -46,25 +55,26 @@ export function Labors() {
       <div className={"pb-20 h-full"}>
         <header className={"flex justify-between items-end mb-2"}>
           <h3 className={"text-lg font-semibold"}>Lista de serviços</h3>
-
-          <Button
-            text="Cadastrar novo"
-            className={"bg-blue-700 text-white text-sm"}
-            onClick={() => {
-              setLabors((prev) => [
-                ...prev,
-                {
-                  name: "Novo serviço",
-                  cost: 0,
-                  profit: 0,
-                  value: 0,
-                  unit: "un",
-                  id: new Date().toISOString(),
-                  created_at: new Date(),
-                },
-              ]);
-            }}
-          />
+          {userCanCreateLabor && (
+            <Button
+              text="Cadastrar novo"
+              className={"bg-blue-700 text-white text-sm"}
+              onClick={() => {
+                setLabors((prev) => [
+                  ...prev,
+                  {
+                    name: "Novo serviço",
+                    cost: 0,
+                    profit: 0,
+                    value: 0,
+                    unit: "un",
+                    id: new Date().toISOString(),
+                    created_at: new Date(),
+                  },
+                ]);
+              }}
+            />
+          )}
         </header>
         {/* <header>
           <div>

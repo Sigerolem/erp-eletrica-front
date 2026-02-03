@@ -6,6 +6,7 @@ import { fetchWithToken } from "src/utils/fetchWithToken";
 import { BrlStringFromCents } from "src/utils/formating";
 import { validateFloatFieldOnBlur, validateStringFieldOnBlur } from "src/utils/inputValidation";
 import type { LaborsType } from "./Labors";
+import { hasPermission } from "src/utils/permissionLogic";
 
 interface Props {
   labor: LaborsType;
@@ -23,11 +24,21 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
   const [cost, setCost] = useState(0);
   const [value, setValue] = useState(0);
   const [profit, setProfit] = useState(0);
-  const [bgColor, setBgColor] = useState("bg-blue-100")
+  const [bgColor, setBgColor] = useState("bg-blue-100");
+  const [userCanEditLabor, setUserCanEditLabor] = useState(false);
+  const [userCanDeleteLabor, setUserCanDeleteLabor] = useState(false);
 
   useEffect(() => {
     if (!labor) {
       return;
+    }
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (role == "owner" || hasPermission(permission ?? "----------------", "labor", 'W')) {
+      setUserCanEditLabor(true);
+    }
+    if (role == "owner" || hasPermission(permission ?? "----------------", "labor", 'D')) {
+      setUserCanDeleteLabor(true);
     }
     setName(labor.name);
     setUnit(labor.unit);
@@ -122,17 +133,25 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
   return (
     <article key={labor.id} className={`${bgColor} flex flex-col gap-2 p-4 not-first:border-t not-first:border-slate-600`}>
       <div className={"flex gap-2"}>
-        <Input label={"Nome"} name={`${labor.id}-name`} value={name} onBlur={(e) => {
-          validateStringFieldOnBlur(e, setName, setValidationErrors, {
-            min: 2,
-            required: true
-          })
-        }} />
+        <Input
+          label={"Nome"}
+          name={`${labor.id}-name`}
+          value={name} onBlur={(e) => {
+            validateStringFieldOnBlur(e, setName, setValidationErrors, {
+              min: 2,
+              required: true
+            })
+          }}
+          disabled={!userCanEditLabor}
+          className={!userCanEditLabor ? "bg-blue-50!" : ""}
+        />
         <UnitSelector
           label={"Unidade"}
           value={unit}
           type={"service"}
           doOnSelect={(value) => { setUnit(value); }}
+          disabled={!userCanEditLabor}
+
         />
       </div>
       <div className={"flex gap-2"}>
@@ -151,7 +170,8 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
           onBlur={(e) => {
             validateFloatFieldOnBlur(e, setCost, setValidationErrors, { min: 0, removeFromString: 'R$' })
           }}
-          className={"min-w-24"}
+          className={!userCanEditLabor ? "bg-blue-50!" : ""}
+          disabled={!userCanEditLabor}
         />
         <Input
           label={"Valor"}
@@ -160,7 +180,8 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
           onBlur={(e) => {
             validateFloatFieldOnBlur(e, setValue, setValidationErrors, { min: 0, removeFromString: 'R$' })
           }}
-          className={"min-w-24"}
+          className={!userCanEditLabor ? "bg-blue-50!" : ""}
+          disabled={!userCanEditLabor}
         />
       </div>
       <div className={"w-full flex justify-end gap-2"}>
@@ -171,12 +192,13 @@ export function LaborRow({ labor, serverLabors, setServerLabors, setLabors }: Pr
               className={"bg-red-700 text-white text-sm mt-4"}
               onClick={() => { setLabors(prev => prev.filter(lab => lab.id != labor.id)) }}
             />
-            :
-            <Button
-              text="Excluir"
-              className={"bg-red-700 text-white text-sm mt-4"}
-              onClick={handleDelete}
-            />
+            : userCanDeleteLabor && (
+              <Button
+                text="Excluir"
+                className={"bg-red-700 text-white text-sm mt-4"}
+                onClick={handleDelete}
+              />
+            )
         }
         {!originalLabor && (
           <Button
