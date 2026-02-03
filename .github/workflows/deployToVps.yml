@@ -27,6 +27,7 @@ jobs:
 
             # Puxa a última versão do código
             #GIT_SSH_COMMAND="ssh -i ~/.ssh/vpsToGithub" git pull origin main
+            git restore .
             git pull origin main
 
             # Instala dependências e faz o build
