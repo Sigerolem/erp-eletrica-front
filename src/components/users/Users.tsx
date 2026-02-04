@@ -4,6 +4,7 @@ import { useEffect, useState } from "preact/hooks";
 import { CreateUserModal } from "./CreateUserModal";
 import { Button } from "src/elements/Button";
 import { formatUserRoleEnum } from "src/utils/formating";
+import { hasPermission } from "@utils/permissionLogic";
 
 export type UsersRoleType = "admin" | "owner" | "employee" | "guest";
 
@@ -23,6 +24,7 @@ export function Users() {
   const [users, setUsers] = useState<UsersType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [userCanCreateUser, setUserCanCreateUser] = useState(false);
 
   const USER_URL =
     window.location.hostname == "localhost"
@@ -34,6 +36,23 @@ export function Users() {
   }
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "user", "R")
+    ) {
+      window.location.href = "/";
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "user", "W")
+    ) {
+      setUserCanCreateUser(true);
+    }
+
     fetchWithToken<{ users: UsersType[] }>({ path: "/users" }).then(
       (result) => {
         setIsFetching(false);
@@ -43,7 +62,7 @@ export function Users() {
           window.alert("Erro ao buscar usuários.");
           console.error(result.data, result.code);
         }
-      }
+      },
     );
   }, []);
 
@@ -60,11 +79,13 @@ export function Users() {
       <div>
         <header className={"flex justify-between items-end mb-2"}>
           <h3 className={"text-lg font-semibold"}>Lista de usuários</h3>
-          <Button
-            text="Novo usuário"
-            className={"bg-blue-700 text-white text-sm"}
-            onClick={handleNewUser}
-          />
+          {userCanCreateUser && (
+            <Button
+              text="Novo usuário"
+              className={"bg-blue-700 text-white text-sm"}
+              onClick={handleNewUser}
+            />
+          )}
         </header>
         <Table>
           <THead collumns={[["Nome", "CPF"], ["Login", "Celular"], ["Tipo"]]} />

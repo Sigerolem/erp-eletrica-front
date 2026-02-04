@@ -6,13 +6,15 @@ import { validateStringFieldOnBlur } from "@utils/inputValidation";
 import { DataForm } from "@elements/DataForm";
 import { RoleSelector } from "src/elements/RoleSelector";
 import { PermissionSelector } from "src/elements/PermissionSelector";
+import { hasPermission } from "src/utils/permissionLogic";
+import { fetchWithToken } from "src/utils/fetchWithToken";
 
 export function UserDataForm({
   userData,
   doOnSubmit,
 }: {
   doOnSubmit: (
-    userData: Partial<UsersType>
+    userData: Partial<UsersType>,
   ) => Promise<{ [key: string]: string } | null>;
   userData?: UsersType;
 }) {
@@ -20,6 +22,7 @@ export function UserDataForm({
     [key: string]: string;
   }>({});
 
+  const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
   const [login, setLogin] = useState("");
@@ -28,9 +31,36 @@ export function UserDataForm({
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [permissions, setPermissions] = useState<string>("-----------------");
-  console.log(permissions)
+  const [userCanEditUser, setUserCanEditUser] = useState(false);
+  const [userCanDeleteUser, setUserCanDeleteUser] = useState(false);
+
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "user", "R")
+    ) {
+      window.location.href = "/";
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "user", "W")
+    ) {
+      setUserCanEditUser(true);
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "user", "D")
+    ) {
+      setUserCanDeleteUser(true);
+    }
+
     if (userData) {
+      setId(userData.id);
       setName(userData.name);
       setCpf(userData.cpf);
       setLogin(userData.login);
@@ -79,7 +109,7 @@ export function UserDataForm({
       login,
       password: password as string | undefined,
       role,
-      permissions
+      permissions,
     };
 
     if (password == "") {
@@ -101,6 +131,20 @@ export function UserDataForm({
     }
   }
 
+  async function handleDeleteUser() {
+    if (window.confirm("Tem certeza que deseja deletar esse usuário?")) {
+      fetchWithToken({
+        path: `/users/${id}`,
+        method: "DELETE",
+      }).then((result) => {
+        if (result.code == 200) {
+          window.alert("Usuário deletado com sucesso");
+          window.location.href = "/usuarios";
+        }
+      });
+    }
+  }
+
   return (
     <DataForm onSubmit={onFormSubmit}>
       <div className={"flex gap-4"}>
@@ -116,6 +160,8 @@ export function UserDataForm({
               required: true,
             });
           }}
+          disabled={!userCanEditUser}
+          className={!userCanEditUser ? "bg-blue-50!" : ""}
         />
         <Input
           label="CPF"
@@ -129,6 +175,8 @@ export function UserDataForm({
               required: true,
             });
           }}
+          disabled={!userCanEditUser}
+          className={!userCanEditUser ? "bg-blue-50!" : ""}
         />
       </div>
       <div className={"flex gap-4"}>
@@ -144,6 +192,8 @@ export function UserDataForm({
               required: true,
             });
           }}
+          disabled={!userCanEditUser}
+          className={!userCanEditUser ? "bg-blue-50!" : ""}
         />
         <Input
           label="Senha"
@@ -157,6 +207,8 @@ export function UserDataForm({
               required: true,
             });
           }}
+          disabled={!userCanEditUser}
+          className={!userCanEditUser ? "bg-blue-50!" : ""}
         />
       </div>
       <div className={"flex gap-4"}>
@@ -172,6 +224,8 @@ export function UserDataForm({
               required: false,
             });
           }}
+          disabled={!userCanEditUser}
+          className={!userCanEditUser ? "bg-blue-50!" : ""}
         />
         <RoleSelector
           label="Função"
@@ -179,11 +233,14 @@ export function UserDataForm({
           doOnSelect={(v) => {
             if (v === "owner") {
               setPermissions("M".repeat(15));
+            } else if (v === "admin") {
+              setPermissions("W".repeat(15));
             } else {
-              setPermissions("-".repeat(15))
+              setPermissions("-".repeat(15));
             }
-            setRole(v as UsersRoleType)
+            setRole(v as UsersRoleType);
           }}
+          disabled={!userCanEditUser}
         />
       </div>
       <Input
@@ -199,77 +256,90 @@ export function UserDataForm({
             required: false,
           });
         }}
+        disabled={!userCanEditUser}
+        className={!userCanEditUser ? "bg-blue-50!" : ""}
       />
-      {
-        role !== "owner" && (
-          <div className={"grid grid-cols-4 gap-2 not-sm:grid-cols-2"}>
-            <PermissionSelector
-              label="Usuários"
-              value={permissions}
-              index={0}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Fornecedores"
-              value={permissions}
-              index={1}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Materiais"
-              value={permissions}
-              index={2}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Compras"
-              value={permissions}
-              index={3}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Clientes"
-              value={permissions}
-              index={4}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Orçamentos"
-              value={permissions}
-              index={5}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Ordens"
-              value={permissions}
-              index={6}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Pedidos"
-              value={permissions}
-              index={7}
-              setPermissions={setPermissions}
-            />
-            <PermissionSelector
-              label="Serviços"
-              value={permissions}
-              index={8}
-              setPermissions={setPermissions}
-            />
-          </div>
-        )
-      }
+      {role !== "owner" && userCanEditUser && (
+        <div className={"grid grid-cols-4 gap-2 not-sm:grid-cols-2"}>
+          <PermissionSelector
+            label="Usuários"
+            value={permissions}
+            index={0}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Fornecedores"
+            value={permissions}
+            index={1}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Materiais"
+            value={permissions}
+            index={2}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Compras"
+            value={permissions}
+            index={3}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Clientes"
+            value={permissions}
+            index={4}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Orçamentos"
+            value={permissions}
+            index={5}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Ordens"
+            value={permissions}
+            index={6}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Pedidos"
+            value={permissions}
+            index={7}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Serviços"
+            value={permissions}
+            index={8}
+            setPermissions={setPermissions}
+          />
+        </div>
+      )}
 
       <div className={"flex gap-4 justify-end"}>
-        <button
-          className={
-            "bg-blue-800 p-2 max-w-2xl rounded-md font-semibold text-white"
-          }
-          type={"submit"}
-        >
-          Salvar
-        </button>
+        {userCanEditUser && (
+          <button
+            className={
+              "bg-blue-700 p-2 max-w-2xl rounded-md font-semibold text-white"
+            }
+            type={"submit"}
+          >
+            Salvar
+          </button>
+        )}
+        {userCanDeleteUser && (
+          <button
+            className={
+              "bg-red-700 p-2 max-w-2xl rounded-md font-semibold text-white"
+            }
+            type={"button"}
+            onClick={handleDeleteUser}
+          >
+            Deletar
+          </button>
+        )}
       </div>
     </DataForm>
   );

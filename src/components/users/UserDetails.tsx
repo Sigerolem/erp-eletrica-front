@@ -2,11 +2,22 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import type { UsersType } from "./Users";
 import { UserDataForm } from "./UserDataForm";
+import { hasPermission } from "@utils/permissionLogic";
 
 export function UserDetails() {
   const [user, setUser] = useState<UsersType | null>(null);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "user", "R")
+    ) {
+      window.location.href = "/";
+    }
+
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
     fetchWithToken<{ user: UsersType }>({
