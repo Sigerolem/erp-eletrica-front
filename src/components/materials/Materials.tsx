@@ -7,6 +7,7 @@ import { BrlStringFromCents } from "@utils/formating";
 import { Button } from "@elements/Button";
 import { Input } from "src/elements/Input";
 import { hasPermission } from "src/utils/permissionLogic";
+import { SelectSupplierModal } from "../suppliers/SelectSupplierModal";
 
 export type MaterialsType = {
   id: string;
@@ -38,10 +39,22 @@ const MATERIAL_URL =
 
 export function Materials() {
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
+  const [suppliers, setSuppliers] = useState<SuppliersType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [search, setSearch] = useState("");
   const [userCanEditMaterial, setUserCanEditMaterial] =
     useState<boolean>(false);
+  const [isSupplierModalOpen, setIsSupplierModalOpen] =
+    useState<boolean>(false);
+  const [selectedSupplier, setSelectedSupplier] = useState({
+    name: "",
+    id: "",
+  });
+  const [searchInfo, setSearchInfo] = useState({
+    amountFound: 0,
+    amountShowing: 0,
+    limit: 0,
+  });
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -53,13 +66,30 @@ export function Materials() {
     ) {
       setUserCanEditMaterial(true);
     }
-
-    fetchWithToken<{ materials: MaterialsType[] }>({
-      path: search == "" ? "/materials" : `/materials?search=${search}`,
+    let path = "/materials";
+    if (selectedSupplier.id != "") {
+      path += `?supplier_id=${selectedSupplier.id}`;
+      if (search != "") {
+        path += `&search=${search}`;
+      }
+    } else if (search != "") {
+      path += `?search=${search}`;
+    }
+    fetchWithToken<{
+      materials: MaterialsType[];
+      limit: number;
+      total: number;
+    }>({
+      path,
     }).then(({ code, data }) => {
       setIsFetching(false);
       if (code == 200) {
         setMaterials(data.materials);
+        setSearchInfo({
+          amountFound: data.total,
+          amountShowing: data.materials.length,
+          limit: data.limit,
+        });
       } else if (code == 403) {
         window.location.href = "/";
       } else {
@@ -68,6 +98,59 @@ export function Materials() {
       }
     });
   }, [search]);
+
+  useEffect(() => {
+    fetchWithToken<{ suppliers: SuppliersType[] }>({
+      path: "/suppliers",
+    }).then(({ code, data }) => {
+      if (code == 200) {
+        setSuppliers(data.suppliers);
+      } else if (code == 403) {
+        window.alert(
+          "Não foi permitido acesso à lista de fornecedores para filtro.",
+        );
+      } else {
+        window.alert("Erro ao buscar a lista de fornecedores");
+        console.error(data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    let path = "/materials";
+    if (selectedSupplier.id != "") {
+      path += `?supplier_id=${selectedSupplier.id}`;
+      if (search != "") {
+        path += `&search=${search}`;
+      }
+    } else if (search != "") {
+      path += `?search=${search}`;
+    } else {
+      path += "";
+    }
+    fetchWithToken<{
+      materials: MaterialsType[];
+      limit: number;
+      total: number;
+    }>({
+      path,
+    }).then(({ code, data }) => {
+      setIsFetching(false);
+      if (code == 200) {
+        setMaterials(data.materials);
+        setSearchInfo({
+          amountFound: data.total,
+          amountShowing: data.materials.length,
+          limit: data.limit,
+        });
+      } else if (code == 403) {
+        window.location.href = "/";
+      } else {
+        window.alert("Erro ao buscar a lista de materiais");
+        console.error(data);
+      }
+    });
+  }, [selectedSupplier]);
 
   const xSize = window.innerWidth;
 
@@ -85,21 +168,68 @@ export function Materials() {
             </a>
           )}
         </header>
-        <div className={"mt-4 mb-4 flex items-end gap-2"}>
-          {/* <span
-            className={"bg-slate-600 p-2 rounded-md text-white font-semibold"}
-          >
-            Pesquisa:
-          </span> */}
-          <Input
-            name="search"
-            placeholder={"Pesquise aqui o nome do material"}
-            value={search}
-            onBlur={(e) => {
-              setSearch(e.currentTarget.value);
-            }}
-          />
+        <div className={"mt-4 mb-4 flex gap-2 flex-col justify-stretch"}>
+          <div className="flex gap-2 items-end">
+            <Input
+              name="search"
+              placeholder={"Pesquise aqui o nome do material"}
+              value={search}
+              onBlur={(e) => {
+                setSearch(e.currentTarget.value);
+              }}
+            />
+            {search != "" && (
+              <Button
+                text="Limpar"
+                className={"bg-slate-600 text-white text-sm"}
+                onClick={() => {
+                  setSearch("");
+                }}
+              />
+            )}
+          </div>
+          <div className="flex gap-2 items-end">
+            <Input
+              name="supplier"
+              placeholder={"Todos fornecedores"}
+              className={"cursor-pointer"}
+              value={selectedSupplier.name}
+              onClick={() => {
+                setIsSupplierModalOpen(true);
+              }}
+            />
+            {selectedSupplier.name != "" && (
+              <Button
+                text="Todos fornecedores"
+                className={"bg-slate-600 text-white text-sm"}
+                onClick={() => {
+                  setSelectedSupplier({ name: "", id: "" });
+                }}
+              />
+            )}
+          </div>
+          {isSupplierModalOpen && (
+            <SelectSupplierModal
+              closeModal={() => {
+                setIsSupplierModalOpen(false);
+              }}
+              selectSupplier={(sup) => {
+                setSelectedSupplier({ name: sup.name, id: sup.id });
+              }}
+              suppliers={suppliers}
+            />
+          )}
         </div>
+        {searchInfo.amountFound > searchInfo.limit ? (
+          <span className={"text-sm -mt-2 block font-semibold"}>
+            Exibindo {searchInfo.amountShowing} de {searchInfo.amountFound}{" "}
+            materiais encontrados
+          </span>
+        ) : (
+          <span className={"text-sm -mt-2 block font-semibold"}>
+            Exibindo os {searchInfo.amountShowing} materiais encontrados
+          </span>
+        )}
         <Table>
           {xSize < 700 ? (
             <THead collumns={[["Nome", "Fornecedor"], ["Estoque"]]} />

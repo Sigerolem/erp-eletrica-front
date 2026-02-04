@@ -14,7 +14,7 @@ export function SelectSupplierModal({
   suppliers: SuppliersType[];
   selectSupplier: (supplier: SuppliersType) => void;
   closeModal: () => void;
-  cleanError: () => void;
+  cleanError?: () => void;
 }) {
   const [search, setSearch] = useState("");
   const [validationErrors, setValidationErrors] = useState<{
@@ -41,12 +41,12 @@ export function SelectSupplierModal({
 
   function handleSupplierSelect(supplier: SuppliersType) {
     selectSupplier(supplier);
-    cleanError();
+    cleanError && cleanError();
     closeModal();
   }
 
-  async function handleSearchSupplier(value?: string) {
-    const searchString = encodeURIComponent(value ? value : search);
+  async function handleSearchSupplier() {
+    const searchString = encodeURIComponent(search);
     const { code, data } = await fetchWithToken<{
       suppliers: SuppliersType[];
     }>({
@@ -65,8 +65,9 @@ export function SelectSupplierModal({
   return (
     <section className={"absolute top-0 left-0 w-full h-full"}>
       <div
-        className={`fixed top-0 left-0 w-full h-full ${xSize < 700 ? "p-8" : "p-32"
-          } bg-[#000000AA] z-20`}
+        className={`fixed top-0 left-0 w-full h-full ${
+          xSize < 700 ? "p-8" : "p-32"
+        } bg-[#000000AA] z-20`}
         onClick={closeModal}
       >
         <div
@@ -95,7 +96,7 @@ export function SelectSupplierModal({
                 if (e.key == "Enter") {
                   e.preventDefault();
                   const button = document.querySelector<HTMLButtonElement>(
-                    "[name='searchButton']"
+                    "[name='searchButton']",
                   );
                   if (button) {
                     e.currentTarget.blur();

@@ -6,6 +6,7 @@ import type {
 import { Button } from "@elements/Button";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
@@ -67,6 +68,16 @@ export function OrderDetails() {
   };
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "order", "R")
+    ) {
+      window.location.href = "/";
+      return;
+    }
+
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
     setId(id);

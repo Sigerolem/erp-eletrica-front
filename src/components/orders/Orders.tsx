@@ -3,6 +3,7 @@ import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function Orders() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
@@ -12,6 +13,16 @@ export function Orders() {
     window.location.hostname == "localhost" ? "/ordens/id#" : "/ordens/id/#";
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "order", "R")
+    ) {
+      window.location.href = "/";
+      return;
+    }
+
     fetchWithToken<{ quotations: QuotationsType[] }>({
       path: "/quotations/orders",
     }).then((result) => {
@@ -70,7 +81,7 @@ export function Orders() {
                     <p>{formatQuotationStatusEnum(quotation.status)}</p>
                   </Td>
                 </Tr>
-              )
+              ),
             )}
           </tbody>
         </Table>
