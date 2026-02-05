@@ -5,14 +5,14 @@ import { calculateProfit } from "./calculator";
 export function handleUpdateListItemValues({
   value,
   propName,
-  id,
+  createdAt,
   itemsList,
   setValidationErrors,
   setItemsList,
 }: {
   value: string;
   propName: "unit_cost" | "unit_value" | "unit_profit";
-  id: string;
+  createdAt: string;
   itemsList: Partial<QuotationItemsType>[];
   setItemsList: Dispatch<StateUpdater<Partial<QuotationItemsType>[]>>;
   setValidationErrors: Dispatch<StateUpdater<{ [key: string]: string }>>;
@@ -23,8 +23,12 @@ export function handleUpdateListItemValues({
     .replaceAll(".", "")
     .replaceAll(",", ".")
     .trim();
-  const oldItem = itemsList.find((item) => item.id == id)!;
+  const oldItem = itemsList.find((item) => item.created_at == createdAt)!;
   if (Math.round(parseFloat(value) * 100) == oldItem[propName]) {
+    setValidationErrors((prev) => {
+      delete prev[`${propName}-${createdAt}`];
+      return { ...prev };
+    });
     return;
   }
   if (
@@ -34,11 +38,11 @@ export function handleUpdateListItemValues({
   ) {
     setValidationErrors((prev) => ({
       ...prev,
-      [`${propName}-${id}`]: "Digite um valor válido",
+      [`${propName}-${createdAt}`]: "Digite um valor válido",
     }));
   } else {
     setValidationErrors((prev) => {
-      delete prev[`${propName}-${id}`];
+      delete prev[`${propName}-${createdAt}`];
       return { ...prev };
     });
     let [newCost, newValue, newProfit] = [0, 0, 0];
@@ -47,7 +51,7 @@ export function handleUpdateListItemValues({
       if (oldItem.type == "expense") {
         setItemsList((prev) =>
           prev.map((item) => {
-            if (item.id == id) {
+            if (item.created_at == createdAt) {
               return {
                 ...item,
                 unit_cost: newCost,
@@ -55,18 +59,22 @@ export function handleUpdateListItemValues({
             } else {
               return item;
             }
-          })
+          }),
         );
         return;
       }
-      newProfit = itemsList.find((item) => item.id == id)!.unit_profit!;
+      newProfit = itemsList.find(
+        (item) => item.created_at == createdAt,
+      )!.unit_profit!;
       newValue = calculateProfit({
         cost: newCost,
         profit: newProfit,
       }).value;
     } else if (propName == "unit_value") {
       newValue = Math.round(parseFloat(value || "0") * 100);
-      newCost = itemsList.find((item) => item.id == id)!.unit_cost!;
+      newCost = itemsList.find(
+        (item) => item.created_at == createdAt,
+      )!.unit_cost!;
       newProfit = calculateProfit({
         cost: newCost,
         value: newValue,
@@ -78,9 +86,13 @@ export function handleUpdateListItemValues({
       }
       if (newProfit > 9900) {
         newCost = 0;
-        newValue = itemsList.find((item) => item.id == id)!.unit_value!;
+        newValue = itemsList.find(
+          (item) => item.created_at == createdAt,
+        )!.unit_value!;
       } else {
-        newCost = itemsList.find((item) => item.id == id)!.unit_cost!;
+        newCost = itemsList.find(
+          (item) => item.created_at == createdAt,
+        )!.unit_cost!;
         newValue = calculateProfit({
           cost: newCost,
           profit: newProfit,
@@ -89,7 +101,7 @@ export function handleUpdateListItemValues({
     }
     setItemsList((prev) =>
       prev.map((item) => {
-        if (item.id == id) {
+        if (item.created_at == createdAt) {
           return {
             ...item,
             unit_cost: newCost,
@@ -99,7 +111,7 @@ export function handleUpdateListItemValues({
         } else {
           return item;
         }
-      })
+      }),
     );
   }
 }

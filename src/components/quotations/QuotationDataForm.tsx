@@ -35,7 +35,7 @@ export function QuotationDataForm({
   customers,
   children,
 }: {
-  doOnSubmit: ({ }: {
+  doOnSubmit: ({}: {
     quotationData: Partial<QuotationsType>;
     itemsToDelete?: string[];
     materialsToDelete?: string[];
@@ -113,14 +113,14 @@ export function QuotationDataForm({
       setQuoteMaterials(quotationData.materials);
       setOccasionalMaterials(
         quotationData.items.filter(
-          (item) => item.type === "occasional_material"
-        )
+          (item) => item.type === "occasional_material",
+        ),
       );
       setServiceItems(
-        quotationData.items.filter((item) => item.type === "service")
+        quotationData.items.filter((item) => item.type === "service"),
       );
       setExpenses(
-        quotationData.items.filter((item) => item.type === "expense")
+        quotationData.items.filter((item) => item.type === "expense"),
       );
     }
     setMaterialsToDelete([]);
@@ -133,7 +133,7 @@ export function QuotationDataForm({
         if (result.code == 200) {
           setMaterials(result.data.materials);
         }
-      }
+      },
     );
   }, []);
 
@@ -143,7 +143,7 @@ export function QuotationDataForm({
         if (result.code == 200) {
           setLabors(result.data.labors);
         }
-      }
+      },
     );
   }, []);
 
@@ -232,6 +232,7 @@ export function QuotationDataForm({
       taken_amount: 0,
       quotation_id: quotationData?.id || undefined,
       is_private: false,
+      created_at: new Date().toISOString(),
     };
     setQuoteMaterials((prev) => [...prev, newInvMaterial]);
   }
@@ -248,7 +249,7 @@ export function QuotationDataForm({
       taken_amount: 0,
       is_private: false,
       quotation_id: quotationData?.id,
-      id: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
     setOccasionalMaterials((prev) => [...prev, newOccMaterial]);
   }
@@ -269,7 +270,7 @@ export function QuotationDataForm({
       taken_amount: 0,
       is_private: false,
       quotation_id: quotationData?.id,
-      id: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
     setServiceItems((prev) => [...prev, newService]);
   }
@@ -286,7 +287,7 @@ export function QuotationDataForm({
       taken_amount: 0,
       is_private: false,
       quotation_id: quotationData?.id,
-      id: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
     setServiceItems((prev) => [...prev, newService]);
   }
@@ -303,7 +304,7 @@ export function QuotationDataForm({
       taken_amount: 0,
       is_private: false,
       quotation_id: quotationData?.id,
-      id: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
     setExpenses((prev) => [...prev, newService]);
   }
@@ -325,8 +326,9 @@ export function QuotationDataForm({
         errors={validationErrors}
       />
       <div
-        className={`grid gap-3 items-end ${xSize < 800 ? "grid-cols-2" : "grid-cols-4"
-          }`}
+        className={`grid gap-3 items-end ${
+          xSize < 800 ? "grid-cols-2" : "grid-cols-4"
+        }`}
       >
         <Input
           label="Tempo esperado"
@@ -341,7 +343,7 @@ export function QuotationDataForm({
               {
                 min: 0,
                 required: true,
-              }
+              },
             );
           }}
         />
@@ -428,7 +430,7 @@ export function QuotationDataForm({
                 setValidationErrors,
                 {
                   max: 20,
-                }
+                },
               );
             }}
           />
@@ -456,8 +458,9 @@ export function QuotationDataForm({
         <></>
       ) : (
         <section
-          className={`border rounded-md p-2 border-gray-400 ${!showValues && "hidden"
-            }`}
+          className={`border rounded-md p-2 border-gray-400 ${
+            !showValues && "hidden"
+          }`}
         >
           <div className={`flex gap-4 items-end ${!showValues && "hidden"}`}>
             <Input
@@ -526,8 +529,9 @@ export function QuotationDataForm({
         </button>
       </div>
       <section
-        className={`flex flex-col gap-2 p-1 border rounded-md border-gray-400 ${!showDetails && "hidden"
-          }`}
+        className={`flex flex-col gap-2 p-1 border rounded-md border-gray-400 ${
+          !showDetails && "hidden"
+        }`}
       >
         <div className={"flex gap-4 items-end"}>
           <Textarea
@@ -543,7 +547,7 @@ export function QuotationDataForm({
                 {
                   min: 5,
                   max: 100,
-                }
+                },
               );
             }}
           />
@@ -576,7 +580,7 @@ export function QuotationDataForm({
                   min: 0,
                   max: 300,
                   required: false,
-                }
+                },
               );
             }}
           />
@@ -594,7 +598,7 @@ export function QuotationDataForm({
                   min: 0,
                   max: 300,
                   required: false,
-                }
+                },
               );
             }}
           />
@@ -605,7 +609,7 @@ export function QuotationDataForm({
         {isMaterialModalOpen && (
           <SelectMaterialModal
             materials={materials}
-            cleanError={() => { }}
+            cleanError={() => {}}
             closeModal={() => {
               setIsMaterialModalOpen(false);
             }}
@@ -615,7 +619,7 @@ export function QuotationDataForm({
         {isLaborModalOpen && (
           <SelectLaborModal
             labors={labors}
-            cleanError={() => { }}
+            cleanError={() => {}}
             closeModal={() => {
               setIsLaborModalOpen(false);
             }}

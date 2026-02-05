@@ -49,48 +49,49 @@ export function ExceptionalItemsList({
     setItems(itemsList);
   }, [itemsList]);
 
-  function handleDeleteItem({ id }: { id: string }) {
+  function handleDeleteItem({ createdAt }: { createdAt: string }) {
     const errors = Object.keys(validationErrors);
     errors.forEach((error) => {
-      if (error.includes(`-${id}`)) {
+      if (error.includes(`-${createdAt}`)) {
         setValidationErrors((prev) => {
           delete prev[error];
           return prev;
         });
       }
     });
-    setItemsList((prev) => [...prev.filter((item) => id !== item.id)]);
+    setItemsList((prev) => [
+      ...prev.filter((item) => createdAt !== item.created_at),
+    ]);
   }
 
   function handleUpdateItemInt({
-    id,
+    createdAt,
     value,
     propName,
   }: {
-    id: string;
+    createdAt: string;
     value: string;
     propName: string;
   }) {
-    console.log(id);
     if (isNaN(parseInt(value || "0"))) {
       setValidationErrors((prev) => ({
         ...prev,
-        [`${propName}-${id}`]: "Digite um valor válido",
+        [`${propName}-${createdAt}`]: "Digite um valor válido",
       }));
     } else {
       setValidationErrors((prev) => {
-        delete prev[`${propName}-${id}`];
+        delete prev[`${propName}-${createdAt}`];
         return { ...prev };
       });
     }
     setItemsList((prev) =>
       prev.map((item) => {
-        if (item.id == id) {
+        if (item.created_at == createdAt) {
           return { ...item, [propName]: parseInt(value || "0") };
         } else {
           return item;
         }
-      })
+      }),
     );
   }
   const xSize = window.innerWidth;
@@ -98,16 +99,16 @@ export function ExceptionalItemsList({
   function handleUpdateItemCurrency({
     value,
     propName,
-    id,
+    createdAt,
   }: {
     value: string;
     propName: "unit_cost" | "unit_value" | "unit_profit";
-    id: string;
+    createdAt: string;
   }) {
     handleUpdateListItemValues({
       value,
       propName,
-      id,
+      createdAt,
       itemsList,
       setItemsList,
       setValidationErrors,
@@ -133,7 +134,7 @@ export function ExceptionalItemsList({
         }
         return (
           <div
-            key={item.id}
+            key={item.id ?? item.created_at ?? ""}
             className={`grid gap-x-4 items-end ${
               xSize < 1000 ? "grid-cols-4" : "grid-cols-8"
             } ${index > 0 && "border-t border-gray-400"}`}
@@ -146,7 +147,7 @@ export function ExceptionalItemsList({
                 onBlur={(e) => {
                   setItemsList((prev) => [
                     ...prev.map((mapItem) => {
-                      if (item.id == mapItem.id) {
+                      if (item.created_at == mapItem.created_at) {
                         return { ...mapItem, name: e.currentTarget.value };
                       } else {
                         return { ...mapItem };
@@ -162,7 +163,7 @@ export function ExceptionalItemsList({
               doOnSelect={(value) => {
                 setItemsList((prev) => [
                   ...prev.map((mapItem) => {
-                    if (item.id == mapItem.id) {
+                    if (item.created_at == mapItem.created_at) {
                       return { ...mapItem, unit: value };
                     } else {
                       return { ...mapItem };
@@ -179,7 +180,7 @@ export function ExceptionalItemsList({
               }
             >
               <Input
-                name={`unit_cost-${item.id}`}
+                name={`unit_cost-${item.created_at}`}
                 label={xSize < 1000 ? "Custo Unit." : ""}
                 value={BrlStringFromCents(item.unit_cost)}
                 onBlur={(e) => {
@@ -187,7 +188,7 @@ export function ExceptionalItemsList({
                   handleUpdateItemCurrency({
                     value,
                     propName: "unit_cost",
-                    id: item.id!,
+                    createdAt: item.created_at!,
                   });
                 }}
                 errors={validationErrors}
@@ -195,7 +196,7 @@ export function ExceptionalItemsList({
               />
               <Input
                 label={xSize < 1000 ? "Lucro" : ""}
-                name={`unit_profit-${item.id}`}
+                name={`unit_profit-${item.created_at}`}
                 value={`${(item.unit_profit! / 100)
                   .toFixed(2)
                   .replaceAll(",", "")
@@ -205,7 +206,7 @@ export function ExceptionalItemsList({
                   handleUpdateItemCurrency({
                     value,
                     propName: "unit_profit",
-                    id: item.id!,
+                    createdAt: item.created_at!,
                   });
                 }}
                 errors={validationErrors}
@@ -220,7 +221,7 @@ export function ExceptionalItemsList({
               }
             >
               <Input
-                name={`unit_value-${item.id}`}
+                name={`unit_value-${item.created_at}`}
                 label={xSize < 1000 ? "Valor Unit." : ""}
                 value={BrlStringFromCents(item.unit_value)}
                 onBlur={(e) => {
@@ -228,7 +229,7 @@ export function ExceptionalItemsList({
                   handleUpdateItemCurrency({
                     value,
                     propName: "unit_value",
-                    id: item.id!,
+                    createdAt: item.created_at!,
                   });
                 }}
                 errors={validationErrors}
@@ -238,14 +239,14 @@ export function ExceptionalItemsList({
               <div className={"flex gap-2 items-end justify-stretch"}>
                 <Input
                   label={xSize < 1000 ? "Qtd. Eesperada" : ""}
-                  name={`expected_amount-${item.id}`}
+                  name={`expected_amount-${item.created_at}`}
                   value={item.expected_amount}
                   onBlur={(e) => {
                     const value = e.currentTarget.value;
                     handleUpdateItemInt({
                       value,
                       propName: "expected_amount",
-                      id: item.id!,
+                      createdAt: item.created_at!,
                     });
                   }}
                   errors={validationErrors}
@@ -255,10 +256,10 @@ export function ExceptionalItemsList({
                   text="X"
                   className={"bg-red-600 py-1 text-white"}
                   onClick={() => {
-                    if (item.id) {
-                      deleteItem((prev) => [...prev, item.id!]);
+                    if (item.created_at) {
+                      deleteItem((prev) => [...prev, item.created_at!]);
                     }
-                    handleDeleteItem({ id: item.id! });
+                    handleDeleteItem({ createdAt: item.created_at! });
                   }}
                 />
               </div>
