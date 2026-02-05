@@ -11,6 +11,7 @@ import { hasPermission } from "src/utils/permissionLogic";
 export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
   const [id, setId] = useState("");
+  const [userCanEditOrders, setUserCanEditOrders] = useState(false);
 
   const quotationStatusButtonMap = {
     draft: [{ text: "Concluir rascunho", class: "", status: "q_awaiting" }],
@@ -76,6 +77,12 @@ export function OrderDetails() {
     ) {
       window.location.href = "/";
       return;
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "order", "W")
+    ) {
+      setUserCanEditOrders(true);
     }
 
     const path = new URL(window.location.href);
@@ -144,7 +151,8 @@ export function OrderDetails() {
           quotationData={quotation}
         >
           <div className={"flex justify-evenly"}>
-            {quotationStatusButtonMap[quotation.status].length > 0 ? (
+            {quotationStatusButtonMap[quotation.status].length > 0 &&
+            userCanEditOrders ? (
               quotationStatusButtonMap[quotation.status].map((btn) => (
                 <Button
                   text={btn.text}
