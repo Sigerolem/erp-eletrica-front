@@ -165,7 +165,7 @@ export function OrderDetails() {
             ) : (
               <></>
             )}
-            <Button type={"submit"} text="Salvar" />
+            {userCanEditOrders && <Button type={"submit"} text="Salvar" />}
           </div>
         </QuotationDataForm>
       ) : (
