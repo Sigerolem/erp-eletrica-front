@@ -13,8 +13,8 @@ export function CreatePurchase() {
     const role = localStorage.getItem("apiRole");
     const permission = localStorage.getItem("apiPermissions");
     if (
-      role == "owner" ||
-      hasPermission(permission ?? "----------------", "purchase", "W")
+      role !== "owner" &&
+      !hasPermission(permission ?? "----------------", "purchase", "W")
     ) {
       window.location.href = "/compras";
     }
