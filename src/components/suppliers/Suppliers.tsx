@@ -3,6 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Table, Td, THead, Tr } from "/src/elements/Table";
 import { CreateSupplierModal } from "./CreateSupplierModal";
 import { Button } from "@elements/Button";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export type SuppliersType = {
   id: string;
@@ -20,6 +21,7 @@ export function Suppliers() {
   const [suppliers, setSuppliers] = useState<SuppliersType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [userCanEditSupplier, setUserCanEditSupplier] = useState(false);
 
   function handleNewSupplier() {
     setIsModalOpen(true);
@@ -31,6 +33,23 @@ export function Suppliers() {
       : "/fornecedores/id/#";
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "supplier", "R")
+    ) {
+      window.location.href = "/";
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "supplier", "W")
+    ) {
+      setUserCanEditSupplier(true);
+    }
+
     fetchWithToken<{ suppliers: SuppliersType[] }>({ path: "/suppliers" }).then(
       (result) => {
         setIsFetching(false);
@@ -40,7 +59,7 @@ export function Suppliers() {
           window.alert("Erro ao buscar fornecedores.");
           console.error(result.data);
         }
-      }
+      },
     );
   }, []);
 
@@ -59,11 +78,13 @@ export function Suppliers() {
       <div>
         <header className={"flex justify-between items-end mb-2"}>
           <h3 className={"text-lg font-semibold"}>Lista de fornecedores</h3>
-          <Button
-            text="Novo fornecedor"
-            className={"bg-blue-700 text-white text-sm"}
-            onClick={handleNewSupplier}
-          />
+          {userCanEditSupplier && (
+            <Button
+              text="Novo fornecedor"
+              className={"bg-blue-700 text-white text-sm"}
+              onClick={handleNewSupplier}
+            />
+          )}
         </header>
         <Table>
           {xSize < 720 ? (
@@ -122,7 +143,7 @@ export function Suppliers() {
                     <p>{supplier.material_count || 0}</p>
                   </Td>
                 </Tr>
-              )
+              ),
             )}
           </tbody>
         </Table>

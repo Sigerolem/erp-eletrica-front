@@ -3,11 +3,30 @@ import { useEffect, useState } from "preact/hooks";
 import type { SuppliersType } from "./Suppliers";
 import { SupplierDataForm } from "./SupplierDataForm";
 import { Button } from "@elements/Button";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function SupplierDetails() {
   const [supplier, setSupplier] = useState<SuppliersType | null>(null);
+  const [userCanEditSupplier, setUserCanEditSupplier] = useState(false);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "supplier", "R")
+    ) {
+      window.location.href = "/";
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "supplier", "W")
+    ) {
+      setUserCanEditSupplier(true);
+    }
+
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
     fetchWithToken<{ supplier: SuppliersType }>({
@@ -49,7 +68,11 @@ export function SupplierDetails() {
           doOnSubmit={handleDataSubmition}
           supplierData={supplier ?? undefined}
         >
-          <Button text="Salvar" type={"submit"} />
+          {userCanEditSupplier ? (
+            <Button text="Salvar" type={"submit"} />
+          ) : (
+            <></>
+          )}
         </SupplierDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>

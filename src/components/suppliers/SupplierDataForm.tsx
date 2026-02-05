@@ -1,18 +1,14 @@
 import { Input } from "@elements/Input";
-import type { JSX, TargetedFocusEvent, TargetedSubmitEvent } from "preact";
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type StateUpdater,
-} from "preact/hooks";
-import type { SuppliersType } from "./Suppliers";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
+import type { JSX, TargetedSubmitEvent } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import type { SuppliersType } from "./Suppliers";
+import { hasPermission } from "src/utils/permissionLogic";
 
 interface SupplierDataFormProps {
   supplierData?: SuppliersType;
   doOnSubmit: (
-    supplierData: Omit<SuppliersType, "id">
+    supplierData: Omit<SuppliersType, "id">,
   ) => Promise<{ [key: string]: string } | undefined>;
   children: JSX.Element;
 }
@@ -33,8 +29,25 @@ export function SupplierDataForm({
   const [mobileNumber, setMobileNumber] = useState("");
   const [address, setAddress] = useState("");
   const [salesperson, setSalesperson] = useState("");
+  const [userCanEditSupplier, setUserCanEditSupplier] = useState(false);
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "supplier", "R")
+    ) {
+      window.location.href = "/";
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "supplier", "W")
+    ) {
+      setUserCanEditSupplier(true);
+    }
     if (supplierData) {
       setName(supplierData.name);
       setCnpj(supplierData.cnpj);
@@ -98,6 +111,8 @@ export function SupplierDataForm({
             required: true,
           });
         }}
+        disabled={!userCanEditSupplier}
+        className={!userCanEditSupplier ? "bg-blue-50!" : ""}
       />
       <div className={"flex gap-4"}>
         <Input
@@ -111,6 +126,8 @@ export function SupplierDataForm({
               max: 20,
             });
           }}
+          disabled={!userCanEditSupplier}
+          className={!userCanEditSupplier ? "bg-blue-50!" : ""}
         />
         <Input
           label="E-mail"
@@ -124,6 +141,8 @@ export function SupplierDataForm({
               required: false,
             });
           }}
+          disabled={!userCanEditSupplier}
+          className={!userCanEditSupplier ? "bg-blue-50!" : ""}
         />
       </div>
       <div className={"flex gap-4"}>
@@ -139,6 +158,8 @@ export function SupplierDataForm({
               required: false,
             });
           }}
+          disabled={!userCanEditSupplier}
+          className={!userCanEditSupplier ? "bg-blue-50!" : ""}
         />
         <Input
           label="Celular"
@@ -152,6 +173,8 @@ export function SupplierDataForm({
               required: false,
             });
           }}
+          disabled={!userCanEditSupplier}
+          className={!userCanEditSupplier ? "bg-blue-50!" : ""}
         />
       </div>
       <Input
@@ -167,6 +190,8 @@ export function SupplierDataForm({
             required: false,
           });
         }}
+        disabled={!userCanEditSupplier}
+        className={!userCanEditSupplier ? "bg-blue-50!" : ""}
       />
       <Input
         label="Vendedor / Representante"
@@ -181,6 +206,8 @@ export function SupplierDataForm({
             required: false,
           });
         }}
+        disabled={!userCanEditSupplier}
+        className={!userCanEditSupplier ? "bg-blue-50!" : ""}
       />
       {children}
     </form>
