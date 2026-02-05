@@ -61,6 +61,12 @@ export function Materials() {
     const permission = localStorage.getItem("apiPermissions");
 
     if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "material", "R")
+    ) {
+      window.location.href = "/";
+    }
+    if (
       role == "owner" ||
       hasPermission(permission ?? "----------------", "material", "W")
     ) {
