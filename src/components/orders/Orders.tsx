@@ -29,6 +29,9 @@ export function Orders() {
       setIsFetching(false);
       if (result.code == 200 || result.code == 201) {
         setQuotations(result.data.quotations);
+      } else if (result.code == 403) {
+        window.location.href = "/";
+        return;
       } else {
         window.alert("Erro ao buscar ordens de serviço.");
         console.error(result.data, result.code);

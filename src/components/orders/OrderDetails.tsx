@@ -86,6 +86,9 @@ export function OrderDetails() {
     }).then((result) => {
       if (result.code == 200) {
         setQuotation(result.data.quotation);
+      } else if (result.code == 403) {
+        window.location.href = "/";
+        return;
       } else {
         window.alert("Erro ao se comunicar com o servidor.");
       }
