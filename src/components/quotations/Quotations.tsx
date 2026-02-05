@@ -10,6 +10,7 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
 import { fetchPdf } from "src/utils/fetchPdf";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export type QuotationItemTypeType =
   | "occasional_material"
@@ -93,23 +94,43 @@ export type QuotationsType = {
 export function Quotations() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
+  const [userCanCreateQuotations, setUserCanCreateQuotations] = useState(false);
 
   const QUOTATION_URL =
     window.location.hostname == "localhost"
       ? "/orcamentos/id#"
       : "/orcamentos/id/#";
 
-  function handleNewCustomer() {
+  function handleNewQuotation() {
     window.location.href = "/orcamentos/novo";
   }
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "quotation", "R")
+    ) {
+      window.location.href = "/";
+      return;
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "quotation", "W")
+    ) {
+      setUserCanCreateQuotations(true);
+    }
+
     fetchWithToken<{ quotations: QuotationsType[] }>({
       path: "/quotations/quotes",
     }).then((result) => {
       setIsFetching(false);
       if (result.code == 200 || result.code == 201) {
         setQuotations(result.data.quotations);
+      } else if (result.code == 403) {
+        window.location.href = "/";
+        return;
       } else {
         window.alert("Erro ao buscar orçamentos.");
         console.error(result.data, result.code);
@@ -123,11 +144,13 @@ export function Quotations() {
       <div>
         <header className={"flex justify-between items-end mb-2"}>
           <h3 className={"text-lg font-semibold"}>Orçamentos abertos</h3>
-          <Button
-            text="Novo orçamento"
-            className={"bg-blue-700 text-white text-sm"}
-            onClick={handleNewCustomer}
-          />
+          {userCanCreateQuotations && (
+            <Button
+              text="Novo orçamento"
+              className={"bg-blue-700 text-white text-sm"}
+              onClick={handleNewQuotation}
+            />
+          )}
         </header>
         <Table>
           {xSize < 720 ? (
@@ -167,7 +190,7 @@ export function Quotations() {
                         text="PDF"
                         onClick={() =>
                           fetchPdf(
-                            `/quotations/print/${quotation.id}?mode=hidden`
+                            `/quotations/print/${quotation.id}?mode=hidden`,
                           )
                         }
                         className={"bg-blue-700 text-white text-sm p-1!"}
@@ -200,14 +223,14 @@ export function Quotations() {
                       text="PDF s/ valores"
                       onClick={() =>
                         fetchPdf(
-                          `/quotations/print/${quotation.id}?mode=hidden`
+                          `/quotations/print/${quotation.id}?mode=hidden`,
                         )
                       }
                       className={"ml-2 bg-blue-700 text-white"}
                     />
                   </Td>
                 </Tr>
-              )
+              ),
             )}
           </tbody>
         </Table>

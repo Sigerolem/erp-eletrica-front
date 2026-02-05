@@ -3,10 +3,12 @@ import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { QuotationDataForm } from "./QuotationDataForm";
 import type { QuotationsStatusType, QuotationsType } from "./Quotations";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function QuotationDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
   const [id, setId] = useState("");
+  const [userCanEditQuotations, setUserCanEditQuotations] = useState(false);
 
   const quotationStatusButtonMap = {
     draft: [{ text: "Concluir rascunho", class: "", status: "q_awaiting" }],
@@ -64,6 +66,21 @@ export function QuotationDetails() {
   };
 
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "quotation", "R")
+    ) {
+      window.location.href = "/";
+      return;
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "quotation", "W")
+    ) {
+      setUserCanEditQuotations(true);
+    }
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
     setId(id);
@@ -127,7 +144,8 @@ export function QuotationDetails() {
           quotationData={quotation}
         >
           <div className={"flex justify-evenly"}>
-            {quotationStatusButtonMap[quotation.status].length > 0 ? (
+            {quotationStatusButtonMap[quotation.status].length > 0 &&
+            userCanEditQuotations ? (
               quotationStatusButtonMap[quotation.status].map((btn) => (
                 <Button
                   text={btn.text}
@@ -140,7 +158,9 @@ export function QuotationDetails() {
             ) : (
               <></>
             )}
-            <Button type={"submit"} text="Salvar alterações" />
+            {userCanEditQuotations && (
+              <Button type={"submit"} text="Salvar alterações" />
+            )}
           </div>
         </QuotationDataForm>
       ) : (

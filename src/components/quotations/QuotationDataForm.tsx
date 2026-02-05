@@ -28,6 +28,7 @@ import {
   BrlStringFromCents,
   formatQuotationStatusEnum,
 } from "@utils/formating";
+import { hasPermission } from "src/utils/permissionLogic";
 
 export function QuotationDataForm({
   quotationData,
@@ -91,7 +92,40 @@ export function QuotationDataForm({
   >([]);
   const [expenses, setExpenses] = useState<Partial<QuotationItemsType>[]>([]);
 
+  const [userCanEdit, setUserCanEdit] = useState(false);
+
   useEffect(() => {
+    const role = localStorage.getItem("apiRole");
+    const permission = localStorage.getItem("apiPermissions");
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "quotation", "R") &&
+      !hasPermission(permission ?? "----------------", "order", "R")
+    ) {
+      window.location.href = "/";
+      return;
+    }
+
+    if (quotationData) {
+      if (
+        ["q_awaiting", "q_approved", "denied"].includes(quotationData.status)
+      ) {
+        if (
+          role == "owner" ||
+          hasPermission(permission ?? "----------------", "quotation", "W")
+        ) {
+          setUserCanEdit(true);
+        }
+      } else {
+        if (
+          role == "owner" ||
+          hasPermission(permission ?? "----------------", "order", "W")
+        ) {
+          setUserCanEdit(true);
+        }
+      }
+    }
+
     if (quotationData) {
       setStatus(quotationData.status);
       setMaterialCost(quotationData.material_cost);
@@ -324,6 +358,8 @@ export function QuotationDataForm({
           });
         }}
         errors={validationErrors}
+        disabled={!userCanEdit}
+        className={userCanEdit ? "" : "bg-blue-50!"}
       />
       <div
         className={`grid gap-3 items-end ${
@@ -346,6 +382,8 @@ export function QuotationDataForm({
               },
             );
           }}
+          disabled={!userCanEdit}
+          className={userCanEdit ? "" : "bg-blue-50!"}
         />
         {customers && isCustomerModalOpen && (
           <SelectCustomerModal
@@ -369,10 +407,12 @@ export function QuotationDataForm({
             e.currentTarget.blur();
             setIsCustomerModalOpen(true);
           }}
-          className={"cursor-pointer"}
           value={customerSelected === null ? "" : customerSelected.name}
           errors={validationErrors}
-          disabled={customers == undefined}
+          disabled={customers == undefined || !userCanEdit}
+          className={
+            userCanEdit ? "cursor-pointer" : "cursor-not-allowed bg-blue-50!"
+          }
         />
         <Input
           label="Desconto Material"
@@ -389,6 +429,8 @@ export function QuotationDataForm({
               removeFromString: "%",
             });
           }}
+          disabled={!userCanEdit}
+          className={userCanEdit ? "" : "bg-blue-50!"}
         />
         <Input
           label="Desconto Serviço"
@@ -405,6 +447,8 @@ export function QuotationDataForm({
               removeFromString: "%",
             });
           }}
+          disabled={!userCanEdit}
+          className={userCanEdit ? "" : "bg-blue-50!"}
         />
       </div>
 
@@ -433,36 +477,34 @@ export function QuotationDataForm({
                 },
               );
             }}
+            disabled={!userCanEdit}
+            className={userCanEdit ? "" : "bg-blue-50!"}
           />
         </div>
       )}
-      <div className={"flex text-xl font-semibold gap-2 -mb-2"}>
-        Valores
-        <button
-          type={"button"}
-          className={
-            "bg-blue-800 shadow-md text-white rounded-md flex items-center justify-center"
-          }
-          onClick={() => {
-            setShowValues((prev) => !prev);
-          }}
-        >
-          <svg fill="#fff" width="30px" viewBox="-5.5 0 32 32">
-            <title>eye-slash</title>
-            <path d="M20.44 15.48c-0.12-0.16-2.28-2.92-5.48-4.56l0.92-3c0.12-0.44-0.12-0.92-0.56-1.040s-0.92 0.12-1.040 0.56l-0.88 2.8c-0.96-0.32-2-0.56-3.080-0.56-5.6 0-9.92 5.56-10.12 5.8-0.24 0.32-0.24 0.72 0 1.040 0.16 0.24 4.2 5.36 9.48 5.76l-0.56 1.8c-0.12 0.44 0.12 0.92 0.56 1.040 0.080 0.040 0.16 0.040 0.24 0.040 0.36 0 0.68-0.24 0.8-0.6l0.72-2.36c5-0.68 8.8-5.48 9-5.72 0.24-0.28 0.24-0.68 0-1zM1.96 16c1.16-1.32 4.52-4.64 8.36-4.64 0.88 0 1.76 0.2 2.6 0.48l-0.28 0.88c-0.68-0.48-1.48-0.72-2.32-0.72-2.2 0-4 1.8-4 4s1.8 4 4 4c0.040 0 0.040 0 0.080 0l-0.2 0.64c-3.8-0.080-7.080-3.36-8.24-4.64zM10.88 18.24c-0.2 0.040-0.4 0.080-0.6 0.080-1.28 0-2.32-1.040-2.32-2.32s1.040-2.32 2.32-2.32c0.68 0 1.32 0.32 1.76 0.8l-1.16 3.76zM12 20.44l2.4-7.88c1.96 1.080 3.52 2.64 4.24 3.44-0.96 1.12-3.52 3.68-6.64 4.44z"></path>
-          </svg>
-        </button>
-      </div>
+      {userCanEdit && (
+        <div className={"flex text-xl font-semibold gap-2 -mb-2"}>
+          Valores
+          <button
+            type={"button"}
+            className={
+              "bg-blue-800 shadow-md text-white rounded-md flex items-center justify-center"
+            }
+            onClick={() => {
+              setShowValues((prev) => !prev);
+            }}
+          >
+            <svg fill="#fff" width="30px" viewBox="-5.5 0 32 32">
+              <title>eye-slash</title>
+              <path d="M20.44 15.48c-0.12-0.16-2.28-2.92-5.48-4.56l0.92-3c0.12-0.44-0.12-0.92-0.56-1.040s-0.92 0.12-1.040 0.56l-0.88 2.8c-0.96-0.32-2-0.56-3.080-0.56-5.6 0-9.92 5.56-10.12 5.8-0.24 0.32-0.24 0.72 0 1.040 0.16 0.24 4.2 5.36 9.48 5.76l-0.56 1.8c-0.12 0.44 0.12 0.92 0.56 1.040 0.080 0.040 0.16 0.040 0.24 0.040 0.36 0 0.68-0.24 0.8-0.6l0.72-2.36c5-0.68 8.8-5.48 9-5.72 0.24-0.28 0.24-0.68 0-1zM1.96 16c1.16-1.32 4.52-4.64 8.36-4.64 0.88 0 1.76 0.2 2.6 0.48l-0.28 0.88c-0.68-0.48-1.48-0.72-2.32-0.72-2.2 0-4 1.8-4 4s1.8 4 4 4c0.040 0 0.040 0 0.080 0l-0.2 0.64c-3.8-0.080-7.080-3.36-8.24-4.64zM10.88 18.24c-0.2 0.040-0.4 0.080-0.6 0.080-1.28 0-2.32-1.040-2.32-2.32s1.040-2.32 2.32-2.32c0.68 0 1.32 0.32 1.76 0.8l-1.16 3.76zM12 20.44l2.4-7.88c1.96 1.080 3.52 2.64 4.24 3.44-0.96 1.12-3.52 3.68-6.64 4.44z"></path>
+            </svg>
+          </button>
+        </div>
+      )}
 
-      {URL_PATH.includes("novo") ? (
-        <></>
-      ) : (
-        <section
-          className={`border rounded-md p-2 border-gray-400 ${
-            !showValues && "hidden"
-          }`}
-        >
-          <div className={`flex gap-4 items-end ${!showValues && "hidden"}`}>
+      {!URL_PATH.includes("novo") && showValues && userCanEdit && (
+        <section className={`border rounded-md p-2 border-gray-400`}>
+          <div className={`flex gap-4 items-end`}>
             <Input
               label="Custo de materiais"
               name="materialCost"
@@ -485,7 +527,7 @@ export function QuotationDataForm({
               className={"bg-blue-50!"}
             />
           </div>
-          <div className={`flex gap-4 items-end ${!showValues && "hidden"}`}>
+          <div className={`flex gap-4 items-end`}>
             <Input
               label="Valor de materiais"
               name="materialCost"
@@ -550,6 +592,7 @@ export function QuotationDataForm({
                 },
               );
             }}
+            disabled={!userCanEdit}
           />
           <Textarea
             label="Ferramentas ou Equipamentos"
@@ -563,6 +606,7 @@ export function QuotationDataForm({
                 required: false,
               });
             }}
+            disabled={!userCanEdit}
           />
         </div>
         <div className={"flex gap-4 items-end"}>
@@ -583,6 +627,7 @@ export function QuotationDataForm({
                 },
               );
             }}
+            disabled={!userCanEdit}
           />
           <Textarea
             label="Anotações"
@@ -601,6 +646,7 @@ export function QuotationDataForm({
                 },
               );
             }}
+            disabled={!userCanEdit}
           />
         </div>
       </section>
@@ -633,17 +679,20 @@ export function QuotationDataForm({
         doOnClickAdd={() => {
           setIsMaterialModalOpen(true);
         }}
+        hideAddButton={!userCanEdit}
       >
         <InventoryItemsList
           itemsList={quoteMaterials}
           setItemsList={setQuoteMaterials}
           setIsThereError={itemsListErrorChecker}
           deleteItem={setMaterialsToDelete}
+          readOnly={!userCanEdit}
         />
       </ListWrapper>
       <ListWrapper
         label={"Materiais não cadastrados"}
         doOnClickAdd={handleNewExceptionalMaterial}
+        hideAddButton={!userCanEdit}
       >
         <ExceptionalItemsList
           itemsList={occasionalMaterials}
@@ -651,12 +700,14 @@ export function QuotationDataForm({
           deleteItem={setItemsToDelete}
           quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
+          readOnly={!userCanEdit}
         />
       </ListWrapper>
       <ListWrapper
         label={"Serviços"}
         doOnClickAdd={handleNewBlankServiceItem}
         doOnClickSearch={handleOpenLaborModal}
+        hideAddButton={!userCanEdit}
       >
         <ExceptionalItemsList
           itemsList={serviceItems}
@@ -665,9 +716,14 @@ export function QuotationDataForm({
           quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
           type="service"
+          readOnly={!userCanEdit}
         />
       </ListWrapper>
-      <ListWrapper label={"Despesas"} doOnClickAdd={handleNewExpenseItem}>
+      <ListWrapper
+        label={"Despesas"}
+        doOnClickAdd={handleNewExpenseItem}
+        hideAddButton={!userCanEdit}
+      >
         <ExceptionalItemsList
           itemsList={expenses}
           setItemsList={setExpenses}
@@ -675,6 +731,7 @@ export function QuotationDataForm({
           quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
           type="expense"
+          readOnly={!userCanEdit}
         />
       </ListWrapper>
       {children}

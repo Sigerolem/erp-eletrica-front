@@ -22,6 +22,7 @@ interface ComponentProps {
   type?: QuotationItemTypeType;
   deleteItem: Dispatch<StateUpdater<string[]>>;
   quotation?: QuotationsType;
+  readOnly?: boolean;
 }
 
 export function ExceptionalItemsList({
@@ -31,6 +32,7 @@ export function ExceptionalItemsList({
   type = "occasional_material",
   deleteItem,
   quotation,
+  readOnly,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
@@ -124,7 +126,7 @@ export function ExceptionalItemsList({
           <span>Custo unitário</span>
           <span>Margem de lucro</span>
           <span>Valor unitário</span>
-          <span>Quantidade prevista</span>
+          <span>Quantidade</span>
         </header>
       )}
 
@@ -155,6 +157,8 @@ export function ExceptionalItemsList({
                     }),
                   ]);
                 }}
+                disabled={readOnly}
+                className={readOnly ? "bg-blue-50!" : ""}
               />
             </div>
             <UnitSelector
@@ -171,6 +175,7 @@ export function ExceptionalItemsList({
                   }),
                 ]);
               }}
+              disabled={readOnly}
             />
             <div
               className={
@@ -192,7 +197,8 @@ export function ExceptionalItemsList({
                   });
                 }}
                 errors={validationErrors}
-                className={"min-w-5"}
+                className={readOnly ? "min-w-5 bg-blue-50!" : "min-w-5"}
+                disabled={readOnly}
               />
               <Input
                 label={xSize < 1000 ? "Lucro" : ""}
@@ -210,7 +216,8 @@ export function ExceptionalItemsList({
                   });
                 }}
                 errors={validationErrors}
-                className={"min-w-5"}
+                className={readOnly ? "min-w-5 bg-blue-50!" : "min-w-5"}
+                disabled={readOnly}
               />
             </div>
             <div
@@ -233,7 +240,8 @@ export function ExceptionalItemsList({
                   });
                 }}
                 errors={validationErrors}
-                className={"min-w-5"}
+                className={readOnly ? "min-w-5 bg-blue-50!" : "min-w-5"}
+                disabled={readOnly}
               />
 
               <div className={"flex gap-2 items-end justify-stretch"}>
@@ -250,18 +258,21 @@ export function ExceptionalItemsList({
                     });
                   }}
                   errors={validationErrors}
-                  className={"min-w-4"}
+                  className={readOnly ? "min-w-4 bg-blue-50!" : "min-w-4"}
+                  disabled={readOnly}
                 />
-                <Button
-                  text="X"
-                  className={"bg-red-600 py-1 text-white"}
-                  onClick={() => {
-                    if (item.created_at) {
-                      deleteItem((prev) => [...prev, item.created_at!]);
-                    }
-                    handleDeleteItem({ createdAt: item.created_at! });
-                  }}
-                />
+                {!readOnly && (
+                  <Button
+                    text="X"
+                    className={"bg-red-600 py-1 text-white"}
+                    onClick={() => {
+                      if (item.created_at) {
+                        deleteItem((prev) => [...prev, item.created_at!]);
+                      }
+                      handleDeleteItem({ createdAt: item.created_at! });
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>

@@ -5,17 +5,19 @@ export function ListWrapper({
   doOnClickAdd,
   doOnClickSearch,
   children,
+  hideAddButton,
 }: {
   label: string;
   doOnClickAdd?: () => void;
   doOnClickSearch?: () => void;
   children: ReactNode | ReactNode[];
+  hideAddButton?: boolean;
 }) {
   return (
     <div>
       <header className={"flex items-center justify-start gap-2 pb-1"}>
         <span className={"font-semibold text-xl"}>{label}</span>
-        {doOnClickAdd && (
+        {!hideAddButton && doOnClickAdd && (
           <button
             type={"button"}
             className={
@@ -28,7 +30,7 @@ export function ListWrapper({
             +
           </button>
         )}
-        {doOnClickSearch && (
+        {!hideAddButton && doOnClickSearch && (
           <button
             type={"button"}
             className={

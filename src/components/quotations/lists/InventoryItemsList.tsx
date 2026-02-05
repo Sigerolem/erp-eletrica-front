@@ -13,6 +13,7 @@ interface ComponentProps {
   setItemsList: Dispatch<StateUpdater<Partial<QuotationMaterialsType>[]>>;
   setIsThereError: (bool: boolean) => void;
   deleteItem: Dispatch<StateUpdater<string[]>>;
+  readOnly?: boolean;
 }
 
 export function InventoryItemsList({
@@ -20,6 +21,7 @@ export function InventoryItemsList({
   setIsThereError,
   setItemsList,
   deleteItem,
+  readOnly,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationMaterialsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
@@ -80,7 +82,7 @@ export function InventoryItemsList({
         } else {
           return item;
         }
-      })
+      }),
     );
   }
 
@@ -119,7 +121,7 @@ export function InventoryItemsList({
         } else {
           return item;
         }
-      })
+      }),
     );
   }
   const xSize = window.innerWidth;
@@ -173,7 +175,8 @@ export function InventoryItemsList({
                   });
                 }}
                 errors={validationErrors}
-                className={"min-w-5"}
+                className={readOnly ? "min-w-5 bg-blue-50!" : "min-w-5"}
+                disabled={readOnly}
               />
               <div className={"flex gap-2 items-end justify-stretch"}>
                 <Input
@@ -183,18 +186,20 @@ export function InventoryItemsList({
                   className={"min-w-5 bg-blue-50!"}
                 />
                 <div className={"ml-1"}>
-                  <Button
-                    text="X"
-                    className={"bg-red-600 py-1 text-white"}
-                    onClick={() => {
-                      if (item.id) {
-                        deleteItem((prev) => [...prev, item.id!]);
-                      }
-                      handleDeleteItem({
-                        matId: item.material_id!,
-                      });
-                    }}
-                  />
+                  {!readOnly && (
+                    <Button
+                      text="X"
+                      className={"bg-red-600 py-1 text-white"}
+                      onClick={() => {
+                        if (item.id) {
+                          deleteItem((prev) => [...prev, item.id!]);
+                        }
+                        handleDeleteItem({
+                          matId: item.material_id!,
+                        });
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
