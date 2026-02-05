@@ -105,16 +105,22 @@ export function PurchaseDataForm({
         }
       },
     );
-    fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }).then(
-      ({ code, data }) => {
-        if (code == 200) {
-          setMaterials(data.materials);
-        } else {
-          window.alert("Erro ao se comunicar com o servidor.");
-        }
-      },
-    );
   }, []);
+
+  useEffect(() => {
+    if (selectedSupplier == null) {
+      return;
+    }
+    fetchWithToken<{ materials: MaterialsType[] }>({
+      path: `/materials?supplier_id=${selectedSupplier.id}`,
+    }).then(({ code, data }) => {
+      if (code == 200) {
+        setMaterials(data.materials);
+      } else {
+        window.alert("Erro ao se comunicar com o servidor.");
+      }
+    });
+  }, [selectedSupplier]);
 
   useEffect(() => {
     if (purchaseData !== undefined) {
@@ -365,6 +371,10 @@ export function PurchaseDataForm({
             "bg-slate-700 px-2 shadow-md rounded-md text-white text-sm font-semibold"
           }
           onClick={() => {
+            if (selectedSupplier == null) {
+              window.alert("Selecione um fornecedor");
+              return;
+            }
             setIsMatModalOpen(true);
           }}
         >

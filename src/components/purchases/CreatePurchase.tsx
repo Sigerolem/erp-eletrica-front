@@ -1,14 +1,12 @@
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { Button } from "@elements/Button";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { PurchaseDataForm } from "./PurchaseDataForm";
 import type { PurchasesType } from "./Purchases";
 import { hasPermission } from "src/utils/permissionLogic";
 
 export function CreatePurchase() {
-  const [purchases, setPurchases] = useState<Partial<PurchasesType>[]>([]);
-
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
     const permission = localStorage.getItem("apiPermissions");
@@ -30,14 +28,6 @@ export function CreatePurchase() {
     });
 
     if (code == 201) {
-      const purchase = data.purchase;
-      setPurchases((prev) => [
-        {
-          ...purchase,
-          supplier: basicSupplier,
-        },
-        ...prev,
-      ]);
       window.location.href = "/compras";
       return null;
     }
