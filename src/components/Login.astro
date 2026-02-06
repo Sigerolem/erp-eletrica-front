@@ -76,9 +76,11 @@
           name: string;
           role: string;
           permissions: string;
+          login: string;
         }) => {
           localStorage.setItem("apiToken", data.token);
           localStorage.setItem("apiName", data.name);
+          localStorage.setItem("apiLogin", data.login);
           localStorage.setItem("apiRole", data.role);
           localStorage.setItem("apiPermissions", data.permissions);
           localStorage.setItem("apiTokenDate", new Date().toLocaleDateString());

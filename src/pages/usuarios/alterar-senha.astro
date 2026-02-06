@@ -1,0 +1,10 @@
+---
+import Header from "@comp/Header.astro";
+import DefaultLayout from "@layouts/DefaultLayout.astro";
+import { ChangePassword } from "@comp/users/ChangePassword.tsx";
+---
+
+<DefaultLayout title="Trocar Senha" transition:persist>
+  <Header title="Trocar Senha" />
+  <ChangePassword client:load />
+</DefaultLayout>

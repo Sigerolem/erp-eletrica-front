@@ -1,5 +1,6 @@
 ---
 import { SideBarMenu } from "@comp/SideBarMenu";
+import { UserCard } from "@elements/UserCard";
 
 const routes = [
   { name: "Dashboard", path: "/" },
@@ -18,29 +19,17 @@ const routes = [
 <aside
   id="sideBar"
   class="bg-slate-800 p-4 gap-3 flex md:flex-col navBar md:fixed md:h-full not-md:w-full not-md:overflow-scroll"
+  transition:persist="sideBar"
 >
-  <div
-    id="idCard"
-    class="p-1 md:p-2 text-white font-semibold rounded-md not-md:bg-slate-600 not-md:flex not-md:items-center"
-  >
-    <p class="not-md:hidden">Olá</p>
-    <span transition:persist="userName" id="userName" class="not-md:p-1"
-      >...</span
-    >
-  </div>
+  <UserCard client:load />
   <SideBarMenu routes={routes} client:load />
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const role = localStorage.getItem("apiRole");
       const permissions = localStorage.getItem("apiPermissions");
-      const name = localStorage.getItem("apiName");
       if (role == undefined || permissions == undefined) {
         document.location.href = "login/";
       }
-      const userNameSpan = document.getElementById(
-        "userName",
-      ) as HTMLSpanElement;
-      userNameSpan.innerText = name || "";
     });
   </script>
 </aside>
