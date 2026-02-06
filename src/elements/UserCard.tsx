@@ -37,7 +37,7 @@ export function UserCard() {
 
       {isModalOpen && (
         <section
-          className="fixed top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-50 flex flex-col justify-center"
+          className="fixed top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-100 flex flex-col justify-center"
           onClick={() => setIsModalOpen(false)}
         >
           <div
