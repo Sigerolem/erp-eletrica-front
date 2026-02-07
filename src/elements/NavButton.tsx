@@ -1,15 +1,18 @@
 import { useEffect, useState } from "preact/hooks";
 
-export function NavButton({ name, path }: { name: string; path: string }) {
-  const [isSelected, setIsSelected] = useState(false);
+export function NavButton({
+  name,
+  path,
+  isSelected,
+}: {
+  name: string;
+  path: string;
+  isSelected?: boolean;
+}) {
   const [isDev, setIsDev] = useState(false);
 
-  const url = new URL(window.location.href);
-  if (url.pathname == path) {
-    setIsSelected(true);
-  }
   useEffect(() => {
-    if (url.hostname.includes("localhost")) {
+    if (window.location.hostname.includes("localhost")) {
       setIsDev(true);
     }
   }, []);

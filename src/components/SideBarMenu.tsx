@@ -1,11 +1,11 @@
 import { useEffect, useState } from "preact/hooks";
 import { NavButton } from "@elements/NavButton";
 
-interface Route {
+type Route = {
   name: string;
   path: string;
   permissionNeeded?: number;
-}
+};
 
 interface Props {
   routes: Route[];
@@ -13,6 +13,9 @@ interface Props {
 
 export function SideBarMenu({ routes }: Props) {
   const [filteredRoutes, setFilteredRoutes] = useState<Route[]>([]);
+  const [currentPath, setCurrentPath] = useState(
+    typeof window !== "undefined" ? window.location.pathname : "",
+  );
 
   useEffect(() => {
     const permissions = localStorage.getItem("apiPermissions");
@@ -26,10 +29,25 @@ export function SideBarMenu({ routes }: Props) {
     setFilteredRoutes(filtered);
   }, [routes]);
 
+  useEffect(() => {
+    const handlePageLoad = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    document.addEventListener("astro:page-load", handlePageLoad);
+    return () =>
+      document.removeEventListener("astro:page-load", handlePageLoad);
+  }, []);
+
   return (
     <>
       {filteredRoutes.map((route) => (
-        <NavButton key={route.path} name={route.name} path={route.path} />
+        <NavButton
+          key={route.path}
+          name={route.name}
+          path={route.path}
+          isSelected={currentPath === route.path}
+        />
       ))}
     </>
   );
