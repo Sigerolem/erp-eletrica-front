@@ -15,9 +15,7 @@ export function NavButton({ name, path }: { name: string; path: string }) {
   return (
     <a href={path}>
       <span
-        class={`block text-white ${
-          isSelected ? "bg-slate-600" : ""
-        } cursor-pointer py-2 px-1 text-lg rounded-md hover:brightness-80 ${isDev ? "bg-red-600" : ""}`}
+        class={`block text-white cursor-pointer py-2 px-1 text-lg rounded-md hover:brightness-80 ${isDev ? "bg-red-600" : isSelected ? "bg-slate-600" : ""}`}
       >
         {name}
       </span>
