@@ -15,6 +15,7 @@ export function UserCard() {
     window.localStorage.removeItem("apiName");
     window.localStorage.removeItem("apiRole");
     window.localStorage.removeItem("apiPermissions");
+    window.localStorage.removeItem("apiLogin");
     window.location.href = "/login";
   };
 

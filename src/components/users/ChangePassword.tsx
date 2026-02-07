@@ -28,6 +28,10 @@ export function ChangePassword() {
       window.alert("Preencha todos os campos");
       return;
     }
+    if (newPassword.length < 6) {
+      window.alert("A nova senha deve ter pelo menos 6 caracteres");
+      return;
+    }
     if (newPassword != confirmPassword) {
       window.alert("As senhas não coincidem");
       return;
