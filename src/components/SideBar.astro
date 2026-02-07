@@ -19,10 +19,9 @@ const routes = [
 <aside
   id="sideBar"
   class="bg-slate-800 p-4 gap-3 flex md:flex-col navBar md:fixed md:h-full not-md:w-full not-md:overflow-scroll"
-  transition:persist="sideBar"
 >
   <UserCard client:load />
-  <SideBarMenu routes={routes} client:load />
+  <SideBarMenu routes={routes} client:only="preact" />
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const role = localStorage.getItem("apiRole");

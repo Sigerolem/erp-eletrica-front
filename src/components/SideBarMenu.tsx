@@ -29,11 +29,7 @@ export function SideBarMenu({ routes }: Props) {
   return (
     <>
       {filteredRoutes.map((route) => (
-        <NavButton
-          key={route.path}
-          name={route.name}
-          path={route.path}
-        />
+        <NavButton key={route.path} name={route.name} path={route.path} />
       ))}
     </>
   );
