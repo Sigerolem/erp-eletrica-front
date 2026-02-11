@@ -124,6 +124,13 @@ export function QuotationDataForm({
           setUserCanEdit(true);
         }
       }
+    } else {
+      if (
+        role == "owner" ||
+        hasPermission(permission ?? "----------------", "quotation", "W")
+      ) {
+        setUserCanEdit(true);
+      }
     }
 
     if (quotationData) {
