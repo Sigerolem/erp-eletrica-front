@@ -135,7 +135,7 @@ export function InventoryItemsList({
         <div>Quantidade prevista</div>
       </header> */}
 
-      {items.map((item) => {
+      {items.toReversed().map((item) => {
         if (item == undefined) {
           return <></>;
         }

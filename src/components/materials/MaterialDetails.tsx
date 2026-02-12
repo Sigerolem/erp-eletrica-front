@@ -55,7 +55,11 @@ export function MaterialDetails() {
       body: JSON.stringify(materialData),
     });
 
-    if (code == 409 && typeof data.error == "string") {
+    if (code == 200 || code == 201) {
+      setMaterial(data.material);
+      window.alert("Altterações salvas");
+      return null;
+    } else if (code == 409 && typeof data.error == "string") {
       const errors = {} as { [key: string]: string };
       if (data.error.includes("entity.name")) {
         errors.name = "Esse nome já foi utilizado";
@@ -69,10 +73,10 @@ export function MaterialDetails() {
       return errors;
     }
 
-    if (code == 200 || code == 201) {
-      setMaterial(data.material);
-      window.alert("Altterações salvas");
-      return null;
+    if (code == 400 || code == 500) {
+      window.alert(
+        `Erro ao salvar material. \n ${data.error} \n ${data.message}`,
+      );
     }
 
     return { erro: "Alguma coisa" };

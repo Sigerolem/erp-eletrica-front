@@ -130,7 +130,7 @@ export function ExceptionalItemsList({
         </header>
       )}
 
-      {items.map((item, index) => {
+      {items.toReversed().map((item, index) => {
         if (item == undefined) {
           return <></>;
         }
@@ -266,8 +266,8 @@ export function ExceptionalItemsList({
                     text="X"
                     className={"bg-red-600 py-1 text-white"}
                     onClick={() => {
-                      if (item.created_at) {
-                        deleteItem((prev) => [...prev, item.created_at!]);
+                      if (item.id) {
+                        deleteItem((prev) => [...prev, item.id!]);
                       }
                       handleDeleteItem({ createdAt: item.created_at! });
                     }}

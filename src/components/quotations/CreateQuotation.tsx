@@ -21,7 +21,7 @@ export function CreateQuotation() {
         } else {
           window.alert("Erro ao buscar lista de clientes para a seleção");
         }
-      }
+      },
     );
   }, []);
 
@@ -36,9 +36,11 @@ export function CreateQuotation() {
       body: JSON.stringify(quotationData),
     });
 
-    if (code == 400) {
-      window.alert("Requisição feita ao servidor é inválida.");
-      console.error(code, data);
+    if (code == 400 || code == 500) {
+      window.alert(
+        `Erro ao salvar orçamento. \n ${data.error} \n ${data.message}`,
+      );
+      console.error(data);
     }
 
     if (code == 201) {
