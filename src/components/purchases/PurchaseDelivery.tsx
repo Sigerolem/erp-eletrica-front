@@ -193,7 +193,7 @@ export function PurchaseDelivery() {
       const material = result.data.material;
       setPurchaseItems((prev) => [
         {
-          amount_delivered: 1,
+          amount_delivered: material.barcode == barcode ? 1 : material.pkg_size,
           amount_requested: 0,
           ipi: material.ipi,
           material: material,
