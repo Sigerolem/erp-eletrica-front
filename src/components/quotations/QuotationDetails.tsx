@@ -9,6 +9,7 @@ export function QuotationDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
   const [id, setId] = useState("");
   const [userCanEditQuotations, setUserCanEditQuotations] = useState(false);
+  const [somethingChanged, setSomethingChanged] = useState(false);
 
   const quotationStatusButtonMap = {
     draft: [{ text: "Concluir rascunho", class: "", status: "q_awaiting" }],
@@ -142,9 +143,11 @@ export function QuotationDetails() {
         <QuotationDataForm
           doOnSubmit={updateQuotationData}
           quotationData={quotation}
+          setSomethingChanged={setSomethingChanged}
         >
           <div className={"flex justify-evenly"}>
-            {quotationStatusButtonMap[quotation.status].length > 0 &&
+            {!somethingChanged &&
+            quotationStatusButtonMap[quotation.status].length > 0 &&
             userCanEditQuotations ? (
               quotationStatusButtonMap[quotation.status].map((btn) => (
                 <Button
@@ -158,7 +161,8 @@ export function QuotationDetails() {
             ) : (
               <></>
             )}
-            {userCanEditQuotations && (
+
+            {userCanEditQuotations && somethingChanged && (
               <Button type={"submit"} text="Salvar alterações" />
             )}
           </div>

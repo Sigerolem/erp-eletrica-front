@@ -130,8 +130,7 @@ export function InventoryItemsList({
   // }
 
   const xSize = window.innerWidth;
-  console.log(items.length);
-  console.log(itemsList.length);
+
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3"}>
       {items.map((item) => {

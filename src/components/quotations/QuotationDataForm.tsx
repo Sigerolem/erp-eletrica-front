@@ -14,7 +14,12 @@ import {
   validateStringFieldOnBlur,
 } from "@utils/inputValidation";
 import type { JSX, TargetedSubmitEvent } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type StateUpdater,
+} from "preact/hooks";
 import { ExceptionalItemsList } from "./lists/ExceptionalItemsList";
 import { InventoryItemsList } from "./lists/InventoryItemsList";
 import type {
@@ -35,6 +40,7 @@ export function QuotationDataForm({
   doOnSubmit,
   customers,
   children,
+  setSomethingChanged,
 }: {
   doOnSubmit: ({}: {
     quotationData: Partial<QuotationsType>;
@@ -44,6 +50,7 @@ export function QuotationDataForm({
   quotationData?: QuotationsType;
   customers?: CustomersType[];
   children?: JSX.Element;
+  setSomethingChanged: Dispatch<StateUpdater<boolean>>;
 }) {
   const URL_PATH = window.location.pathname;
 
@@ -55,6 +62,7 @@ export function QuotationDataForm({
   const [isLaborModalOpen, setIsLaborModalOpen] = useState(false);
   const [labors, setLabors] = useState<LaborsType[]>([]);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+
   const [itemsToDelete, setItemsToDelete] = useState<string[]>([]);
   const [materialsToDelete, setMaterialsToDelete] = useState<string[]>([]);
 
@@ -81,6 +89,7 @@ export function QuotationDataForm({
 
   const [customerSelected, setCustomerSelected] =
     useState<CustomersType | null>(null);
+
   const [quoteMaterials, setQuoteMaterials] = useState<
     Partial<QuotationMaterialsType>[]
   >([]);
@@ -92,7 +101,14 @@ export function QuotationDataForm({
   >([]);
   const [expenses, setExpenses] = useState<Partial<QuotationItemsType>[]>([]);
 
+  const [dataWasUsed, setDataWasUsed] = useState(false);
   const [userCanEdit, setUserCanEdit] = useState(false);
+
+  const [baseDataHasChanged, setBaseDataHasChanged] = useState(false);
+  const [materialsHasChanged, setMaterialsHasChanged] = useState(false);
+  const [itemsHasChanged, setItemsHasChanged] = useState(false);
+  const [expensesHasChanged, setExpensesHasChanged] = useState(false);
+  const [servicesHasChanged, setServicesHasChanged] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -134,6 +150,7 @@ export function QuotationDataForm({
     }
 
     if (quotationData) {
+      setDataWasUsed(true);
       setStatus(quotationData.status);
       setMaterialCost(quotationData.material_cost);
       setMaterialValue(quotationData.material_value);
@@ -167,6 +184,78 @@ export function QuotationDataForm({
     setMaterialsToDelete([]);
     setItemsToDelete([]);
   }, [quotationData]);
+
+  useEffect(() => {
+    if (
+      baseDataHasChanged ||
+      materialsHasChanged ||
+      itemsHasChanged ||
+      expensesHasChanged ||
+      servicesHasChanged
+    ) {
+      setSomethingChanged(true);
+    } else {
+      setSomethingChanged(false);
+    }
+  }, [
+    baseDataHasChanged,
+    materialsHasChanged,
+    itemsHasChanged,
+    expensesHasChanged,
+    servicesHasChanged,
+  ]);
+
+  useEffect(() => {
+    if (!quotationData || !dataWasUsed) {
+      return;
+    }
+    if (
+      status !== quotationData.status ||
+      materialCost !== quotationData.material_cost ||
+      materialValue !== quotationData.material_value ||
+      serviceCost !== quotationData.service_cost ||
+      serviceValue !== quotationData.service_value ||
+      directCost !== quotationData.direct_cost ||
+      directValue !== quotationData.direct_value ||
+      matDiscount !== quotationData.mat_discount ||
+      serDiscount !== quotationData.ser_discount ||
+      purchaseOrder !== quotationData.purchase_order ||
+      toolList !== quotationData.tool_list ||
+      reference !== quotationData.reference ||
+      description !== quotationData.description ||
+      expectedDuration !== quotationData.expected_duration ||
+      privateComments !== quotationData.private_comments ||
+      publicComments !== quotationData.public_comments
+    ) {
+      setBaseDataHasChanged(true);
+    }
+  }, [
+    status,
+    materialCost,
+    materialValue,
+    serviceCost,
+    serviceValue,
+    directCost,
+    directValue,
+    matDiscount,
+    serDiscount,
+    purchaseOrder,
+    toolList,
+    reference,
+    description,
+    expectedDuration,
+    privateComments,
+    publicComments,
+  ]);
+
+  useEffect(() => {
+    if (!quotationData || !dataWasUsed) {
+      return;
+    }
+    if (quoteMaterials.length != quotationData.materials.length) {
+      setSomethingChanged(true);
+    }
+  }, [quoteMaterials]);
 
   useEffect(() => {
     fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }).then(
@@ -247,6 +336,13 @@ export function QuotationDataForm({
 
     if (errors) {
       setValidationErrors((prev) => ({ ...prev, ...errors }));
+    } else {
+      setMaterialsHasChanged(false);
+      setItemsHasChanged(false);
+      setExpensesHasChanged(false);
+      setServicesHasChanged(false);
+      setBaseDataHasChanged(false);
+      setSomethingChanged(false);
     }
   }
 
@@ -262,6 +358,9 @@ export function QuotationDataForm({
   }
 
   function handleNewInventoryMaterial(material: MaterialsType) {
+    if (quoteMaterials.map((item) => item.material_id).includes(material.id)) {
+      return;
+    }
     const newInvMaterial: Partial<QuotationMaterialsType> = {
       material_id: material.id,
       name: material.name,
@@ -275,7 +374,8 @@ export function QuotationDataForm({
       is_private: false,
       created_at: new Date().toISOString(),
     };
-    setQuoteMaterials((prev) => [...prev, newInvMaterial]);
+    setQuoteMaterials((prev) => [newInvMaterial, ...prev]);
+    setMaterialsHasChanged(true);
   }
 
   function handleNewExceptionalMaterial() {
@@ -292,7 +392,8 @@ export function QuotationDataForm({
       quotation_id: quotationData?.id,
       created_at: new Date().toISOString(),
     };
-    setOccasionalMaterials((prev) => [...prev, newOccMaterial]);
+    setOccasionalMaterials((prev) => [newOccMaterial, ...prev]);
+    setItemsHasChanged(true);
   }
 
   function handleOpenLaborModal() {
@@ -313,7 +414,8 @@ export function QuotationDataForm({
       quotation_id: quotationData?.id,
       created_at: new Date().toISOString(),
     };
-    setServiceItems((prev) => [...prev, newService]);
+    setServiceItems((prev) => [newService, ...prev]);
+    setServicesHasChanged(true);
   }
 
   function handleSelectLabor(labor: LaborsType) {
@@ -330,7 +432,8 @@ export function QuotationDataForm({
       quotation_id: quotationData?.id,
       created_at: new Date().toISOString(),
     };
-    setServiceItems((prev) => [...prev, newService]);
+    setServiceItems((prev) => [newService, ...prev]);
+    setServicesHasChanged(true);
   }
 
   function handleNewExpenseItem() {
@@ -348,6 +451,7 @@ export function QuotationDataForm({
       created_at: new Date().toISOString(),
     };
     setExpenses((prev) => [...prev, newService]);
+    setExpensesHasChanged(true);
   }
 
   const xSize = window.innerWidth;
@@ -418,7 +522,9 @@ export function QuotationDataForm({
           errors={validationErrors}
           disabled={customers == undefined || !userCanEdit}
           className={
-            userCanEdit ? "cursor-pointer" : "cursor-not-allowed bg-blue-50!"
+            customers == undefined || !userCanEdit
+              ? "cursor-not-allowed bg-blue-50!"
+              : "cursor-pointer"
           }
         />
         <Input
@@ -694,6 +800,7 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           deleteItem={setMaterialsToDelete}
           readOnly={!userCanEdit}
+          setSomethingChanged={setMaterialsHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -708,6 +815,7 @@ export function QuotationDataForm({
           quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
           readOnly={!userCanEdit}
+          setSomethingChanged={setItemsHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -724,6 +832,7 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           type="service"
           readOnly={!userCanEdit}
+          setSomethingChanged={setServicesHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -739,6 +848,7 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           type="expense"
           readOnly={!userCanEdit}
+          setSomethingChanged={setExpensesHasChanged}
         />
       </ListWrapper>
       {children}
