@@ -130,7 +130,7 @@ export function ExceptionalItemsList({
         </header>
       )}
 
-      {items.toReversed().map((item, index) => {
+      {items.map((item, index) => {
         if (item == undefined) {
           return <></>;
         }

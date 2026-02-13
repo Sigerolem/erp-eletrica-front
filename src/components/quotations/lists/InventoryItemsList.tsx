@@ -14,6 +14,7 @@ interface ComponentProps {
   setIsThereError: (bool: boolean) => void;
   deleteItem: Dispatch<StateUpdater<string[]>>;
   readOnly?: boolean;
+  setSomethingChanged: Dispatch<StateUpdater<boolean>>;
 }
 
 export function InventoryItemsList({
@@ -22,6 +23,7 @@ export function InventoryItemsList({
   setItemsList,
   deleteItem,
   readOnly,
+  setSomethingChanged,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationMaterialsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
@@ -53,6 +55,7 @@ export function InventoryItemsList({
     setItemsList((prev) => [
       ...prev.filter((item) => item.material_id != matId),
     ]);
+    setSomethingChanged(true);
   }
 
   function handleUpdateItemInt({
@@ -84,58 +87,54 @@ export function InventoryItemsList({
         }
       }),
     );
+    setSomethingChanged(true);
   }
 
-  function handleUpdateItemCurrency({
-    material_id,
-    value,
-    propName,
-  }: {
-    material_id: string;
-    value: string;
-    propName: string;
-  }) {
-    value = value
-      .replace("R$", "")
-      .trim()
-      .replaceAll(".", "")
-      .replaceAll(",", ".");
-    if (isNaN(parseFloat(value || "0"))) {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [`${propName}-${material_id}`]: "Digite um valor válido",
-      }));
-    } else {
-      setValidationErrors((prev) => {
-        delete prev[`${propName}-${material_id}`];
-        return { ...prev };
-      });
-    }
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.material_id == material_id) {
-          return {
-            ...item,
-            [propName]: Math.round(parseFloat(value || "0") * 100),
-          };
-        } else {
-          return item;
-        }
-      }),
-    );
-  }
+  // function handleUpdateItemCurrency({  n tava usando, se for usar tem que colocar o has changed aqui
+  //   material_id,
+  //   value,
+  //   propName,
+  // }: {
+  //   material_id: string;
+  //   value: string;
+  //   propName: string;
+  // }) {
+  //   value = value
+  //     .replace("R$", "")
+  //     .trim()
+  //     .replaceAll(".", "")
+  //     .replaceAll(",", ".");
+  //   if (isNaN(parseFloat(value || "0"))) {
+  //     setValidationErrors((prev) => ({
+  //       ...prev,
+  //       [`${propName}-${material_id}`]: "Digite um valor válido",
+  //     }));
+  //   } else {
+  //     setValidationErrors((prev) => {
+  //       delete prev[`${propName}-${material_id}`];
+  //       return { ...prev };
+  //     });
+  //   }
+  //   setItems((prev) =>
+  //     prev.map((item) => {
+  //       if (item.material_id == material_id) {
+  //         return {
+  //           ...item,
+  //           [propName]: Math.round(parseFloat(value || "0") * 100),
+  //         };
+  //       } else {
+  //         return item;
+  //       }
+  //     }),
+  //   );
+  // }
+
   const xSize = window.innerWidth;
+  console.log(items.length);
+  console.log(itemsList.length);
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3"}>
-      {/* <header className={"grid grid-cols-4 font-semibold"}>
-        <div className={"col-span-2"}>
-          <span className={"block -mb-2"}>Material</span>
-        </div>
-        <div>Valor unitário</div>
-        <div>Quantidade prevista</div>
-      </header> */}
-
-      {items.toReversed().map((item) => {
+      {items.map((item) => {
         if (item == undefined) {
           return <></>;
         }
@@ -168,6 +167,9 @@ export function InventoryItemsList({
                 value={item.expected_amount}
                 onBlur={(e) => {
                   const value = e.currentTarget.value;
+                  if (value == item.expected_amount!.toString()) {
+                    return;
+                  }
                   handleUpdateItemInt({
                     value,
                     material_id: item.material_id!,
@@ -184,6 +186,7 @@ export function InventoryItemsList({
                   name={`real_amount-${item.material_id}`}
                   value={(item.taken_amount || 0) - (item.returned_amount || 0)}
                   className={"min-w-5 bg-blue-50!"}
+                  disabled={true}
                 />
                 <div className={"ml-1"}>
                   {!readOnly && (
