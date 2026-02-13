@@ -10,6 +10,7 @@ export function QuotationDetails() {
   const [id, setId] = useState("");
   const [userCanEditQuotations, setUserCanEditQuotations] = useState(false);
   const [somethingChanged, setSomethingChanged] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const quotationStatusButtonMap = {
     draft: [{ text: "Concluir rascunho", class: "", status: "q_awaiting" }],
@@ -105,6 +106,7 @@ export function QuotationDetails() {
     itemsToDelete?: string[];
     materialsToDelete?: string[];
   }) {
+    setIsFetching(true);
     const { code, data } = await fetchWithToken<{ quotation: QuotationsType }>({
       path: `/quotations/${id}`,
       method: "PUT",
@@ -119,10 +121,12 @@ export function QuotationDetails() {
       window.alert("Alterações salvas com sucesso");
       setQuotation(data.quotation);
     }
+    setIsFetching(false);
     return null;
   }
 
   async function updateQuotationStatus(newStatus: QuotationsStatusType) {
+    setIsFetching(true);
     const { code, data } = await fetchWithToken<{ quotation: QuotationsType }>({
       path: `/quotations/${id}`,
       method: "PATCH",
@@ -135,6 +139,7 @@ export function QuotationDetails() {
       }
       setQuotation(data.quotation);
     }
+    setIsFetching(false);
   }
 
   return (
@@ -156,6 +161,7 @@ export function QuotationDetails() {
                   onClick={() => {
                     updateQuotationStatus(btn.status as QuotationsStatusType);
                   }}
+                  disabled={isFetching}
                 />
               ))
             ) : (
@@ -163,7 +169,11 @@ export function QuotationDetails() {
             )}
 
             {userCanEditQuotations && somethingChanged && (
-              <Button type={"submit"} text="Salvar alterações" />
+              <Button
+                type={"submit"}
+                text="Salvar alterações"
+                disabled={isFetching}
+              />
             )}
           </div>
         </QuotationDataForm>
