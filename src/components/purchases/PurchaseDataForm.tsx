@@ -164,6 +164,7 @@ export function PurchaseDataForm({
       window.alert("Material já adicionado.");
       return;
     }
+    setItemsWereChanged(true);
     setPurchaseItems((prev) => [
       ...prev,
       {
