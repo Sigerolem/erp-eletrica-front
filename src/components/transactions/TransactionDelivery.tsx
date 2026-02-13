@@ -51,7 +51,7 @@ export function TransactionDelivery() {
       return;
     }
     const input = document.querySelector(
-      `[name=barcode-${materialBeingUpdated}]`
+      `[name=barcode-${materialBeingUpdated}]`,
     ) as HTMLInputElement;
     input.focus();
   }, [materialBeingUpdated]);
@@ -68,7 +68,7 @@ export function TransactionDelivery() {
         items: transactionItems.map((item) =>
           item.id.includes("null-")
             ? { ...item, id: undefined, created_at: undefined }
-            : item
+            : item,
         ),
       }),
     });
@@ -84,7 +84,7 @@ export function TransactionDelivery() {
 
   async function handleMaterialBarcodeUpdate(
     materialId: string,
-    barcode: string
+    barcode: string,
   ) {
     const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${materialId}`,
@@ -96,8 +96,8 @@ export function TransactionDelivery() {
         prev.map((item) =>
           item.material_id == materialId
             ? { ...item, material: { ...item.material, barcode } }
-            : item
-        )
+            : item,
+        ),
       );
     } else if (code == 409) {
       window.alert("Codigo de barras já cadastrado");
@@ -116,7 +116,7 @@ export function TransactionDelivery() {
           return { ...item, separated_amount: item.separated_amount + 1 };
         }
         return item;
-      })
+      }),
     );
     setTransactionItems((prev) =>
       prev.map((item) => {
@@ -128,7 +128,7 @@ export function TransactionDelivery() {
           };
         }
         return item;
-      })
+      }),
     );
     if (itemWasFoundHere) {
       return true;
@@ -149,7 +149,7 @@ export function TransactionDelivery() {
           expected_amount: 0,
           returned_amount: 0,
           name: material.name,
-          separated_amount: 1,
+          separated_amount: material.barcode == code ? 1 : material.pkg_size,
           taken_amount: 0,
           transaction_id: transaction!.id,
           unit_cost: material.avg_cost,
@@ -173,11 +173,11 @@ export function TransactionDelivery() {
   async function focusOnScannedItem(barcode: string) {
     try {
       let input = document.querySelector<HTMLInputElement>(
-        `#barcode-${barcode}`
+        `#barcode-${barcode}`,
       );
       if (input == null) {
         input = document.querySelector<HTMLInputElement>(
-          `[name='separatedAmount${barcode}']`
+          `[name='separatedAmount${barcode}']`,
         );
       }
       if (input == null) {
@@ -253,10 +253,10 @@ export function TransactionDelivery() {
           {transactionItems.map((item) => {
             const hasBeenScanned =
               Object.keys(barcodeLog).includes(
-                item.material.barcode || "void"
+                item.material.barcode || "void",
               ) ||
               Object.keys(barcodeLog).includes(
-                item.material.pkg_barcode || "void"
+                item.material.pkg_barcode || "void",
               );
             let color = "";
             color =
@@ -329,7 +329,7 @@ export function TransactionDelivery() {
                           ...prev.map((pItem) =>
                             pItem.material_id == item.material_id
                               ? { ...pItem, separated_amount: val }
-                              : pItem
+                              : pItem,
                           ),
                         ]);
                       }}
@@ -359,7 +359,7 @@ export function TransactionDelivery() {
                           e.preventDefault();
                           handleMaterialBarcodeUpdate(
                             item.material_id!,
-                            e.currentTarget.value.trim()
+                            e.currentTarget.value.trim(),
                           );
                           setMaterialBeingUpdated("");
                         }
