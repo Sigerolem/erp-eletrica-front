@@ -359,6 +359,7 @@ export function QuotationDataForm({
 
   function handleNewInventoryMaterial(material: MaterialsType) {
     if (quoteMaterials.map((item) => item.material_id).includes(material.id)) {
+      window.alert("Esse material já foi adicionado.");
       return;
     }
     const newInvMaterial: Partial<QuotationMaterialsType> = {
