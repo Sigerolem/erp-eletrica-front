@@ -8,6 +8,7 @@ import { hasPermission } from "src/utils/permissionLogic";
 export function SupplierDetails() {
   const [supplier, setSupplier] = useState<SuppliersType | null>(null);
   const [userCanEditSupplier, setUserCanEditSupplier] = useState(false);
+  const [userCanSeePurchases, setUserCanSeePurchases] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -25,6 +26,13 @@ export function SupplierDetails() {
       hasPermission(permission ?? "----------------", "supplier", "W")
     ) {
       setUserCanEditSupplier(true);
+    }
+
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "purchase", "R")
+    ) {
+      setUserCanSeePurchases(true);
     }
 
     const path = new URL(window.location.href);
@@ -69,7 +77,17 @@ export function SupplierDetails() {
           supplierData={supplier ?? undefined}
         >
           {userCanEditSupplier ? (
-            <Button text="Salvar" type={"submit"} />
+            <div className={"flex min-w-full gap-4 justify-end"}>
+              <Button text="Salvar" type={"submit"} />
+              {userCanSeePurchases && (
+                <a href={`/compras?supplier=${supplier.id}`}>
+                  <Button
+                    text="Ver compras"
+                    className={"bg-slate-600 text-white"}
+                  />
+                </a>
+              )}
+            </div>
           ) : (
             <></>
           )}
