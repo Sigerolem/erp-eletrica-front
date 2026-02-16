@@ -90,6 +90,14 @@ export function Purchases() {
     }).then(({ code, data }) => {
       if (code == 200) {
         setSupplierList(data.suppliers);
+        const pageQuery = window.location.search;
+        if (pageQuery.includes("supplier")) {
+          const supId = pageQuery.split("=")[1];
+          const supplier = data.suppliers.find((s) => s.id == supId);
+          if (supplier) {
+            setSupplierSelected(supplier.name);
+          }
+        }
       } else if (code == 403) {
         setUserCantSeeSuppliers(true);
         window.alert(
