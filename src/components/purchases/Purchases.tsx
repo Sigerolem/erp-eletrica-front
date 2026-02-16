@@ -3,10 +3,12 @@ import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { Button } from "@elements/Button";
 import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
+import { Input } from "src/elements/Input";
 import { Table, Td, THead, Tr } from "src/elements/Table";
 import { fetchPdf } from "src/utils/fetchPdf";
 import { fetchWithToken } from "src/utils/fetchWithToken";
 import { hasPermission } from "src/utils/permissionLogic";
+import { SelectSupplierModal } from "../suppliers/SelectSupplierModal";
 
 export type PurchaseStatusType =
   | "draft"
@@ -53,6 +55,11 @@ export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [userCanCreatePurchase, setUserCanCreatePurchase] = useState(false);
+  const [supplierSelected, setSupplierSelected] = useState<string | null>(null);
+  const [supplierList, setSupplierList] = useState<SuppliersType[]>([]);
+  const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
+  const [showOnlyConcluded, setShowOnlyConcluded] = useState(false);
+  const [userCantSeeSuppliers, setUserCantSeeSuppliers] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -70,8 +77,40 @@ export function Purchases() {
     ) {
       setUserCanCreatePurchase(true);
     }
-    fetchWithToken<{ purchases: PurchasesType[] }>({ path: "/purchases" }).then(
-      ({ code, data }) => {
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "supplier", "R")
+    ) {
+      setUserCantSeeSuppliers(true);
+      return;
+    }
+
+    fetchWithToken<{ suppliers: SuppliersType[] }>({
+      path: "/suppliers",
+    }).then(({ code, data }) => {
+      if (code == 200) {
+        setSupplierList(data.suppliers);
+      } else if (code == 403) {
+        setUserCantSeeSuppliers(true);
+        window.alert(
+          "Você pode ver a lista de compra, mas não pode ver a lista de fornecedores para realizar filtragens.",
+        );
+      } else {
+        window.alert("Erro ao buscar a lista de fornecedores");
+        console.error(data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const pageQuery = window.location.search;
+    let supId: string | null = null;
+    if (pageQuery.includes("supplier") && !userCantSeeSuppliers) {
+      supId = pageQuery.split("=")[1];
+
+      fetchWithToken<{ purchases: PurchasesType[] }>({
+        path: `/purchases/query?supplier=${supId}`,
+      }).then(({ code, data }) => {
         setIsFetching(false);
         if (code == 200) {
           setPurchases(data.purchases);
@@ -79,9 +118,26 @@ export function Purchases() {
           window.alert("Erro ao buscar a lista de materiais");
           console.error(data);
         }
-      },
-    );
-  }, []);
+      });
+    } else {
+      if (pageQuery.includes("supplier")) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("supplier");
+        window.history.pushState({}, "", url);
+      }
+      fetchWithToken<{ purchases: PurchasesType[] }>({
+        path: "/purchases",
+      }).then(({ code, data }) => {
+        setIsFetching(false);
+        if (code == 200) {
+          setPurchases(data.purchases);
+        } else {
+          window.alert("Erro ao buscar a lista de materiais");
+          console.error(data);
+        }
+      });
+    }
+  }, [supplierSelected]);
 
   const xSize = window.innerWidth;
   return (
@@ -106,6 +162,49 @@ export function Purchases() {
             </>
           )}
         </header>
+        {!userCantSeeSuppliers && (
+          <div className={"mb-2 flex gap-2 items-center"}>
+            <Input
+              placeholder="Todos os fornecedores"
+              name="supplier"
+              className={
+                userCantSeeSuppliers ? "cursor-not-allowed" : "cursor-pointer"
+              }
+              onClick={() => {
+                setIsSupplierModalOpen(true);
+              }}
+              value={supplierSelected ?? ""}
+              disabled={userCantSeeSuppliers}
+            />
+            {supplierSelected && (
+              <Button
+                text="Limpar"
+                onClick={() => {
+                  setSupplierSelected(null);
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete("supplier");
+                  window.history.pushState({}, "", url);
+                }}
+                className={"bg-slate-600 text-white text-sm"}
+              />
+            )}
+          </div>
+        )}
+        {isSupplierModalOpen && (
+          <SelectSupplierModal
+            closeModal={() => {
+              setIsSupplierModalOpen(false);
+            }}
+            suppliers={supplierList}
+            selectSupplier={(supplier) => {
+              setSupplierSelected(supplier.name);
+              setIsSupplierModalOpen(false);
+              const url = new URL(window.location.href);
+              url.searchParams.set("supplier", String(supplier.id));
+              window.history.pushState({}, "", url);
+            }}
+          />
+        )}
         <Table>
           {xSize < 720 ? (
             <THead

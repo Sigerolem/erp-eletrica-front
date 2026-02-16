@@ -47,7 +47,6 @@ export function PurchaseDetails() {
     }).then((result) => {
       if (result.code == 200) {
         setPurchase(result.data.purchase);
-        console.log(result.data);
       } else {
         window.alert("Erro ao se comunicar com o servidor.");
       }

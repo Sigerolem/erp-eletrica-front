@@ -94,9 +94,9 @@ export function ReceivedItemsList({
                     ),
                   ]);
                 }}
-                disabled={!userCanEditPurchase}
+                disabled={!userCanEditPurchase || purchase.status == "finished"}
                 className={
-                  !userCanEditPurchase
+                  !userCanEditPurchase || purchase.status == "finished"
                     ? "bg-blue-50! text-center font-semibold"
                     : "text-center font-semibold"
                 }
@@ -145,8 +145,12 @@ export function ReceivedItemsList({
                     ),
                   ]);
                 }}
-                disabled={!userCanEditPurchase}
-                className={!userCanEditPurchase ? "bg-blue-50!" : ""}
+                disabled={!userCanEditPurchase || purchase.status == "finished"}
+                className={
+                  !userCanEditPurchase || purchase.status == "finished"
+                    ? "bg-blue-50!"
+                    : ""
+                }
               />
               <Input
                 label={"Custo c/ IPI"}
@@ -198,8 +202,12 @@ export function ReceivedItemsList({
                     ),
                   ]);
                 }}
-                disabled={!userCanEditPurchase}
-                className={!userCanEditPurchase ? "bg-blue-50!" : ""}
+                disabled={!userCanEditPurchase || purchase.status == "finished"}
+                className={
+                  !userCanEditPurchase || purchase.status == "finished"
+                    ? "bg-blue-50!"
+                    : ""
+                }
               />
               <Input
                 label={"Valor IPI"}
@@ -250,8 +258,12 @@ export function ReceivedItemsList({
                   ]);
                   setItemsWereChanged(true);
                 }}
-                disabled={!userCanEditPurchase}
-                className={!userCanEditPurchase ? "bg-blue-50!" : ""}
+                disabled={!userCanEditPurchase || purchase.status == "finished"}
+                className={
+                  !userCanEditPurchase || purchase.status == "finished"
+                    ? "bg-blue-50!"
+                    : ""
+                }
               />
               <Input
                 label={"Custo diluído"}

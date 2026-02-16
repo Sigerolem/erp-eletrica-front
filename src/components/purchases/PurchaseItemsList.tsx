@@ -219,9 +219,13 @@ export function PurchaseItemsList({
                       parseInt(value),
                     );
                   }}
-                  disabled={!userCanEditPurchase}
+                  disabled={
+                    !userCanEditPurchase || purchase.status == "finished"
+                  }
                   className={
-                    !userCanEditPurchase ? "bg-blue-50! min-w-5" : "min-w-5"
+                    !userCanEditPurchase || purchase.status == "finished"
+                      ? "bg-blue-50! min-w-5"
+                      : "min-w-5"
                   }
                   errors={validationErrors}
                 />

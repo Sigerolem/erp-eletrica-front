@@ -139,7 +139,11 @@ export function PurchaseDataForm({
   }, [purchaseData]);
 
   useEffect(() => {
-    if (status !== "received" && purchaseItems.length > 0) {
+    if (
+      status !== "received" &&
+      status !== "finished" &&
+      purchaseItems.length > 0
+    ) {
       return;
     }
     let pItems = purchaseItems.map((item) => item as PurchaseItemsType);
@@ -244,8 +248,14 @@ export function PurchaseDataForm({
                   max: 50,
                 });
               }}
-              disabled={!userCanEditPurchase}
-              className={userCanEditPurchase ? "" : "bg-blue-50!"}
+              disabled={
+                !userCanEditPurchase || purchaseData?.status == "finished"
+              }
+              className={
+                !userCanEditPurchase || purchaseData?.status == "finished"
+                  ? "bg-blue-50!"
+                  : ""
+              }
               errors={validationErrors}
             />
             <Checkbox
@@ -253,8 +263,14 @@ export function PurchaseDataForm({
               name="isTracked"
               checked={isTracked}
               setChecked={setIsTracked}
-              disabled={!userCanEditPurchase}
-              className={userCanEditPurchase ? "" : "bg-blue-50!"}
+              disabled={
+                !userCanEditPurchase || purchaseData?.status == "finished"
+              }
+              className={
+                !userCanEditPurchase || purchaseData?.status == "finished"
+                  ? "bg-blue-50!"
+                  : ""
+              }
             />
           </div>
           <div className={"flex gap-4"}>
@@ -317,8 +333,14 @@ export function PurchaseDataForm({
                 setPurchaseCost(Math.round(newPurchaseCost + val));
                 setTaxCost(Math.round(newTaxCost));
               }}
-              disabled={!userCanEditPurchase}
-              className={userCanEditPurchase ? "" : "bg-blue-50!"}
+              disabled={
+                !userCanEditPurchase || purchaseData?.status == "finished"
+              }
+              className={
+                !userCanEditPurchase || purchaseData?.status == "finished"
+                  ? "bg-blue-50!"
+                  : ""
+              }
               errors={validationErrors}
             />
           </div>
@@ -395,7 +417,8 @@ export function PurchaseDataForm({
       <div
         className={"bg-slate-100 border border-slate-400 py-1 rounded-md mb-4"}
       >
-        {purchaseData?.status == "received" ? (
+        {purchaseData?.status == "received" ||
+        purchaseData?.status == "finished" ? (
           <ReceivedItemsList
             purchase={{
               ...purchaseData,
