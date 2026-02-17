@@ -1,7 +1,7 @@
 import type { CustomersType } from "@comp/customers/Customers";
 import { SelectCustomerModal } from "@comp/customers/SelectCustomerModal";
 import type { MaterialsType } from "@comp/materials/Materials";
-import { SelectMaterialModal } from "@comp/materials/SelectMaterialModal";
+import { SelectMultipleMaterialsModal } from "@comp/materials/SelectMultipleMaterialsModal";
 import type { LaborsType } from "@comp/labors/Labors";
 import { SelectLaborModal } from "@comp/labors/SelectLaborModal";
 import { DataForm } from "@elements/DataForm";
@@ -359,7 +359,6 @@ export function QuotationDataForm({
 
   function handleNewInventoryMaterial(material: MaterialsType) {
     if (quoteMaterials.map((item) => item.material_id).includes(material.id)) {
-      window.alert("Esse material já foi adicionado.");
       return;
     }
     const newInvMaterial: Partial<QuotationMaterialsType> = {
@@ -766,7 +765,7 @@ export function QuotationDataForm({
       </section>
 
       <>
-        <SelectMaterialModal
+        <SelectMultipleMaterialsModal
           materials={materials}
           cleanError={() => {}}
           closeModal={() => {
@@ -774,6 +773,9 @@ export function QuotationDataForm({
           }}
           isHiddden={!isMaterialModalOpen}
           selectMaterial={handleNewInventoryMaterial}
+          selectedMaterialIds={quoteMaterials
+            .map((m) => m.material_id)
+            .filter((id): id is string => !!id)}
         />
         {isLaborModalOpen && (
           <SelectLaborModal

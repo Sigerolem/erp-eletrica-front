@@ -249,7 +249,11 @@ export function TransactionDelivery() {
             }
           }}
         />
-        <ListWrapper label="Materiais" doOnClickAdd={() => {}}>
+        <ListWrapper
+          label="Materiais"
+          doOnClickAdd={() => {}}
+          hideAddButton={true}
+        >
           {transactionItems.map((item) => {
             const hasBeenScanned =
               Object.keys(barcodeLog).includes(
