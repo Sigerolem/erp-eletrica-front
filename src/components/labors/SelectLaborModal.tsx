@@ -48,10 +48,7 @@ export function SelectLaborModal({
   async function handleSearchLabor(value?: string) {
     const searchString = encodeURIComponent(value ? value : search);
     const { code, data } = await fetchWithToken<{ labors: LaborsType[] }>({
-      path:
-        search == ""
-          ? "/labors"
-          : `/labors?search=${searchString}&page=1`,
+      path: search == "" ? "/labors" : `/labors?search=${searchString}&page=1`,
     });
     if (code == 200) {
       setLaborsFound(data.labors);
@@ -63,8 +60,9 @@ export function SelectLaborModal({
   return (
     <section className={"absolute top-0 left-0 w-full h-full"}>
       <div
-        className={`fixed top-0 left-0 w-full h-full ${xSize < 700 ? "p-8" : "p-32"
-          } bg-[#000000AA] z-20 overflow-y-scroll`}
+        className={`fixed top-0 left-0 w-full h-full ${
+          xSize < 700 ? "p-8" : "p-32"
+        } bg-[#000000AA] z-20 overflow-y-scroll`}
         onClick={closeModal}
       >
         <div
@@ -75,9 +73,7 @@ export function SelectLaborModal({
             e.stopPropagation();
           }}
         >
-          <strong className={"pb-2 text-lg block"}>
-            Selecione um serviço
-          </strong>
+          <strong className={"pb-2 text-lg block"}>Selecione um serviço</strong>
           <div className={"flex gap-2 w-full items-end"}>
             <Input
               name="search"
@@ -93,7 +89,7 @@ export function SelectLaborModal({
                 if (e.key == "Enter") {
                   e.preventDefault();
                   const button = document.querySelector<HTMLButtonElement>(
-                    "[name='searchButton']"
+                    "[name='searchButton']",
                   );
                   if (button) {
                     e.currentTarget.blur();
@@ -130,7 +126,6 @@ export function SelectLaborModal({
             <span>Nenhum serviço encontrado com essa busca!</span>
           )}
         </div>
-
       </div>
     </section>
   );

@@ -766,16 +766,15 @@ export function QuotationDataForm({
       </section>
 
       <>
-        {isMaterialModalOpen && (
-          <SelectMaterialModal
-            materials={materials}
-            cleanError={() => {}}
-            closeModal={() => {
-              setIsMaterialModalOpen(false);
-            }}
-            selectMaterial={handleNewInventoryMaterial}
-          />
-        )}
+        <SelectMaterialModal
+          materials={materials}
+          cleanError={() => {}}
+          closeModal={() => {
+            setIsMaterialModalOpen(false);
+          }}
+          isHiddden={!isMaterialModalOpen}
+          selectMaterial={handleNewInventoryMaterial}
+        />
         {isLaborModalOpen && (
           <SelectLaborModal
             labors={labors}

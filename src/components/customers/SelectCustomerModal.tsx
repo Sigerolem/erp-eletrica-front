@@ -33,7 +33,7 @@ export function SelectCustomerModal({
     return () => {
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [])
+  }, []);
 
   useEffect(() => {
     setCustomersFound(customers);
@@ -65,8 +65,9 @@ export function SelectCustomerModal({
   return (
     <section className={"absolute top-0 left-0 w-full h-full"}>
       <div
-        className={`fixed top-0 left-0 w-full h-full ${xSize < 700 ? "p-8" : "p-32"
-          } bg-[#000000AA] z-20`}
+        className={`fixed top-0 left-0 w-full h-full ${
+          xSize < 700 ? "p-8" : "p-32"
+        } bg-[#000000AA] z-20`}
         onClick={closeModal}
       >
         <div
@@ -77,9 +78,7 @@ export function SelectCustomerModal({
             e.stopPropagation();
           }}
         >
-          <strong className={"pb-2 text-lg block"}>
-            Selecione um cliente
-          </strong>
+          <strong className={"pb-2 text-lg block"}>Selecione um cliente</strong>
           <div className={"flex gap-2 w-full items-end"}>
             <Input
               name="search"
@@ -95,7 +94,7 @@ export function SelectCustomerModal({
                 if (e.key == "Enter") {
                   e.preventDefault();
                   const button = document.querySelector<HTMLButtonElement>(
-                    "[name='searchButton']"
+                    "[name='searchButton']",
                   );
                   if (button) {
                     e.currentTarget.blur();
