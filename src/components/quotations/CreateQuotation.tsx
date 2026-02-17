@@ -12,6 +12,7 @@ import { Button } from "@elements/Button";
 
 export function CreateQuotation() {
   const [customers, setCustomers] = useState<CustomersType[]>([]);
+  const [somethingChanged, setSomethingChanged] = useState(false);
 
   useEffect(() => {
     fetchWithToken<{ customers: CustomersType[] }>({ path: "/customers" }).then(
@@ -61,6 +62,7 @@ export function CreateQuotation() {
         <QuotationDataForm
           doOnSubmit={handleDataSubmition}
           customers={customers}
+          setSomethingChanged={setSomethingChanged}
         >
           <Button
             className={"bg-blue-700 text-white"}
