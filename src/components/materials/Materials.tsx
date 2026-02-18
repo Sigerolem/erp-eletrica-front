@@ -1,13 +1,14 @@
-import { useEffect, useState } from "preact/hooks";
-import { CreateMaterialModal } from "@comp/materials/CreateMaterialModal";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
-import { fetchWithToken } from "/src/utils/fetchWithToken";
-import { Table, Td, THead, Tr } from "/src/elements/Table";
-import { BrlStringFromCents } from "@utils/formating";
 import { Button } from "@elements/Button";
+import { BrlStringFromCents } from "@utils/formating";
+import { useEffect, useState } from "preact/hooks";
+import barcodeIcon from "src/assets/white-barcode-icon.png";
 import { Input } from "src/elements/Input";
 import { hasPermission } from "src/utils/permissionLogic";
 import { SelectSupplierModal } from "../suppliers/SelectSupplierModal";
+import { Table, Td, THead, Tr } from "/src/elements/Table";
+import { fetchWithToken } from "/src/utils/fetchWithToken";
+import { ScanMaterialModal } from "./ScanMaterialModal";
 
 export type MaterialsType = {
   id: string;
@@ -55,6 +56,7 @@ export function Materials() {
     amountShowing: 0,
     limit: 0,
   });
+  const [isBarcodeModalOpen, setIsBarcodeModalOpen] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -163,13 +165,48 @@ export function Materials() {
   return (
     <>
       <div className={"pb-20 h-full"}>
-        <header className={"flex justify-between items-end mb-2"}>
-          <h3 className={"text-lg font-semibold"}>Lista de materiais</h3>
+        {isBarcodeModalOpen && (
+          <ScanMaterialModal
+            closeModal={() => {
+              setIsBarcodeModalOpen(false);
+            }}
+          />
+        )}
+        <header className={"flex justify-between items-end mb-2 not-sm:gap-2"}>
+          <div className={"flex gap-2 justify-end items-end"}>
+            <h3 className={"text-lg font-semibold text-left -mb-1"}>
+              Lista de materiais
+            </h3>
+          </div>
+          <button
+            type={"button"}
+            className={
+              "bg-blue-700 p-1 rounded-lg flex items-center sm:gap-2 not-sm:gap-1 not-sm:flex-col"
+            }
+            onClick={() => {
+              setIsBarcodeModalOpen(true);
+            }}
+          >
+            <span
+              className={
+                "text-white font-semibold p-0.5 not-sm:text-sm not-sm:-mb-2"
+              }
+            >
+              Buscar
+            </span>
+            <img
+              src={barcodeIcon.src}
+              className={"w-8"}
+              alt="Ler código de barras"
+            />
+          </button>
           {userCanEditMaterial && (
             <a href="/materiais/novo">
               <Button
                 text="Cadastrar novo"
-                className={"bg-blue-700 text-white text-sm"}
+                className={
+                  "bg-blue-700 text-white text-sm not-sm:leading-[1.3]"
+                }
               />
             </a>
           )}
