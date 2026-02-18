@@ -95,6 +95,7 @@ export function ScanMaterialModal({ closeModal }: { closeModal: () => void }) {
                       'input[name="search"]',
                     ) as HTMLInputElement;
                     input.focus();
+                    input.select();
                   }, 100);
                 }}
                 className={"bg-gray-600 text-white"}
