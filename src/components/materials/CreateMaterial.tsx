@@ -28,7 +28,6 @@ export function CreateMaterial() {
       method: "POST",
       body: JSON.stringify(materialData),
     });
-    setIsFetching(false);
 
     if (code == 201) {
       const material = data.material;
@@ -36,6 +35,7 @@ export function CreateMaterial() {
       window.location.reload();
       return null;
     }
+    setIsFetching(false);
 
     if (code == 409) {
       let erro = {} as { [key: string]: string };
@@ -71,7 +71,9 @@ export function CreateMaterial() {
       }
     }
 
-    window.alert("Erro ao salvar o material");
+    window.alert(
+      "Erro inesperado ao salvar o material. Consulte o desenvolvedor se necessário.",
+    );
     console.error(code, data);
     return { erro: "Algum problema ocorreu" };
   }

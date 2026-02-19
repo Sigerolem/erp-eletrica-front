@@ -1,5 +1,10 @@
 import { fetchWithToken } from "@utils/fetchWithToken";
-import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type StateUpdater,
+} from "preact/hooks";
 import { CustomerDataForm } from "./CustomerDataForm";
 import type { CustomersType } from "./Customers";
 import { Button } from "@elements/Button";
@@ -11,6 +16,8 @@ export function CreateCustomerModal({
   closeModal: () => void;
   setCustomers: Dispatch<StateUpdater<CustomersType[]>>;
 }) {
+  const [isFetching, setIsFetching] = useState(false);
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key == "Escape") {
@@ -26,33 +33,37 @@ export function CreateCustomerModal({
   }, []);
 
   async function handleDataSubmition(customerData: Partial<CustomersType>) {
+    setIsFetching(true);
     const { code, data } = await fetchWithToken<{ customer: CustomersType }>({
       path: "/customers/create",
       method: "POST",
       body: JSON.stringify(customerData),
     });
+    setIsFetching(false);
 
     if (code == 409) {
       let errors = {} as { [key: string]: string };
-      if (data.message.includes("entity.name")) {
+      if (data.message.includes("customers_name")) {
         errors = { ...errors, name: "Esse nome já foi utilizado" };
-      } else if (data.message.includes("entity.cnpj")) {
+        window.alert(`O cliente ${customerData.name} já foi cadastrado.`);
+      } else if (data.message.includes("customers_cnpj")) {
         errors = { ...errors, cnpj: "Esse CNPJ já foi cadastrado" };
+        window.alert(`O cnpj ${customerData.cnpj} já foi cadastrado.`);
       }
       return errors;
-    }
-
-    if (code == 400) {
+    } else if (code == 400) {
       window.alert("Requisição feita ao servidor é inválida.");
       console.error(code, data);
-    }
-
-    if (code == 201) {
+    } else if (code == 201) {
       setCustomers((prev) => [data.customer, ...prev]);
       closeModal();
     } else {
+      window.alert(
+        "Erro inesperado ao salvar cliente. Consulte o desenvolvedor.",
+      );
       console.error(code, data);
     }
+
     return null;
   }
 
@@ -81,7 +92,7 @@ export function CreateCustomerModal({
         </header>
         <div>
           <CustomerDataForm doOnSubmit={handleDataSubmition}>
-            <Button text="Salvar" type={"submit"} />
+            <Button text="Salvar" type={"submit"} disabled={isFetching} />
           </CustomerDataForm>
         </div>
       </div>
