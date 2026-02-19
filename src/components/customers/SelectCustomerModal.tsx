@@ -68,6 +68,7 @@ export function SelectCustomerModal({
       setCustomersFound(data.customers);
       setNothingWasFound(false);
     } else if (code == 404) {
+      setCustomersFound([]);
       setNothingWasFound(true);
     } else {
       setNothingWasFound(false);
@@ -95,7 +96,7 @@ export function SelectCustomerModal({
           }}
         >
           <strong className={"pb-2 text-lg block"}>Selecione um cliente</strong>
-          <div className={"flex gap-2 w-full items-end"}>
+          <div className={"flex gap-2 w-full items-end pb-2"}>
             <Input
               name="search"
               placeholder={"Nome do cliente"}
@@ -145,7 +146,9 @@ export function SelectCustomerModal({
             ))}
           </div>
           {nothingWasFound && (
-            <span>Nenhum cliente encontrado com essa busca!</span>
+            <span className={"-pt-1"}>
+              Nenhum cliente encontrado com essa busca!
+            </span>
           )}
         </div>
       </div>
