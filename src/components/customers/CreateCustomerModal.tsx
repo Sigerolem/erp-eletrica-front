@@ -21,7 +21,13 @@ export function CreateCustomerModal({
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key == "Escape") {
-        closeModal();
+        if (isFetching == false) {
+          closeModal();
+        } else {
+          window.alert(
+            "Aguarde alguns segundos a requisição ao servidor obter resposta, ou atualize a página.",
+          );
+        }
       }
     };
 
@@ -30,7 +36,7 @@ export function CreateCustomerModal({
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, []);
+  }, [isFetching]);
 
   async function handleDataSubmition(customerData: Partial<CustomersType>) {
     setIsFetching(true);
@@ -39,6 +45,13 @@ export function CreateCustomerModal({
       method: "POST",
       body: JSON.stringify(customerData),
     });
+
+    if (code == 201) {
+      setCustomers((prev) => [data.customer, ...prev]);
+      closeModal();
+      return null;
+    }
+
     setIsFetching(false);
 
     if (code == 409) {
@@ -54,26 +67,27 @@ export function CreateCustomerModal({
     } else if (code == 400) {
       window.alert("Requisição feita ao servidor é inválida.");
       console.error(code, data);
-    } else if (code == 201) {
-      setCustomers((prev) => [data.customer, ...prev]);
-      closeModal();
-    } else {
-      window.alert(
-        "Erro inesperado ao salvar cliente. Consulte o desenvolvedor.",
-      );
-      console.error(code, data);
+      return { erro: "Requisição inválida" };
     }
 
-    return null;
+    window.alert(
+      "Erro inesperado ao salvar cliente. Consulte o desenvolvedor.",
+    );
+    console.error(code, data);
+    return { error: "Erro inesperado" };
   }
 
   return (
     <section
-      className={
-        "absolute top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-10 flex flex-col justify-center"
-      }
+      className={`absolute top-0 left-0 w-full h-full p-10 bg-[#000000AA] z-10 flex flex-col justify-center ${isFetching && "hover:cursor-wait!"}`}
       onClick={() => {
-        closeModal();
+        if (isFetching == false) {
+          closeModal();
+        } else {
+          window.alert(
+            "Aguarde alguns segundos a requisição ao servidor obter resposta, ou atualize a página.",
+          );
+        }
       }}
     >
       <div
@@ -86,13 +100,19 @@ export function CreateCustomerModal({
             text="Cancelar"
             className={"bg-red-700 p-2 rounded-md font-semibold text-white"}
             onClick={() => {
-              closeModal();
+              if (isFetching == false) {
+                closeModal();
+              } else {
+                window.alert(
+                  "Aguarde alguns segundos a requisição ao servidor obter resposta, ou atualize a página.",
+                );
+              }
             }}
           />
         </header>
         <div>
           <CustomerDataForm doOnSubmit={handleDataSubmition}>
-            <Button text="Salvar" type={"submit"} disabled={isFetching} />
+            <Button text="Salvar" type={"submit"} loading={isFetching} />
           </CustomerDataForm>
         </div>
       </div>

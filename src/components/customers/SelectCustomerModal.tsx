@@ -17,6 +17,7 @@ export function SelectCustomerModal({
   cleanError: () => void;
 }) {
   const [search, setSearch] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
   const [validationErrors, setValidationErros] = useState<{
     [key: string]: string;
   }>({});
@@ -46,7 +47,15 @@ export function SelectCustomerModal({
   }
 
   async function handleSearchCustomer(value?: string) {
+    if (isFetching) {
+      return;
+    }
     const searchString = encodeURIComponent(value ? value : search);
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
+    setIsFetching(true);
     const { code, data } = await fetchWithToken<{
       customers: CustomersType[];
     }>({
@@ -57,8 +66,15 @@ export function SelectCustomerModal({
     });
     if (code == 200) {
       setCustomersFound(data.customers);
-      setNothingWasFound(data.customers.length == 0);
+      setNothingWasFound(false);
+    } else if (code == 404) {
+      setNothingWasFound(true);
+    } else {
+      setNothingWasFound(false);
+      window.alert("Erro ao buscar clientes");
+      console.error(data);
     }
+    setIsFetching(false);
   }
 
   const xSize = window.innerWidth;
@@ -110,6 +126,7 @@ export function SelectCustomerModal({
               onClick={() => {
                 handleSearchCustomer();
               }}
+              loading={isFetching}
               text="Buscar"
             />
           </div>

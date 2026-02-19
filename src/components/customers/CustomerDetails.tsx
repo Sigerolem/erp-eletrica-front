@@ -6,6 +6,7 @@ import { Button } from "@elements/Button";
 
 export function CustomerDetails() {
   const [customer, setCustomer] = useState<CustomersType | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     const path = new URL(window.location.href);
@@ -22,11 +23,18 @@ export function CustomerDetails() {
   }, []);
 
   async function handleDataSubmition(customerData: Partial<CustomersType>) {
+    setIsFetching(true);
     const { code, data } = await fetchWithToken<{ customer: CustomersType }>({
       path: `/customers/${customer?.id}`,
       method: "PUT",
       body: JSON.stringify(customerData),
     });
+
+    if (code == 200 || code == 201) {
+      window.alert("Altterações salvas");
+    }
+
+    setIsFetching(false);
 
     if (code == 409) {
       const errors = {} as { [key: string]: string };
@@ -38,9 +46,6 @@ export function CustomerDetails() {
       return errors;
     }
 
-    if (code == 200 || code == 201) {
-      window.alert("Altterações salvas");
-    }
     return null;
   }
 
@@ -51,7 +56,7 @@ export function CustomerDetails() {
           doOnSubmit={handleDataSubmition}
           customerData={customer ?? undefined}
         >
-          <Button text="Salvar" type={"submit"} />
+          <Button text="Salvar" type={"submit"} loading={isFetching} />
         </CustomerDataForm>
       ) : (
         <span className={"animate-bounce text-xl block mt-8 font-semibold"}>

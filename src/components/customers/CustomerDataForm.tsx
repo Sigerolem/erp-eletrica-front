@@ -12,7 +12,7 @@ export function CustomerDataForm({
   children,
 }: {
   doOnSubmit: (
-    customerData: Partial<CustomersType>
+    customerData: Partial<CustomersType>,
   ) => Promise<{ [key: string]: string } | null>;
   customerData?: CustomersType;
   children: JSX.Element;
@@ -45,7 +45,9 @@ export function CustomerDataForm({
     e.preventDefault();
 
     if (Object.keys(validationErrors).length > 0) {
-      window.alert("Só é possivel salvar com dados válidos.");
+      window.alert(
+        "Só é possivel salvar com dados válidos. Talvez seja necessário atualizar a página.",
+      );
       return;
     }
 
