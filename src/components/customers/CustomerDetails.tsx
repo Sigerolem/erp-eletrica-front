@@ -18,6 +18,13 @@ export function CustomerDetails() {
         setCustomer(result.data.customer);
       } else if (result.code == 403) {
         window.location.href = "/";
+      } else if (result.code == 404) {
+        window.alert("Cliente não encontrado");
+        window.location.href = "/clientes";
+      } else {
+        window.alert("Erro ao buscar cliente no servidor");
+        console.error(result);
+        window.location.href = "/clientes";
       }
     });
   }, []);
