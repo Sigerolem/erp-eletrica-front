@@ -168,7 +168,7 @@ export function MaterialDataForm({
 
     if (barcodeIsValid === false || pkgBarcodeIsValid === false) {
       window.alert(
-        "Não é possivel cadastrar materiais com o código de barras repetido!",
+        "Não é possivel cadastrar materiais com o código de barras já utilizado!",
       );
       return;
     }
