@@ -36,27 +36,36 @@ export function CreateMaterial() {
       window.location.reload();
       return null;
     }
+
     if (code == 409) {
       let erro = {} as { [key: string]: string };
-      console.log(typeof data.error);
       if (typeof data.error == "string") {
-        if (data.error.includes("name")) {
+        if (data.message.includes("materials_name")) {
           erro = {
             ...erro,
-            name: "Esse material já foi previamente cadastrado",
+            name: "Esse material já foi cadastrado",
           };
-        }
-        if (data.error.includes("pkg_barcode")) {
+          window.alert(`O material '${materialData.name}' já foi cadastrado.`);
+        } else if (data.message.includes("materials_pkg_barcode")) {
           erro = {
             ...erro,
             pkg_barcode: "Esse codigo de barras ja está cadastrado",
           };
-        }
-        if (data.error.includes("entity.barcode")) {
+          window.alert(
+            `O código de barras ${materialData.pkg_barcode} já foi utilizado.`,
+          );
+        } else if (data.message.includes("materials_barcode")) {
           erro = {
             ...erro,
             barcode: "Esse codigo de barras ja está cadastrado",
           };
+          window.alert(
+            `O código de barras ${materialData.barcode} já foi utilizado.`,
+          );
+        } else {
+          window.alert(
+            "Erro de conflito inesperado. Consulte o desenvolvedor se necessário.",
+          );
         }
         return erro;
       }

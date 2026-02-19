@@ -1,5 +1,4 @@
 import { type InputHTMLAttributes } from "preact";
-import { useEffect } from "preact/hooks";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -9,7 +8,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ label, errors, name, className, ...rest }: InputProps) {
   return (
-    <div className="flex max-w-full flex-col flex-1 min-w-16">
+    <div className="flex max-w-full flex-col flex-1 min-w-16 relative">
       {label !== undefined && label !== "" && (
         <label className="sm:mb-0.5 font-semibold pl-1 not-md:text-sm">
           {label}
