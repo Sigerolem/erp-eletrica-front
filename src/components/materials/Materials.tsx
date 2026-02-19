@@ -51,6 +51,8 @@ export function Materials() {
     name: "",
     id: "",
   });
+  const [userCantSeeSuppliers, setUserCantSeeSuppliers] = useState(false);
+  const [lastQuery, setLastQuery] = useState<string | null>(null);
   const [searchInfo, setSearchInfo] = useState({
     amountFound: 0,
     amountShowing: 0,
@@ -74,45 +76,27 @@ export function Materials() {
     ) {
       setUserCanEditMaterial(true);
     }
-    let path = "/materials";
-    if (selectedSupplier.id != "") {
-      path += `?supplier_id=${selectedSupplier.id}`;
-      if (search != "") {
-        path += `&search=${search}`;
-      }
-    } else if (search != "") {
-      path += `?search=${search}`;
+    if (
+      role != "owner" &&
+      !hasPermission(permission ?? "----------------", "supplier", "R")
+    ) {
+      setUserCantSeeSuppliers(true);
+      return;
     }
-    fetchWithToken<{
-      materials: MaterialsType[];
-      limit: number;
-      total: number;
-    }>({
-      path,
-    }).then(({ code, data }) => {
-      setIsFetching(false);
-      if (code == 200) {
-        setMaterials(data.materials);
-        setSearchInfo({
-          amountFound: data.total,
-          amountShowing: data.materials.length,
-          limit: data.limit,
-        });
-      } else if (code == 403) {
-        window.location.href = "/";
-      } else {
-        window.alert("Erro ao buscar a lista de materiais");
-        console.error(data);
-      }
-    });
-  }, [search]);
 
-  useEffect(() => {
     fetchWithToken<{ suppliers: SuppliersType[] }>({
       path: "/suppliers",
     }).then(({ code, data }) => {
       if (code == 200) {
         setSuppliers(data.suppliers);
+        const pageQuery = window.location.search;
+        if (pageQuery.includes("supplier")) {
+          const supId = pageQuery.split("supplier=")[1];
+          const sup = data.suppliers.find((s) => s.id == supId);
+          if (sup) {
+            setSelectedSupplier({ name: sup.name, id: sup.id });
+          }
+        }
       } else if (code == 403) {
         window.alert(
           "Não foi permitido acesso à lista de fornecedores para filtro.",
@@ -126,16 +110,20 @@ export function Materials() {
 
   useEffect(() => {
     let path = "/materials";
-    if (selectedSupplier.id != "") {
-      path += `?supplier_id=${selectedSupplier.id}`;
+    const pageQuery = window.location.search;
+
+    if (selectedSupplier.id != "" || pageQuery.includes("supplier")) {
+      path += `?supplier_id=${selectedSupplier.id || pageQuery.split("supplier=")[1]}`;
       if (search != "") {
         path += `&search=${search}`;
       }
     } else if (search != "") {
       path += `?search=${search}`;
-    } else {
-      path += "";
     }
+    if (lastQuery == path) {
+      return;
+    }
+    setLastQuery(path);
     fetchWithToken<{
       materials: MaterialsType[];
       limit: number;
@@ -158,7 +146,43 @@ export function Materials() {
         console.error(data);
       }
     });
-  }, [selectedSupplier]);
+  }, [search, selectedSupplier]);
+
+  // useEffect(() => {
+  //   let path = "/materials";
+  //   if (selectedSupplier.id != "") {
+  //     path += `?supplier_id=${selectedSupplier.id}`;
+  //     if (search != "") {
+  //       path += `&search=${search}`;
+  //     }
+  //   } else if (search != "") {
+  //     path += `?search=${search}`;
+  //   } else {
+  //     path += "";
+  //   }
+  //   fetchWithToken<{
+  //     materials: MaterialsType[];
+  //     limit: number;
+  //     total: number;
+  //   }>({
+  //     path,
+  //   }).then(({ code, data }) => {
+  //     setIsFetching(false);
+  //     if (code == 200) {
+  //       setMaterials(data.materials);
+  //       setSearchInfo({
+  //         amountFound: data.total,
+  //         amountShowing: data.materials.length,
+  //         limit: data.limit,
+  //       });
+  //     } else if (code == 403) {
+  //       window.location.href = "/";
+  //     } else {
+  //       window.alert("Erro ao buscar a lista de materiais");
+  //       console.error(data);
+  //     }
+  //   });
+  // }, [selectedSupplier]);
 
   const xSize = window.innerWidth;
 
@@ -247,6 +271,9 @@ export function Materials() {
                 className={"bg-slate-600 text-white text-sm"}
                 onClick={() => {
                   setSelectedSupplier({ name: "", id: "" });
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete("supplier");
+                  window.history.pushState({}, "", url);
                 }}
               />
             )}
@@ -256,8 +283,12 @@ export function Materials() {
               closeModal={() => {
                 setIsSupplierModalOpen(false);
               }}
-              selectSupplier={(sup) => {
-                setSelectedSupplier({ name: sup.name, id: sup.id });
+              selectSupplier={(supplier) => {
+                setSelectedSupplier({ name: supplier.name, id: supplier.id });
+                setIsSupplierModalOpen(false);
+                const url = new URL(window.location.href);
+                url.searchParams.set("supplier", String(supplier.id));
+                window.history.pushState({}, "", url);
               }}
               suppliers={suppliers}
             />

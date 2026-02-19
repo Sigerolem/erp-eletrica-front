@@ -55,11 +55,15 @@ export function Purchases() {
   const [purchases, setPurchases] = useState<PurchasesType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [userCanCreatePurchase, setUserCanCreatePurchase] = useState(false);
-  const [supplierSelected, setSupplierSelected] = useState<string | null>(null);
+  const [supplierSelected, setSupplierSelected] = useState<{
+    name: string;
+    id: string;
+  } | null>(null);
   const [supplierList, setSupplierList] = useState<SuppliersType[]>([]);
   const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
   const [showOnlyConcluded, setShowOnlyConcluded] = useState(false);
   const [userCantSeeSuppliers, setUserCantSeeSuppliers] = useState(false);
+  const [lastQuery, setLastQuery] = useState<string | null>(null);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -95,7 +99,7 @@ export function Purchases() {
           const supId = pageQuery.split("=")[1];
           const supplier = data.suppliers.find((s) => s.id == supId);
           if (supplier) {
-            setSupplierSelected(supplier.name);
+            setSupplierSelected({ name: supplier.name, id: supplier.id });
           }
         }
       } else if (code == 403) {
@@ -111,40 +115,29 @@ export function Purchases() {
   }, []);
 
   useEffect(() => {
+    let path = "/purchases";
     const pageQuery = window.location.search;
-    let supId: string | null = null;
-    if (pageQuery.includes("supplier") && !userCantSeeSuppliers) {
-      supId = pageQuery.split("=")[1];
 
-      fetchWithToken<{ purchases: PurchasesType[] }>({
-        path: `/purchases/query?supplier=${supId}`,
-      }).then(({ code, data }) => {
-        setIsFetching(false);
-        if (code == 200) {
-          setPurchases(data.purchases);
-        } else {
-          window.alert("Erro ao buscar a lista de materiais");
-          console.error(data);
-        }
-      });
-    } else {
-      if (pageQuery.includes("supplier")) {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("supplier");
-        window.history.pushState({}, "", url);
-      }
-      fetchWithToken<{ purchases: PurchasesType[] }>({
-        path: "/purchases",
-      }).then(({ code, data }) => {
-        setIsFetching(false);
-        if (code == 200) {
-          setPurchases(data.purchases);
-        } else {
-          window.alert("Erro ao buscar a lista de materiais");
-          console.error(data);
-        }
-      });
+    if (supplierSelected?.id || pageQuery.includes("supplier")) {
+      path += `/query?supplier=${supplierSelected?.id || pageQuery.split("supplier=")[1]}`;
     }
+    if (lastQuery == path) {
+      return;
+    }
+    console.log("vai rodar a query", path);
+    setLastQuery(path);
+
+    fetchWithToken<{ purchases: PurchasesType[] }>({
+      path,
+    }).then(({ code, data }) => {
+      setIsFetching(false);
+      if (code == 200) {
+        setPurchases(data.purchases);
+      } else {
+        window.alert("Erro ao buscar a lista de materiais");
+        console.error(data);
+      }
+    });
   }, [supplierSelected]);
 
   const xSize = window.innerWidth;
@@ -181,7 +174,7 @@ export function Purchases() {
               onClick={() => {
                 setIsSupplierModalOpen(true);
               }}
-              value={supplierSelected ?? ""}
+              value={supplierSelected?.name ?? ""}
               disabled={userCantSeeSuppliers}
             />
             {supplierSelected && (
@@ -205,7 +198,7 @@ export function Purchases() {
             }}
             suppliers={supplierList}
             selectSupplier={(supplier) => {
-              setSupplierSelected(supplier.name);
+              setSupplierSelected({ name: supplier.name, id: supplier.id });
               setIsSupplierModalOpen(false);
               const url = new URL(window.location.href);
               url.searchParams.set("supplier", String(supplier.id));
