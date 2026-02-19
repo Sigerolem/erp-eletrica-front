@@ -43,6 +43,6 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: ${{ job.status }}
-          content: "${{ job.status == 'success' && '✅ Deploy do Frontend finalizado com sucesso na VPS!' || '❌ O deploy do Frontend falhou!' }}"
+          content: "${{ job.status == 'success' && '✅ Deploy do Frontend finalizado com sucesso na VPS! @everyone' || '❌ O deploy do Frontend falhou! @everyone' }}"
           title: "Deploy - ERP Elétrica"
           color: "${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}" # Verde se sucesso, Vermelho se falha
