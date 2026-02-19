@@ -4,8 +4,11 @@ import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
 import { fetchWithToken } from "/src/utils/fetchWithToken";
 import { hasPermission } from "src/utils/permissionLogic";
+import { useState } from "preact/hooks";
 
 export function CreateMaterial() {
+  const [isFetching, setIsFetching] = useState(false);
+
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
     const permission = localStorage.getItem("apiPermissions");
@@ -19,11 +22,13 @@ export function CreateMaterial() {
   }, []);
 
   async function onFormSubmit(materialData: Partial<MaterialsType>) {
+    setIsFetching(true);
     const { data, code } = await fetchWithToken<{ material: MaterialsType }>({
       path: "/materials/create",
       method: "POST",
       body: JSON.stringify(materialData),
     });
+    setIsFetching(false);
 
     if (code == 201) {
       const material = data.material;
@@ -74,7 +79,7 @@ export function CreateMaterial() {
   return (
     <div className={""}>
       <MaterialDataForm doOnSubmit={onFormSubmit}>
-        <Button text="Salvar material" type={"submit"} />
+        <Button text="Salvar material" type={"submit"} disabled={isFetching} />
       </MaterialDataForm>
     </div>
   );
