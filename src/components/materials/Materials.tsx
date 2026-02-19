@@ -124,6 +124,7 @@ export function Materials() {
       return;
     }
     setLastQuery(path);
+
     fetchWithToken<{
       materials: MaterialsType[];
       limit: number;
