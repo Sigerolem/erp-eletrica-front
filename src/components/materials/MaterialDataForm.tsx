@@ -61,6 +61,10 @@ export function MaterialDataForm({
     id: string;
     name: string;
   } | null>(null);
+  const [barcodeIsValid, setBarcodeIsValid] = useState<boolean | null>(null);
+  const [pkgBarcodeIsValid, setPkgBarcodeIsValid] = useState<boolean | null>(
+    null,
+  );
 
   const [userCanEditMaterial, setUserCanEditMaterial] = useState(false);
   const [userCanDeleteMaterial, setUserCanDeleteMaterial] = useState(false);
@@ -162,6 +166,12 @@ export function MaterialDataForm({
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    if (barcodeIsValid === false || pkgBarcodeIsValid === false) {
+      window.alert(
+        "Não é possivel cadastrar materiais com o código de barras repetido!",
+      );
+      return;
+    }
     const submitData = {
       name,
       barcode: barcode || null,
@@ -184,6 +194,46 @@ export function MaterialDataForm({
 
     const errors = await doOnSubmit(submitData);
     setValidationErrors((prev) => ({ ...prev, ...errors }));
+  }
+
+  async function checkIfBarcodeIsNew(scanCode: string, isPkgField?: boolean) {
+    if (scanCode == "") {
+      return;
+    }
+
+    if (
+      materialData !== undefined &&
+      (materialData.barcode == scanCode || materialData.pkg_barcode == scanCode)
+    ) {
+      if (isPkgField) {
+        setPkgBarcodeIsValid(null);
+      } else {
+        setBarcodeIsValid(null);
+      }
+      return;
+    }
+
+    const { code, data } = await fetchWithToken<{
+      material: MaterialsType | null;
+    }>({ path: `/materials/scan/${scanCode}` });
+    if (code == 200) {
+      window.alert(
+        `Esse código de barras é do material: ${data.material?.name}`,
+      );
+      if (isPkgField) {
+        setPkgBarcodeIsValid(false);
+      } else {
+        setBarcodeIsValid(false);
+      }
+    } else if (code == 404) {
+      if (isPkgField) {
+        setPkgBarcodeIsValid(true);
+      } else {
+        setBarcodeIsValid(true);
+      }
+    } else {
+      window.alert("Erro ao verificar código de barras.");
+    }
   }
 
   return (
@@ -213,9 +263,11 @@ export function MaterialDataForm({
               min: 4,
               max: 100,
             });
+            checkIfBarcodeIsNew(e.currentTarget.value);
           }}
           disabled={!userCanEditMaterial}
-          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
+          className={`${!userCanEditMaterial ? "bg-blue-50!" : ""} 
+          ${barcodeIsValid === true ? "bg-green-100! border-green-600" : barcodeIsValid === false ? "bg-red-300! border-red-600" : ""}`}
           errors={validationErrors}
         />
         <Input
@@ -227,9 +279,11 @@ export function MaterialDataForm({
               min: 4,
               max: 100,
             });
+            checkIfBarcodeIsNew(e.currentTarget.value, true);
           }}
           disabled={!userCanEditMaterial}
-          className={!userCanEditMaterial ? "bg-blue-50!" : ""}
+          className={`${!userCanEditMaterial ? "bg-blue-50!" : ""} 
+          ${pkgBarcodeIsValid === true ? "bg-green-100! border-green-600" : pkgBarcodeIsValid === false ? "bg-red-300! border-red-600" : ""}`}
           errors={validationErrors}
         />
       </div>
