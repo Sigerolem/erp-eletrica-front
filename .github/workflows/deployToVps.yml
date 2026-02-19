@@ -36,3 +36,13 @@ jobs:
 
             rm -rf /var/www/erp-eletrica-front/*
             cp -r dist/* /var/www/erp-eletrica-front/
+
+      - name: Notificar Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          content: "${{ job.status == 'success' && '✅ Deploy do Frontend finalizado com sucesso na VPS!' || '❌ O deploy do Frontend falhou!' }}"
+          title: "Deploy - ERP Elétrica"
+          color: "${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}" # Verde se sucesso, Vermelho se falha
