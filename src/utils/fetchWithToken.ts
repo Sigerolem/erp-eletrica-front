@@ -4,7 +4,7 @@ interface SuccessResponse<T> {
 }
 
 interface ErrorResponse {
-  code: 400 | 401 | 402 | 403 | 404 | 409 | 500 | 501;
+  code: 400 | 401 | 402 | 403 | 404 | 409 | 429 | 500 | 501;
   data: { error: Error | string; message: string };
 }
 
@@ -33,7 +33,8 @@ export async function fetchWithToken<T>({
   }
 
   try {
-    const DOMAIN = import.meta.env.PUBLIC_SERVER_DOMAIN ?? "sistema.eseletrica.com.br";
+    const DOMAIN =
+      import.meta.env.PUBLIC_SERVER_DOMAIN ?? "sistema.eseletrica.com.br";
     const url =
       window.location.hostname == "localhost"
         ? "http://localhost:3000/api"
@@ -65,6 +66,15 @@ export async function fetchWithToken<T>({
     console.warn("Forbidden", data);
     window.alert("Você não tem permissão para realizar essa ação.");
     return { code: 403, data: { error: data, message: "Forbidden" } };
+  }
+
+  if (response.status == 429) {
+    console.warn("Too many requests", data);
+    window.alert(
+      "Você excedeu o limite de requisições. Aguarde alguns segundos e atualize a página.",
+    );
+    throw new Error("Too many requests");
+    return { code: 429, data: { error: data, message: "Too many requests" } };
   }
 
   if (response.status == 200 || response.status == 201) {
