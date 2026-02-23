@@ -41,6 +41,26 @@ export default defineConfig({
         },
       }),
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
+            if (id.includes('CustomerDataForm') || id.includes('UserDataForm') || id.includes('SupplierDataForm') || id.includes('SelectSupplierModal')){
+              return 'forms';
+            }
+            if (id.includes('/src/elements/UserCard') || id.includes('SideBar')){
+              return 'sidebar';
+            }
+            if (id.includes("/src/elements") || id.includes("ListWrapper.tsx") || id.includes("/src/utils")) {
+              return "extra";
+            }
+          },
+        },
+      },
+    },
   },
   base: "/",
   trailingSlash: "ignore",

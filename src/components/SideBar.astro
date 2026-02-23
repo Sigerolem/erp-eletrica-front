@@ -1,6 +1,5 @@
 ---
 import { SideBarMenu } from "@comp/SideBarMenu";
-import { UserCard } from "@elements/UserCard";
 
 const routes = [
   { name: "Dashboard", path: "/" },
@@ -21,7 +20,6 @@ const routes = [
   transition:persist
   class="bg-slate-800 p-4 gap-3 flex md:flex-col navBar md:fixed md:h-full not-md:w-full not-md:overflow-scroll"
 >
-  <UserCard client:load />
   <SideBarMenu routes={routes} client:only="preact" />
   <script>
     document.addEventListener("DOMContentLoaded", () => {
