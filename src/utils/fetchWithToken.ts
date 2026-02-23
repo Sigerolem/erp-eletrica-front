@@ -73,7 +73,6 @@ export async function fetchWithToken<T>({
     window.alert(
       "Você excedeu o limite de requisições. Aguarde alguns segundos e atualize a página.",
     );
-    throw new Error("Too many requests");
     return { code: 429, data: { error: data, message: "Too many requests" } };
   }
 
