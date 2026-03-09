@@ -14,7 +14,6 @@ interface ComponentProps {
   setIsThereError: (bool: boolean) => void;
   deleteItem: Dispatch<StateUpdater<string[]>>;
   readOnly?: boolean;
-  setSomethingChanged: Dispatch<StateUpdater<boolean>>;
 }
 
 export function InventoryItemsList({
@@ -23,7 +22,6 @@ export function InventoryItemsList({
   setItemsList,
   deleteItem,
   readOnly,
-  setSomethingChanged,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationMaterialsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
@@ -55,7 +53,6 @@ export function InventoryItemsList({
     setItemsList((prev) => [
       ...prev.filter((item) => item.material_id != matId),
     ]);
-    setSomethingChanged(true);
   }
 
   function handleUpdateItemInt({
@@ -87,47 +84,7 @@ export function InventoryItemsList({
         }
       }),
     );
-    setSomethingChanged(true);
   }
-
-  // function handleUpdateItemCurrency({  n tava usando, se for usar tem que colocar o has changed aqui
-  //   material_id,
-  //   value,
-  //   propName,
-  // }: {
-  //   material_id: string;
-  //   value: string;
-  //   propName: string;
-  // }) {
-  //   value = value
-  //     .replace("R$", "")
-  //     .trim()
-  //     .replaceAll(".", "")
-  //     .replaceAll(",", ".");
-  //   if (isNaN(parseFloat(value || "0"))) {
-  //     setValidationErrors((prev) => ({
-  //       ...prev,
-  //       [`${propName}-${material_id}`]: "Digite um valor válido",
-  //     }));
-  //   } else {
-  //     setValidationErrors((prev) => {
-  //       delete prev[`${propName}-${material_id}`];
-  //       return { ...prev };
-  //     });
-  //   }
-  //   setItems((prev) =>
-  //     prev.map((item) => {
-  //       if (item.material_id == material_id) {
-  //         return {
-  //           ...item,
-  //           [propName]: Math.round(parseFloat(value || "0") * 100),
-  //         };
-  //       } else {
-  //         return item;
-  //       }
-  //     }),
-  //   );
-  // }
 
   const xSize = window.innerWidth;
 

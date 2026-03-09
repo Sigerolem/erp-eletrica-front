@@ -23,7 +23,6 @@ interface ComponentProps {
   deleteItem: Dispatch<StateUpdater<string[]>>;
   quotation?: QuotationsType;
   readOnly?: boolean;
-  setSomethingChanged: Dispatch<StateUpdater<boolean>>;
 }
 
 export function ExceptionalItemsList({
@@ -34,7 +33,6 @@ export function ExceptionalItemsList({
   deleteItem,
   quotation,
   readOnly,
-  setSomethingChanged,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
@@ -54,7 +52,6 @@ export function ExceptionalItemsList({
   }, [itemsList]);
 
   function handleDeleteItem({ createdAt }: { createdAt: string }) {
-    setSomethingChanged(true);
     const errors = Object.keys(validationErrors);
     errors.forEach((error) => {
       if (error.includes(`-${createdAt}`)) {
@@ -98,7 +95,6 @@ export function ExceptionalItemsList({
         }
       }),
     );
-    setSomethingChanged(true);
   }
   const xSize = window.innerWidth;
 
@@ -119,7 +115,6 @@ export function ExceptionalItemsList({
       setItemsList,
       setValidationErrors,
     });
-    setSomethingChanged(true);
   }
 
   return (
@@ -261,7 +256,6 @@ export function ExceptionalItemsList({
                       propName: "expected_amount",
                       createdAt: item.created_at!,
                     });
-                    setSomethingChanged(true);
                   }}
                   errors={validationErrors}
                   className={readOnly ? "min-w-4 bg-blue-50!" : "min-w-4"}
