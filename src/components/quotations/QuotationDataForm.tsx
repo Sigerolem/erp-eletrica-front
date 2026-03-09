@@ -1,18 +1,3 @@
-import type { CustomersType } from "@comp/customers/Customers";
-import { SelectCustomerModal } from "@comp/customers/SelectCustomerModal";
-import type { MaterialsType } from "@comp/materials/Materials";
-import { SelectMultipleMaterialsModal } from "@comp/materials/SelectMultipleMaterialsModal";
-import type { LaborsType } from "@comp/labors/Labors";
-import { SelectLaborModal } from "@comp/labors/SelectLaborModal";
-import { DataForm } from "@elements/DataForm";
-import { Input } from "@elements/Input";
-import { Textarea } from "@elements/TextArea";
-import { fetchWithToken } from "@utils/fetchWithToken";
-import {
-  validateFloatFieldOnBlur,
-  validateIntFieldOnBlur,
-  validateStringFieldOnBlur,
-} from "@utils/inputValidation";
 import type { JSX, TargetedSubmitEvent } from "preact";
 import {
   useEffect,
@@ -20,20 +5,40 @@ import {
   type Dispatch,
   type StateUpdater,
 } from "preact/hooks";
+
+import { fetchWithToken } from "@utils/fetchWithToken";
+import {
+  BrlStringFromCents,
+  formatQuotationStatusEnum,
+} from "@utils/formating";
+import { hasPermission } from "@utils/permissionLogic";
+import {
+  validateFloatFieldOnBlur,
+  validateIntFieldOnBlur,
+  validateStringFieldOnBlur,
+} from "@utils/inputValidation";
+
+import type { CustomersType } from "@comp/customers/Customers";
+import { SelectCustomerModal } from "@comp/customers/SelectCustomerModal";
+import type { MaterialsType } from "@comp/materials/Materials";
+import { SelectMultipleMaterialsModal } from "@comp/materials/SelectMultipleMaterialsModal";
+import type { LaborsType } from "@comp/labors/Labors";
+import { SelectLaborModal } from "@comp/labors/SelectLaborModal";
+
+import { DataForm } from "@elements/DataForm";
+import { Input } from "@elements/Input";
+import { Textarea } from "@elements/TextArea";
+
 import { ExceptionalItemsList } from "./lists/ExceptionalItemsList";
 import { InventoryItemsList } from "./lists/InventoryItemsList";
+import { ListWrapper } from "./lists/ListWrapper";
 import type {
   QuotationItemsType,
   QuotationMaterialsType,
   QuotationsStatusType,
   QuotationsType,
 } from "./Quotations";
-import { ListWrapper } from "./lists/ListWrapper";
-import {
-  BrlStringFromCents,
-  formatQuotationStatusEnum,
-} from "@utils/formating";
-import { hasPermission } from "src/utils/permissionLogic";
+import { useQuotationState } from "./useQuotationFormState";
 
 export function QuotationDataForm({
   quotationData,
@@ -54,61 +59,90 @@ export function QuotationDataForm({
 }) {
   const URL_PATH = window.location.pathname;
 
+  const { baseInfo, totals, actions, lists, thereIsChange } =
+    useQuotationState(quotationData);
+  const {
+    status,
+    description,
+    reference,
+    publicComments,
+    privateComments,
+    toolList,
+    expectedDuration,
+    purchaseOrder,
+    matDiscount,
+    serDiscount,
+    customerSelected,
+  } = baseInfo;
+  const {
+    directCost,
+    directValue,
+    materialCost,
+    materialValue,
+    serviceCost,
+    serviceValue,
+  } = totals;
+  const {
+    quoteMaterials,
+    setQuoteMaterials,
+    occasionalMaterials,
+    setOccasionalMaterials,
+    serviceItems,
+    setServiceItems,
+    expenses,
+    setExpenses,
+    materialsToDelete,
+    setMaterialsToDelete,
+    itemsToDelete,
+    setItemsToDelete,
+  } = lists;
+  const {
+    updateField,
+    handleNewInventoryMaterial,
+    handleNewExceptionalMaterial,
+    handleNewExpenseItem,
+    handleNewBlankServiceItem,
+    handleSelectLabor,
+  } = actions;
+
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isLaborModalOpen, setIsLaborModalOpen] = useState(false);
   const [labors, setLabors] = useState<LaborsType[]>([]);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
-  const [itemsToDelete, setItemsToDelete] = useState<string[]>([]);
-  const [materialsToDelete, setMaterialsToDelete] = useState<string[]>([]);
-
-  const [reference, setReference] = useState("");
-  const [description, setDescription] = useState("");
-  const [expectedDuration, setExpectedDuration] = useState(0);
-  const [toolList, setToolList] = useState("");
-  const [privateComments, setPrivateComments] = useState("");
-  const [publicComments, setPublicComments] = useState("");
-  const [status, setStatus] = useState<QuotationsStatusType>("q_awaiting");
-  const [purchaseOrder, setPurchaseOrder] = useState("");
-
-  const [materialCost, setMaterialCost] = useState(0);
-  const [materialValue, setMaterialValue] = useState(0);
-  const [serviceCost, setServiceCost] = useState(0);
-  const [serviceValue, setServiceValue] = useState(0);
-  const [directCost, setDirectCost] = useState(0);
-  const [directValue, setDirectValue] = useState(0);
-  const [matDiscount, setMatDiscount] = useState(0);
-  const [serDiscount, setSerDiscount] = useState(0);
-
   const [showValues, setShowValues] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
-  const [customerSelected, setCustomerSelected] =
-    useState<CustomersType | null>(null);
-
-  const [quoteMaterials, setQuoteMaterials] = useState<
-    Partial<QuotationMaterialsType>[]
-  >([]);
-  const [occasionalMaterials, setOccasionalMaterials] = useState<
-    Partial<QuotationItemsType>[]
-  >([]);
-  const [serviceItems, setServiceItems] = useState<
-    Partial<QuotationItemsType>[]
-  >([]);
-  const [expenses, setExpenses] = useState<Partial<QuotationItemsType>[]>([]);
-
-  const [dataWasUsed, setDataWasUsed] = useState(false);
   const [userCanEdit, setUserCanEdit] = useState(false);
 
-  const [baseDataHasChanged, setBaseDataHasChanged] = useState(false);
-  const [materialsHasChanged, setMaterialsHasChanged] = useState(false);
-  const [itemsHasChanged, setItemsHasChanged] = useState(false);
-  const [expensesHasChanged, setExpensesHasChanged] = useState(false);
-  const [servicesHasChanged, setServicesHasChanged] = useState(false);
+  useEffect(() => {
+    async function fetchLists() {
+      const [materialsResult, laborsResult] = await Promise.all([
+        fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }),
+        fetchWithToken<{ labors: LaborsType[] }>({ path: "/labors" }),
+      ]);
+      if (materialsResult.code == 200) {
+        setMaterials(materialsResult.data.materials);
+      } else if (materialsResult.code == 403) {
+        window.alert(
+          "Você não tem permissão para obter a lista de materiais cadastrados.",
+        );
+      }
+      if (laborsResult.code == 200) {
+        setLabors(laborsResult.data.labors);
+      } else if (laborsResult.code == 403) {
+        window.alert(
+          "Você não tem permissão para obter a lista de serviços cadastrados.",
+        );
+      }
+    }
+    fetchLists();
+  }, []);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -121,161 +155,24 @@ export function QuotationDataForm({
       window.location.href = "/";
       return;
     }
-
-    if (quotationData) {
-      if (
-        ["q_awaiting", "q_approved", "denied"].includes(quotationData.status)
-      ) {
-        if (
-          role == "owner" ||
-          hasPermission(permission ?? "----------------", "quotation", "W")
-        ) {
-          setUserCanEdit(true);
-        }
-      } else {
-        if (
-          role == "owner" ||
-          hasPermission(permission ?? "----------------", "order", "W")
-        ) {
-          setUserCanEdit(true);
-        }
-      }
-    } else {
-      if (
-        role == "owner" ||
-        hasPermission(permission ?? "----------------", "quotation", "W")
-      ) {
-        setUserCanEdit(true);
-      }
+    const isNotOrderYet = ["q_awaiting", "q_approved", "denied"].includes(
+      quotationData?.status ?? "q_awaiting",
+    );
+    if (
+      role == "owner" ||
+      hasPermission(
+        permission ?? "----------------",
+        isNotOrderYet ? "quotation" : "order",
+        "W",
+      )
+    ) {
+      setUserCanEdit(true);
     }
-
-    if (quotationData) {
-      setDataWasUsed(true);
-      setStatus(quotationData.status);
-      setMaterialCost(quotationData.material_cost);
-      setMaterialValue(quotationData.material_value);
-      setServiceCost(quotationData.service_cost);
-      setServiceValue(quotationData.service_value);
-      setDirectCost(quotationData.direct_cost);
-      setDirectValue(quotationData.direct_value);
-      setSerDiscount(quotationData.ser_discount);
-      setMatDiscount(quotationData.mat_discount);
-      setPurchaseOrder(quotationData.purchase_order);
-      setToolList(quotationData.tool_list);
-      setReference(quotationData.reference);
-      setDescription(quotationData.description);
-      setExpectedDuration(quotationData.expected_duration);
-      setPrivateComments(quotationData.private_comments);
-      setPublicComments(quotationData.public_comments);
-      setCustomerSelected(quotationData.customer);
-      setQuoteMaterials(quotationData.materials);
-      setOccasionalMaterials(
-        quotationData.items.filter(
-          (item) => item.type === "occasional_material",
-        ),
-      );
-      setServiceItems(
-        quotationData.items.filter((item) => item.type === "service"),
-      );
-      setExpenses(
-        quotationData.items.filter((item) => item.type === "expense"),
-      );
-    }
-    setMaterialsToDelete([]);
-    setItemsToDelete([]);
   }, [quotationData]);
 
   useEffect(() => {
-    if (
-      baseDataHasChanged ||
-      materialsHasChanged ||
-      itemsHasChanged ||
-      expensesHasChanged ||
-      servicesHasChanged
-    ) {
-      setSomethingChanged(true);
-    } else {
-      setSomethingChanged(false);
-    }
-  }, [
-    baseDataHasChanged,
-    materialsHasChanged,
-    itemsHasChanged,
-    expensesHasChanged,
-    servicesHasChanged,
-  ]);
-
-  useEffect(() => {
-    if (!quotationData || !dataWasUsed) {
-      return;
-    }
-    if (
-      status !== quotationData.status ||
-      materialCost !== quotationData.material_cost ||
-      materialValue !== quotationData.material_value ||
-      serviceCost !== quotationData.service_cost ||
-      serviceValue !== quotationData.service_value ||
-      directCost !== quotationData.direct_cost ||
-      directValue !== quotationData.direct_value ||
-      matDiscount !== quotationData.mat_discount ||
-      serDiscount !== quotationData.ser_discount ||
-      purchaseOrder !== quotationData.purchase_order ||
-      toolList !== quotationData.tool_list ||
-      reference !== quotationData.reference ||
-      description !== quotationData.description ||
-      expectedDuration !== quotationData.expected_duration ||
-      privateComments !== quotationData.private_comments ||
-      publicComments !== quotationData.public_comments
-    ) {
-      setBaseDataHasChanged(true);
-    }
-  }, [
-    status,
-    materialCost,
-    materialValue,
-    serviceCost,
-    serviceValue,
-    directCost,
-    directValue,
-    matDiscount,
-    serDiscount,
-    purchaseOrder,
-    toolList,
-    reference,
-    description,
-    expectedDuration,
-    privateComments,
-    publicComments,
-  ]);
-
-  useEffect(() => {
-    if (!quotationData || !dataWasUsed) {
-      return;
-    }
-    if (quoteMaterials.length != quotationData.materials.length) {
-      setSomethingChanged(true);
-    }
-  }, [quoteMaterials]);
-
-  useEffect(() => {
-    fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }).then(
-      (result) => {
-        if (result.code == 200) {
-          setMaterials(result.data.materials);
-        }
-      },
-    );
-  }, []);
-
-  useEffect(() => {
-    fetchWithToken<{ labors: LaborsType[] }>({ path: "/labors" }).then(
-      (result) => {
-        if (result.code == 200) {
-          setLabors(result.data.labors);
-        }
-      },
-    );
-  }, []);
+    setSomethingChanged(Object.keys(thereIsChange).length > 0);
+  }, [thereIsChange]);
 
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -283,6 +180,7 @@ export function QuotationDataForm({
 
     if (Object.keys(validationErrors).length > 0) {
       window.alert("Só é possivel salvar com dados válidos.");
+      console.warn(Object.values(validationErrors));
       return;
     }
 
@@ -312,8 +210,8 @@ export function QuotationDataForm({
       description,
       expected_duration: expectedDuration,
       tool_list: toolList,
-      mat_discount: 0,
-      ser_discount: 0,
+      mat_discount: matDiscount,
+      ser_discount: serDiscount,
       private_comments: privateComments,
       public_comments: publicComments,
       purchase_order: purchaseOrder,
@@ -337,11 +235,6 @@ export function QuotationDataForm({
     if (errors) {
       setValidationErrors((prev) => ({ ...prev, ...errors }));
     } else {
-      setMaterialsHasChanged(false);
-      setItemsHasChanged(false);
-      setExpensesHasChanged(false);
-      setServicesHasChanged(false);
-      setBaseDataHasChanged(false);
       setSomethingChanged(false);
     }
   }
@@ -357,105 +250,7 @@ export function QuotationDataForm({
     }
   }
 
-  function handleNewInventoryMaterial(material: MaterialsType) {
-    if (quoteMaterials.map((item) => item.material_id).includes(material.id)) {
-      return;
-    }
-    const newInvMaterial: Partial<QuotationMaterialsType> = {
-      material_id: material.id,
-      name: material.name,
-      unit_cost: material.avg_cost,
-      unit_profit: material.profit,
-      unit_value: material.value,
-      expected_amount: 0,
-      returned_amount: 0,
-      taken_amount: 0,
-      quotation_id: quotationData?.id || undefined,
-      is_private: false,
-      created_at: new Date().toISOString(),
-    };
-    setQuoteMaterials((prev) => [newInvMaterial, ...prev]);
-    setMaterialsHasChanged(true);
-  }
-
-  function handleNewExceptionalMaterial() {
-    const newOccMaterial: Partial<QuotationItemsType> = {
-      type: "occasional_material",
-      name: "",
-      unit_cost: 0,
-      unit_profit: 0,
-      unit_value: 0,
-      unit: "un",
-      expected_amount: 0,
-      taken_amount: 0,
-      is_private: false,
-      quotation_id: quotationData?.id,
-      created_at: new Date().toISOString(),
-    };
-    setOccasionalMaterials((prev) => [newOccMaterial, ...prev]);
-    setItemsHasChanged(true);
-  }
-
-  function handleOpenLaborModal() {
-    setIsLaborModalOpen(true);
-  }
-
-  function handleNewBlankServiceItem() {
-    const newService: Partial<QuotationItemsType> = {
-      type: "service",
-      name: "",
-      unit_cost: 0,
-      unit_profit: 0,
-      unit_value: 0,
-      unit: "un",
-      expected_amount: 0,
-      taken_amount: 0,
-      is_private: false,
-      quotation_id: quotationData?.id,
-      created_at: new Date().toISOString(),
-    };
-    setServiceItems((prev) => [newService, ...prev]);
-    setServicesHasChanged(true);
-  }
-
-  function handleSelectLabor(labor: LaborsType) {
-    const newService: Partial<QuotationItemsType> = {
-      type: "service",
-      name: labor.name,
-      unit_cost: labor.cost,
-      unit_profit: labor.profit,
-      unit_value: labor.value,
-      unit: labor.unit,
-      expected_amount: 0,
-      taken_amount: 0,
-      is_private: false,
-      quotation_id: quotationData?.id,
-      created_at: new Date().toISOString(),
-    };
-    setServiceItems((prev) => [newService, ...prev]);
-    setServicesHasChanged(true);
-  }
-
-  function handleNewExpenseItem() {
-    const newService: Partial<QuotationItemsType> = {
-      type: "expense",
-      name: "",
-      unit_cost: 0,
-      unit_profit: 0,
-      unit_value: 0,
-      unit: "un",
-      expected_amount: 0,
-      taken_amount: 0,
-      is_private: false,
-      quotation_id: quotationData?.id,
-      created_at: new Date().toISOString(),
-    };
-    setExpenses((prev) => [...prev, newService]);
-    setExpensesHasChanged(true);
-  }
-
   const xSize = window.innerWidth;
-
   return (
     <DataForm onSubmit={onFormSubmit}>
       <Input
@@ -463,7 +258,7 @@ export function QuotationDataForm({
         name="reference"
         value={reference}
         onBlur={(e) => {
-          validateStringFieldOnBlur(e, setReference, setValidationErrors, {
+          validateStringFieldOnBlur(e, updateField, setValidationErrors, {
             required: true,
             min: 5,
           });
@@ -483,15 +278,10 @@ export function QuotationDataForm({
           errors={validationErrors}
           value={expectedDuration}
           onBlur={(e) => {
-            validateIntFieldOnBlur(
-              e,
-              setExpectedDuration,
-              setValidationErrors,
-              {
-                min: 0,
-                required: true,
-              },
-            );
+            validateIntFieldOnBlur(e, updateField, setValidationErrors, {
+              min: 0,
+              required: true,
+            });
           }}
           disabled={!userCanEdit}
           className={userCanEdit ? "" : "bg-blue-50!"}
@@ -508,7 +298,9 @@ export function QuotationDataForm({
             closeModal={() => {
               setIsCustomerModalOpen(false);
             }}
-            selectCustomer={setCustomerSelected}
+            selectCustomer={(customer) => {
+              updateField("customerSelected", customer);
+            }}
           />
         )}
         <Input
@@ -520,16 +312,16 @@ export function QuotationDataForm({
           }}
           value={customerSelected === null ? "" : customerSelected.name}
           errors={validationErrors}
-          disabled={customers == undefined || !userCanEdit}
+          disabled={customers == undefined}
           className={
-            customers == undefined || !userCanEdit
+            customers == undefined
               ? "cursor-not-allowed bg-blue-50!"
               : "cursor-pointer"
           }
         />
         <Input
           label="Desconto Material"
-          name="mat_discount"
+          name="matDiscount"
           errors={validationErrors}
           value={(matDiscount / 100_00).toLocaleString("pt-br", {
             maximumFractionDigits: 2,
@@ -538,7 +330,7 @@ export function QuotationDataForm({
             style: "percent",
           })}
           onBlur={(e) => {
-            validateFloatFieldOnBlur(e, setMatDiscount, setValidationErrors, {
+            validateFloatFieldOnBlur(e, updateField, setValidationErrors, {
               removeFromString: "%",
             });
           }}
@@ -547,7 +339,7 @@ export function QuotationDataForm({
         />
         <Input
           label="Desconto Serviço"
-          name="ser_discount"
+          name="serDiscount"
           errors={validationErrors}
           value={(serDiscount / 100_00).toLocaleString("pt-br", {
             maximumFractionDigits: 2,
@@ -556,7 +348,7 @@ export function QuotationDataForm({
             style: "percent",
           })}
           onBlur={(e) => {
-            validateFloatFieldOnBlur(e, setSerDiscount, setValidationErrors, {
+            validateFloatFieldOnBlur(e, updateField, setValidationErrors, {
               removeFromString: "%",
             });
           }}
@@ -581,14 +373,9 @@ export function QuotationDataForm({
             name="purchaseOrder"
             value={purchaseOrder}
             onBlur={(e) => {
-              validateStringFieldOnBlur(
-                e,
-                setPurchaseOrder,
-                setValidationErrors,
-                {
-                  max: 20,
-                },
-              );
+              validateStringFieldOnBlur(e, updateField, setValidationErrors, {
+                max: 20,
+              });
             }}
             disabled={!userCanEdit}
             className={userCanEdit ? "" : "bg-blue-50!"}
@@ -695,15 +482,10 @@ export function QuotationDataForm({
             errors={validationErrors}
             value={description}
             onBlur={(e) => {
-              validateStringFieldOnBlur(
-                e,
-                setDescription,
-                setValidationErrors,
-                {
-                  min: 5,
-                  max: 100,
-                },
-              );
+              validateStringFieldOnBlur(e, updateField, setValidationErrors, {
+                min: 5,
+                max: 100,
+              });
             }}
             disabled={!userCanEdit}
           />
@@ -713,7 +495,7 @@ export function QuotationDataForm({
             errors={validationErrors}
             value={toolList}
             onBlur={(e) => {
-              validateStringFieldOnBlur(e, setToolList, setValidationErrors, {
+              validateStringFieldOnBlur(e, updateField, setValidationErrors, {
                 min: 2,
                 max: 200,
                 required: false,
@@ -729,16 +511,11 @@ export function QuotationDataForm({
             errors={validationErrors}
             value={publicComments}
             onBlur={(e) => {
-              validateStringFieldOnBlur(
-                e,
-                setPublicComments,
-                setValidationErrors,
-                {
-                  min: 0,
-                  max: 300,
-                  required: false,
-                },
-              );
+              validateStringFieldOnBlur(e, updateField, setValidationErrors, {
+                min: 0,
+                max: 300,
+                required: false,
+              });
             }}
             disabled={!userCanEdit}
           />
@@ -748,16 +525,11 @@ export function QuotationDataForm({
             errors={validationErrors}
             value={privateComments}
             onBlur={(e) => {
-              validateStringFieldOnBlur(
-                e,
-                setPrivateComments,
-                setValidationErrors,
-                {
-                  min: 0,
-                  max: 300,
-                  required: false,
-                },
-              );
+              validateStringFieldOnBlur(e, updateField, setValidationErrors, {
+                min: 0,
+                max: 300,
+                required: false,
+              });
             }}
             disabled={!userCanEdit}
           />
@@ -772,7 +544,9 @@ export function QuotationDataForm({
             setIsMaterialModalOpen(false);
           }}
           isHiddden={!isMaterialModalOpen}
-          selectMaterial={handleNewInventoryMaterial}
+          selectMaterial={(material) => {
+            handleNewInventoryMaterial(material);
+          }}
           selectedMaterialIds={quoteMaterials
             .map((m) => m.material_id)
             .filter((id): id is string => !!id)}
@@ -802,7 +576,6 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           deleteItem={setMaterialsToDelete}
           readOnly={!userCanEdit}
-          setSomethingChanged={setMaterialsHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -817,13 +590,14 @@ export function QuotationDataForm({
           quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
           readOnly={!userCanEdit}
-          setSomethingChanged={setItemsHasChanged}
         />
       </ListWrapper>
       <ListWrapper
         label={"Serviços"}
         doOnClickAdd={handleNewBlankServiceItem}
-        doOnClickSearch={handleOpenLaborModal}
+        doOnClickSearch={() => {
+          setIsLaborModalOpen(true);
+        }}
         hideAddButton={!userCanEdit}
       >
         <ExceptionalItemsList
@@ -834,7 +608,6 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           type="service"
           readOnly={!userCanEdit}
-          setSomethingChanged={setServicesHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -850,7 +623,6 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           type="expense"
           readOnly={!userCanEdit}
-          setSomethingChanged={setExpensesHasChanged}
         />
       </ListWrapper>
       {children}
