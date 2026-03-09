@@ -9,14 +9,20 @@ type StringFieldValidationOptions = {
 
 export function validateStringFieldOnBlur(
   e: TargetedFocusEvent<HTMLInputElement | HTMLTextAreaElement>,
-  setValue: Dispatch<StateUpdater<string>>,
+  setValue:
+    | Dispatch<StateUpdater<string>>
+    | ((name: any, value: string) => void),
   setErrors: Dispatch<StateUpdater<{ [key: string]: string }>>,
-  options: StringFieldValidationOptions
+  options: StringFieldValidationOptions,
 ) {
   const { min, max, required } = options;
   const { name, value } = e.currentTarget;
 
-  setValue(value);
+  if (setValue.length === 2) {
+    (setValue as (n: any, v: string) => void)(name, value);
+  } else {
+    (setValue as Dispatch<StateUpdater<string>>)(value);
+  }
 
   if (required && value.length == 0) {
     setErrors((prev) => ({
@@ -58,11 +64,21 @@ type IntFieldValidationOptions = {
 
 export function validateIntFieldOnBlur(
   e: TargetedFocusEvent<HTMLInputElement>,
-  setValue: Dispatch<StateUpdater<number>>,
+  setStateValue:
+    | Dispatch<StateUpdater<number>>
+    | ((name: any, value: number) => void),
   setErrors: Dispatch<StateUpdater<{ [key: string]: string }>>,
-  { min, max, defaultFieldValue = 0 }: IntFieldValidationOptions
+  { min, max, defaultFieldValue = 0 }: IntFieldValidationOptions,
 ) {
   const { value, name } = e.currentTarget;
+
+  function setValue(value: number) {
+    if (setStateValue.length === 2) {
+      (setStateValue as (n: any, v: number) => void)(name, value);
+    } else {
+      (setStateValue as Dispatch<StateUpdater<number>>)(value);
+    }
+  }
 
   if (value == "" && defaultFieldValue == 0) {
     e.currentTarget.value = "0";
@@ -73,9 +89,9 @@ export function validateIntFieldOnBlur(
   if (isNaN(intValue)) {
     setErrors((prev) => ({
       ...prev,
-      [name]: "Campo deve ser preenchido com um numero inteiro válido.",
+      [name]: "Valor inválido",
     }));
-    setValue(intValue);
+    setValue(-999);
     return;
   }
 
@@ -108,11 +124,22 @@ type FloatFieldValidationOptions = {
 
 export function validateFloatFieldOnBlur(
   e: TargetedFocusEvent<HTMLInputElement>,
-  setValue: Dispatch<StateUpdater<number>>,
+  setStateValue:
+    | Dispatch<StateUpdater<number>>
+    | ((name: any, value: number) => void),
   setErrors: Dispatch<StateUpdater<{ [key: string]: string }>>,
-  { min, max, removeFromString }: FloatFieldValidationOptions
+  { min, max, removeFromString }: FloatFieldValidationOptions,
 ) {
   const { name } = e.currentTarget;
+
+  function setValue(value: number) {
+    if (setStateValue.length === 2) {
+      (setStateValue as (n: any, v: number) => void)(name, value);
+    } else {
+      (setStateValue as Dispatch<StateUpdater<number>>)(value);
+    }
+  }
+
   let value = e.currentTarget.value;
   if (removeFromString) {
     value = value.replaceAll(removeFromString, "").trim();

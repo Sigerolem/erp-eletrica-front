@@ -1,17 +1,16 @@
-import { type InputHTMLAttributes, type TextareaHTMLAttributes } from "preact";
-import { useEffect } from "preact/hooks";
+import { type TextareaHTMLAttributes } from "preact";
 
 interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   errors?: { [key: string]: string };
-  name: string;
+  name?: string;
   disabled?: boolean;
 }
 
 export function Textarea({
   label,
   errors,
-  name,
+  name = "FillerName",
   disabled,
   ...rest
 }: TextAreaProps) {
