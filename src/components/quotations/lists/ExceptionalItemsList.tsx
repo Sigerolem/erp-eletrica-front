@@ -35,6 +35,7 @@ export function ExceptionalItemsList({
   readOnly,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);
+  const [valores, setValores] = useState([0, 0]);
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
@@ -48,6 +49,13 @@ export function ExceptionalItemsList({
   }, [validationErrors]);
 
   useEffect(() => {
+    let [cost, value] = [0, 0];
+    itemsList.forEach((item) => {
+      console.log(item.unit_cost);
+      cost += item.expected_amount! * item.unit_cost!;
+      value += item.expected_amount! * item.unit_value!;
+    });
+    setValores([cost, value]);
     setItems(itemsList);
   }, [itemsList]);
 
@@ -119,8 +127,18 @@ export function ExceptionalItemsList({
 
   return (
     <div className={"px-2 flex flex-col gap-3 pb-3"}>
+      {!readOnly && itemsList.length > 0 && (
+        <div className={"w-full flex justify-around -mb-2"}>
+          <span className={"font-semibold"}>
+            Custo esperado: {BrlStringFromCents(valores[0])}
+          </span>
+          <span className={"font-semibold"}>
+            Valor esperado: {BrlStringFromCents(valores[1])}
+          </span>
+        </div>
+      )}
       {xSize >= 1000 && (
-        <header className={"grid grid-cols-8 gap-x-4 font-semibold"}>
+        <header className={"grid grid-cols-8 gap-x-4 font-semibold -mb-4"}>
           <span className={"col-span-3"}>Nome/Descrição</span>
           <span>Unidade</span>
           <span>Custo unitário</span>

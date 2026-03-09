@@ -7,6 +7,7 @@ import {
   type StateUpdater,
 } from "preact/hooks";
 import type { QuotationMaterialsType } from "../Quotations";
+import { BrlStringFromCents } from "src/utils/formating";
 
 interface ComponentProps {
   itemsList: Partial<QuotationMaterialsType>[];
@@ -24,6 +25,7 @@ export function InventoryItemsList({
   readOnly,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationMaterialsType>[]>([]);
+  const [valores, setValores] = useState([0, 0]);
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
@@ -37,6 +39,13 @@ export function InventoryItemsList({
   }, [validationErrors]);
 
   useEffect(() => {
+    let [cost, value] = [0, 0];
+    itemsList.forEach((item) => {
+      console.log(item.unit_cost);
+      cost += item.expected_amount! * item.material?.avg_cost!;
+      value += item.expected_amount! * item.material?.value!;
+    });
+    setValores([cost, value]);
     setItems(itemsList);
   }, [itemsList]);
 
@@ -90,6 +99,16 @@ export function InventoryItemsList({
 
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3"}>
+      {!readOnly && itemsList.length > 0 && (
+        <div className={"w-full flex justify-around -mb-2"}>
+          <span className={"font-semibold"}>
+            Custo esperado: {BrlStringFromCents(valores[0])}
+          </span>
+          <span className={"font-semibold"}>
+            Valor esperado: {BrlStringFromCents(valores[1])}
+          </span>
+        </div>
+      )}
       {items.map((item) => {
         if (item == undefined) {
           return <></>;

@@ -7,7 +7,6 @@ import type {
 } from "./Quotations";
 import type { MaterialsType } from "../materials/Materials";
 import type { LaborsType } from "../labors/Labors";
-import { set } from "astro:schema";
 
 export function useQuotationState(quotationData: QuotationsType | undefined) {
   const isNotOrderYet = [
@@ -123,7 +122,7 @@ export function useQuotationState(quotationData: QuotationsType | undefined) {
         });
       }
     }
-  }, [baseInfo]);
+  }, [baseInfo, quotationData]);
 
   useEffect(() => {
     if (!quotationData) {

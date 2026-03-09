@@ -11,6 +11,7 @@ import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
 import { fetchPdf } from "src/utils/fetchPdf";
 import { hasPermission } from "src/utils/permissionLogic";
+import { PrintPdfModal } from "./PrintPdfModal";
 
 export type QuotationItemTypeType =
   | "occasional_material"
@@ -95,6 +96,8 @@ export function Quotations() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [userCanCreateQuotations, setUserCanCreateQuotations] = useState(false);
+  const [quotationToPrint, setQuotationToPrint] = useState("");
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   const QUOTATION_URL =
     window.location.hostname == "localhost"
@@ -176,23 +179,17 @@ export function Quotations() {
                       {quotation.customer.name}
                     </p>
                   </Td>
-                  <Td link={`${QUOTATION_URL}${quotation.id}/`}>
+                  <Td>
                     <p>{formatQuotationStatusEnum(quotation.status)}</p>
                     <div className={"flex gap-1"}>
                       <Button
-                        text="PDF Detalhado"
-                        onClick={() =>
-                          fetchPdf(`/quotations/print/${quotation.id}`)
-                        }
-                        className={"bg-blue-700 text-white text-sm p-1!"}
-                      />
-                      <Button
                         text="PDF"
-                        onClick={() =>
-                          fetchPdf(
-                            `/quotations/print/${quotation.id}?mode=hidden`,
-                          )
-                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setQuotationToPrint(quotation.id);
+                          setIsPrintModalOpen(true);
+                        }}
                         className={"bg-blue-700 text-white text-sm p-1!"}
                       />
                     </div>
@@ -215,18 +212,11 @@ export function Quotations() {
                   <Td>
                     <Button
                       text="PDF"
-                      onClick={() =>
-                        fetchPdf(`/quotations/print/${quotation.id}`)
-                      }
-                    />
-                    <Button
-                      text="PDF s/ valores"
-                      onClick={() =>
-                        fetchPdf(
-                          `/quotations/print/${quotation.id}?mode=hidden`,
-                        )
-                      }
-                      className={"ml-2 bg-blue-700 text-white"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setQuotationToPrint(quotation.id);
+                        setIsPrintModalOpen(true);
+                      }}
                     />
                   </Td>
                 </Tr>
@@ -234,6 +224,13 @@ export function Quotations() {
             )}
           </tbody>
         </Table>
+        {isPrintModalOpen && (
+          <PrintPdfModal
+            closeModal={() => setIsPrintModalOpen(false)}
+            quotationId={quotationToPrint}
+            quotationStatus={"q_awaiting"}
+          />
+        )}
         {isFetching && (
           <span className={"animate-bounce text-xl block mt-8 font-semibold"}>
             Carregando...

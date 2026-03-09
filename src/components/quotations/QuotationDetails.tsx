@@ -4,6 +4,7 @@ import { useEffect, useState } from "preact/hooks";
 import { QuotationDataForm } from "./QuotationDataForm";
 import type { QuotationsStatusType, QuotationsType } from "./Quotations";
 import { hasPermission } from "src/utils/permissionLogic";
+import { PrintPdfModal } from "./PrintPdfModal";
 
 export function QuotationDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
@@ -11,6 +12,7 @@ export function QuotationDetails() {
   const [userCanEditQuotations, setUserCanEditQuotations] = useState(false);
   const [somethingChanged, setSomethingChanged] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   const quotationStatusButtonMap = {
     draft: [{ text: "Concluir rascunho", class: "", status: "q_awaiting" }],
@@ -143,7 +145,26 @@ export function QuotationDetails() {
   }
 
   return (
-    <main>
+    <main className={"relative"}>
+      <div
+        className={"absolute w-full flex justify-end -mt-7 md:pr-4 md:-mt-9"}
+      >
+        <Button
+          text="PDF"
+          onClick={() => {
+            setIsPrintModalOpen(true);
+          }}
+        />
+      </div>
+      {isPrintModalOpen && (
+        <PrintPdfModal
+          closeModal={() => {
+            setIsPrintModalOpen(false);
+          }}
+          quotationId={id}
+          quotationStatus={"q_awaiting"}
+        />
+      )}
       {quotation ? (
         <QuotationDataForm
           doOnSubmit={updateQuotationData}
