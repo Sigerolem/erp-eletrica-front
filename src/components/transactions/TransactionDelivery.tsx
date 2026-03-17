@@ -74,7 +74,7 @@ export function TransactionDelivery() {
     });
     if (result.code == 200) {
       window.alert("Separação salva com sucesso");
-      window.location.href = `/pedidos`;
+      window.location.href = `/pedidos/id/#${transaction?.id}`;
       return null;
     }
 

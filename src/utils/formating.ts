@@ -18,7 +18,7 @@ export function BrlStringFromCents(cents?: number) {
 
 export function formatFloatWithDecimalDigits(
   value: number,
-  numOfDigits: 0 | 1 | 2 | 3
+  numOfDigits: 0 | 1 | 2 | 3,
 ) {
   const formatter = new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: numOfDigits,
@@ -27,7 +27,7 @@ export function formatFloatWithDecimalDigits(
   });
   const stringValue = formatter.format(value);
   const floatValue = parseFloat(
-    stringValue.replaceAll(".", "").replaceAll(",", ".")
+    stringValue.replaceAll(".", "").replaceAll(",", "."),
   );
   return floatValue;
 }
@@ -73,7 +73,8 @@ export function formatTransactionStatusEnum(status: TransactionsStatusType) {
     partial: "Atendido parcialmente",
     delivered: "Entregue",
     returning: "Em devolução",
-    completed: "Concluido",
+    returned: "Devolvido",
+    completed: "Concluído",
     cancelled: "Cancelado",
   };
 

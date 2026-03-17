@@ -88,7 +88,7 @@ export type QuotationsType = {
   customer_id: string;
   customer: CustomersType;
   items: Partial<QuotationItemsType>[];
-  materials: Partial<QuotationItemsType>[];
+  materials: Partial<QuotationMaterialsType>[];
   transaction: Partial<TransactionsType> | null;
 };
 

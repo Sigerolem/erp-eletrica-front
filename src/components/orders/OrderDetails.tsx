@@ -1,74 +1,21 @@
+import { Button } from "@elements/Button";
+import { fetchWithToken } from "@utils/fetchWithToken";
+import { useEffect, useState } from "preact/hooks";
+import { hasPermission } from "src/utils/permissionLogic";
 import { QuotationDataForm } from "@comp/quotations/QuotationDataForm";
 import type {
   QuotationsStatusType,
   QuotationsType,
 } from "@comp/quotations/Quotations";
-import { Button } from "@elements/Button";
-import { fetchWithToken } from "@utils/fetchWithToken";
-import { useEffect, useState } from "preact/hooks";
-import { hasPermission } from "src/utils/permissionLogic";
+import { quotationStatusButtonMap } from "@comp/quotations/QuotationDetails";
 
 export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
   const [id, setId] = useState("");
   const [userCanEditOrders, setUserCanEditOrders] = useState(false);
+  const [userCanDeleteQuotations, setUserCanDeleteQuotations] = useState(false);
   const [somethingChanged, setSomethingChanged] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
-
-  const quotationStatusButtonMap = {
-    draft: [{ text: "Concluir rascunho", class: "", status: "q_awaiting" }],
-    q_awaiting: [
-      { text: "Aprovar orçamento", class: "", status: "q_approved" },
-      {
-        text: "Recusar orçamento",
-        class: "bg-red-500 text-white",
-        status: "denied",
-      },
-    ],
-    q_approved: [
-      { text: "Autorizar ordem de serviço", class: "", status: "os_awaiting" },
-    ],
-    os_awaiting: [
-      { text: "Iniciar ordem de serviço", class: "", status: "os_ongoing" },
-    ],
-    os_ongoing: [
-      { text: "Mão de obra finalizada", class: "", status: "os_done_mo" },
-      { text: "Materiais finalizados", class: "", status: "os_done_mat" },
-    ],
-    os_done_mo: [
-      { text: "Materiais finalizados", class: "", status: "awaiting_closure" },
-    ],
-    os_done_mat: [
-      { text: "Mão de obra finalizada", class: "", status: "awaiting_closure" },
-    ],
-    awaiting_closure: [
-      {
-        text: "Finalizar atendimento da OS",
-        class: "",
-        status: "awaiting_delivery",
-      },
-    ],
-    awaiting_delivery: [
-      {
-        text: "Documentação da OS entregue ao Cliente",
-        class: "",
-        status: "delivered",
-      },
-    ],
-    delivered: [
-      {
-        text: "Cliente confirmou atendimento da OS",
-        class: "",
-        status: "awaiting_payment",
-      },
-    ],
-    awaiting_payment: [
-      { text: "Cliente realizou o pagamento", class: "", status: "finished" },
-    ],
-    finished: [],
-    denied: [],
-    cancelled: [],
-  };
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -85,6 +32,12 @@ export function OrderDetails() {
       hasPermission(permission ?? "----------------", "order", "W")
     ) {
       setUserCanEditOrders(true);
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "order", "D")
+    ) {
+      setUserCanDeleteQuotations(true);
     }
 
     const path = new URL(window.location.href);
@@ -127,13 +80,46 @@ export function OrderDetails() {
     if (code == 200) {
       window.alert("Alterações salvas com sucesso");
       setQuotation(data.quotation);
+      if (
+        data.quotation.status == "q_awaiting" ||
+        data.quotation.status == "q_approved"
+      ) {
+        window.location.href = "/ordens";
+      }
     }
     setIsFetching(false);
     return null;
   }
 
+  async function deleteOrder() {
+    setIsFetching(true);
+    const { code } = await fetchWithToken({
+      path: `/quotations/${id}`,
+      method: "DELETE",
+    });
+    if (code == 200) {
+      window.alert("Ordem de serviço excluída com sucesso");
+      window.location.href = "/ordens";
+    }
+    setIsFetching(false);
+  }
+
+  console.log(quotation?.materials);
+
   async function updateQuotationStatus(newStatus: QuotationsStatusType) {
     setIsFetching(true);
+    if (newStatus == "cancelled") {
+      const canCancel = quotation?.materials.every(
+        (material) => material.taken_amount == material.returned_amount,
+      );
+      if (!canCancel) {
+        window.alert(
+          "Não é possível cancelar uma ordem de serviço com materiais não devolvidos",
+        );
+        setIsFetching(false);
+        return;
+      }
+    }
     const { code, data } = await fetchWithToken<{ quotation: QuotationsType }>({
       path: `/quotations/${id}`,
       method: "PATCH",
@@ -164,7 +150,7 @@ export function OrderDetails() {
               quotationStatusButtonMap[quotation.status].map((btn) => (
                 <Button
                   text={btn.text}
-                  className={btn.class || "bg-slate-600 text-white"}
+                  className={btn.class || "bg-blue-700 text-white"}
                   onClick={() => {
                     updateQuotationStatus(btn.status as QuotationsStatusType);
                   }}
@@ -181,6 +167,19 @@ export function OrderDetails() {
                 disabled={isFetching}
               />
             )}
+
+            {userCanDeleteQuotations &&
+              ["cancelled"].includes(quotation.status) && (
+                <Button
+                  type={"button"}
+                  text="Excluir ordem"
+                  onClick={() => {
+                    deleteOrder();
+                  }}
+                  className={"bg-red-500 text-white"}
+                  disabled={isFetching}
+                />
+              )}
           </div>
         </QuotationDataForm>
       ) : (

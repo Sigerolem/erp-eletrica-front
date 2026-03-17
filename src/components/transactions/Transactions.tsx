@@ -29,6 +29,7 @@ export type TransactionsStatusType =
   | "partial"
   | "delivered"
   | "returning"
+  | "returned"
   | "completed"
   | "cancelled";
 
@@ -54,7 +55,7 @@ export function Transactions() {
 
   useEffect(() => {
     fetchWithToken<{ transactions: TransactionsType[] }>({
-      path: "/transactions",
+      path: "/transactions/awaiting",
     }).then((result) => {
       setIsFetching(false);
       if (result.code == 200 || result.code == 201) {

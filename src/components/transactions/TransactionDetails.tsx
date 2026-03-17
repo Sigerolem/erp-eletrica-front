@@ -11,7 +11,6 @@ export function TransactionDetails() {
     const path = new URL(window.location.href);
 
     const id = path.hash.replace("#", "").replaceAll("/", "");
-    // : path.pathname.replace("/materiais/id/", "");
 
     fetchWithToken<{ transaction: TransactionsType }>({
       path: `/transactions/${id}`,
@@ -33,34 +32,34 @@ export function TransactionDetails() {
       ? "/pedidos/devolver/id#"
       : "/pedidos/devolver/id/#";
 
-  async function handleDataSubmition(
-    transactionData: Partial<TransactionsType>
-  ) {
-    const { code, data } = await fetchWithToken<{
-      transaction: TransactionsType;
-    }>({
-      path: `/transactions/${transaction?.id}`,
-      method: "PUT",
-      body: JSON.stringify({ status: "" }),
-    });
+  // async function handleDataSubmition(  //note using for now
+  //   transactionData: Partial<TransactionsType>,
+  // ) {
+  //   const { code, data } = await fetchWithToken<{
+  //     transaction: TransactionsType;
+  //   }>({
+  //     path: `/transactions/${transaction?.id}`,
+  //     method: "PUT",
+  //     body: JSON.stringify({ status: "" }),
+  //   });
 
-    if (code == 409) {
-      const errors = {} as { [key: string]: string };
-      if (data.message.includes("entity.name")) {
-        errors.name = "Esse nome já foi utilizado";
-      } else if (data.message.includes("entity.cnpj")) {
-        errors.cnpj = "Esse CNPJ já foi cadastrado";
-      }
-      return errors;
-    }
+  //   if (code == 409) {
+  //     const errors = {} as { [key: string]: string };
+  //     if (data.message.includes("entity.name")) {
+  //       errors.name = "Esse nome já foi utilizado";
+  //     } else if (data.message.includes("entity.cnpj")) {
+  //       errors.cnpj = "Esse CNPJ já foi cadastrado";
+  //     }
+  //     return errors;
+  //   }
 
-    if (code == 200 || code == 201) {
-      window.alert("Altterações salvas");
-      return null;
-    }
+  //   if (code == 200 || code == 201) {
+  //     window.alert("Altterações salvas");
+  //     return null;
+  //   }
 
-    return { erro: "Alguma coisa" };
-  }
+  //   return { erro: "Alguma coisa" };
+  // }
 
   async function handleConfirmDelivery() {
     const { code, data } = await fetchWithToken<{
@@ -74,7 +73,8 @@ export function TransactionDetails() {
       }),
     });
     if (code == 200) {
-      window.location.href = "/pedidos";
+      // window.location.href = `/pedidos/id/#${transaction?.id}`;
+      window.location.reload();
     } else {
       window.alert("Erro ao confirmar a entrega");
       console.error(data);
@@ -88,12 +88,13 @@ export function TransactionDetails() {
       path: `/transactions/${transaction?.id}`,
       method: "PATCH",
       body: JSON.stringify({
-        status: "completed",
+        status: "returned",
         id: transaction?.id,
       }),
     });
     if (code == 200) {
-      window.location.href = "/pedidos";
+      // window.location.href = `/pedidos/id/#${transaction?.id}`;
+      window.location.reload();
     } else {
       window.alert("Erro ao confirmar a devolução");
       console.error(data);
@@ -104,24 +105,31 @@ export function TransactionDetails() {
     <main>
       {transaction ? (
         <TransactionDataForm
-          doOnSubmit={handleDataSubmition}
+          // doOnSubmit={handleDataSubmition} not using for now
+          doOnSubmit={async () => null}
           transactionData={transaction}
         >
           <div className={"flex justify-around"}>
-            {transaction.status !== "draft" &&
-              transaction.status !== "returning" &&
-              transaction.status !== "completed" && (
-                <a href={`${TRANSACTION_DELIVERY_URL}${transaction.id}`}>
-                  <Button
-                    text={
-                      transaction.status == "awaiting"
-                        ? "Iniciar separação"
+            {[
+              "awaiting",
+              "partial",
+              "ongoing",
+              "delivered",
+              "returned",
+            ].includes(transaction.status) && (
+              <a href={`${TRANSACTION_DELIVERY_URL}${transaction.id}`}>
+                <Button
+                  text={
+                    transaction.status == "awaiting"
+                      ? "Iniciar separação"
+                      : transaction.status == "ongoing"
+                        ? "Continuar separação"
                         : "Realizar nova separação"
-                    }
-                    type={"submit"}
-                  />
-                </a>
-              )}
+                  }
+                />
+              </a>
+            )}
+
             {transaction.status == "ongoing" && (
               <Button
                 text="Confirmar entrega"
@@ -129,21 +137,29 @@ export function TransactionDetails() {
                 onClick={handleConfirmDelivery}
               />
             )}
-            {(transaction.status == "completed" ||
-              transaction.status == "delivered") && (
-              <a href={`${TRANSACTION_RETURN_URL}${transaction.id}`}>
-                <Button
-                  text="Registrar devolução"
-                  className={"bg-blue-700 text-white"}
-                />
-              </a>
-            )}
+
             {transaction.status == "returning" && (
               <Button
                 text="Confirmar devolução"
                 className={"bg-slate-600 text-white"}
                 onClick={handleConfirmReturn}
               />
+            )}
+
+            {(transaction.status == "returned" ||
+              transaction.status == "returning" ||
+              transaction.status == "partial" ||
+              transaction.status == "delivered") && (
+              <a href={`${TRANSACTION_RETURN_URL}${transaction.id}`}>
+                <Button
+                  text={
+                    transaction.status == "returning"
+                      ? "Continuar devolução"
+                      : "Realizar devolução"
+                  }
+                  className={"bg-blue-700 text-white"}
+                />
+              </a>
             )}
           </div>
         </TransactionDataForm>

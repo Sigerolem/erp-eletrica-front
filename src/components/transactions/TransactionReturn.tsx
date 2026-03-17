@@ -49,7 +49,7 @@ export function TransactionReturn() {
       return;
     }
     const input = document.querySelector(
-      `[name=barcode-${materialBeingUpdated}]`
+      `[name=barcode-${materialBeingUpdated}]`,
     ) as HTMLInputElement;
     input.focus();
   }, [materialBeingUpdated]);
@@ -60,7 +60,7 @@ export function TransactionReturn() {
     for (const item of transactionItems) {
       if (item.taken_amount < item.separated_amount + item.returned_amount) {
         window.alert(
-          "Não é permitido devolver quantidade maior que a entregue"
+          "Não é permitido devolver quantidade maior que a entregue",
         );
         return null;
       }
@@ -77,7 +77,7 @@ export function TransactionReturn() {
     });
     if (result.code == 200) {
       window.alert("Devolução salva com sucesso");
-      window.location.href = `/pedidos`;
+      window.location.href = `/pedidos/id/#${transaction?.id}`;
       return null;
     }
 
@@ -98,8 +98,8 @@ export function TransactionReturn() {
       prev.map((item) =>
         item.material.barcode == barcode
           ? { ...item, separated_amount: item.separated_amount + 1 }
-          : item
-      )
+          : item,
+      ),
     );
     setTransactionItems((prev) =>
       prev.map((item) =>
@@ -108,16 +108,16 @@ export function TransactionReturn() {
               ...item,
               separated_amount: item.separated_amount + item.material.pkg_size,
             }
-          : item
-      )
+          : item,
+      ),
     );
     try {
       let input = document.querySelector<HTMLInputElement>(
-        `#barcode-${barcode}`
+        `#barcode-${barcode}`,
       );
       if (input == null) {
         input = document.querySelector<HTMLInputElement>(
-          `[name='separatedAmount${barcode}']`
+          `[name='separatedAmount${barcode}']`,
         );
       }
       if (input == null) {
@@ -133,7 +133,7 @@ export function TransactionReturn() {
 
   async function handleMaterialBarcodeUpdate(
     materialId: string,
-    barcode: string
+    barcode: string,
   ) {
     const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${materialId}`,
@@ -145,8 +145,8 @@ export function TransactionReturn() {
         prev.map((item) =>
           item.material_id == materialId
             ? { ...item, material: { ...item.material, barcode } }
-            : item
-        )
+            : item,
+        ),
       );
     } else {
       window.alert("Erro ao se comunicar com o servidor");
@@ -248,7 +248,7 @@ export function TransactionReturn() {
                           ...prev.map((pItem) =>
                             pItem.material_id == item.material_id
                               ? { ...pItem, separated_amount: val }
-                              : pItem
+                              : pItem,
                           ),
                         ]);
                       }}
@@ -282,7 +282,7 @@ export function TransactionReturn() {
                           e.preventDefault();
                           handleMaterialBarcodeUpdate(
                             item.material_id!,
-                            e.currentTarget.value.trim()
+                            e.currentTarget.value.trim(),
                           );
                           setMaterialBeingUpdated("");
                         }

@@ -6,68 +6,98 @@ import type { QuotationsStatusType, QuotationsType } from "./Quotations";
 import { hasPermission } from "src/utils/permissionLogic";
 import { PrintPdfModal } from "./PrintPdfModal";
 
+export const quotationStatusButtonMap = {
+  q_awaiting: [
+    {
+      text: "Recusar orçamento",
+      class: "bg-red-500 text-white",
+      status: "denied",
+    },
+    {
+      text: "Aprovar orçamento",
+      class: "",
+      status: "q_approved",
+    },
+  ],
+  q_approved: [
+    {
+      text: "Reverter para 'Aguardando'",
+      class: "bg-slate-600 text-white",
+      status: "q_awaiting",
+    },
+    { text: "Autorizar ordem de serviço", class: "", status: "os_awaiting" },
+  ],
+  os_awaiting: [
+    {
+      text: "Cancelar ordem",
+      class: "bg-red-500 text-white",
+      status: "cancelled",
+    },
+    {
+      text: "Reverter para orçamento",
+      class: "bg-slate-600 text-white",
+      status: "q_approved",
+    },
+    { text: "Iniciar ordem de serviço", class: "", status: "os_ongoing" },
+  ],
+  os_ongoing: [
+    {
+      text: "Cancelar Ordem de Serviço",
+      class: "bg-red-500 text-white",
+      status: "cancelled",
+    },
+    { text: "Mão de obra finalizada", class: "", status: "os_done_mo" },
+    { text: "Materiais finalizados", class: "", status: "os_done_mat" },
+  ],
+  os_done_mo: [
+    { text: "Materiais finalizados", class: "", status: "awaiting_closure" },
+  ],
+  os_done_mat: [
+    { text: "Mão de obra finalizada", class: "", status: "awaiting_closure" },
+  ],
+  awaiting_closure: [
+    {
+      text: "Finalizar atendimento da OS",
+      class: "",
+      status: "awaiting_delivery",
+    },
+  ],
+  awaiting_delivery: [
+    {
+      text: "Documentação da OS entregue ao Cliente",
+      class: "",
+      status: "delivered",
+    },
+  ],
+  delivered: [
+    {
+      text: "Cliente confirmou atendimento da OS",
+      class: "",
+      status: "awaiting_payment",
+    },
+  ],
+  awaiting_payment: [
+    { text: "Cliente realizou o pagamento", class: "", status: "finished" },
+  ],
+  finished: [],
+  denied: [],
+  cancelled: [],
+} as {
+  [key in QuotationsStatusType]: {
+    text: string;
+    class: string;
+    status: QuotationsStatusType;
+  }[];
+};
+
 export function QuotationDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
   const [id, setId] = useState("");
   const [userCanEditQuotations, setUserCanEditQuotations] = useState(false);
+  const [userCanDeleteQuotations, setUserCanDeleteQuotations] = useState(false);
   const [somethingChanged, setSomethingChanged] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-
-  const quotationStatusButtonMap = {
-    draft: [{ text: "Concluir rascunho", class: "", status: "q_awaiting" }],
-    q_awaiting: [
-      { text: "Aprovar orçamento", class: "", status: "q_approved" },
-      {
-        text: "Recusar orçamento",
-        class: "bg-red-500 text-white",
-        status: "denied",
-      },
-    ],
-    q_approved: [
-      { text: "Autorizar ordem de serviço", class: "", status: "os_awaiting" },
-    ],
-    os_awaiting: [
-      { text: "Iniciar ordem de serviço", class: "", status: "os_ongoing" },
-    ],
-    os_ongoing: [
-      { text: "Mão de obra finalizada", class: "", status: "os_done_mo" },
-      { text: "Materiais finalizados", class: "", status: "os_done_mat" },
-    ],
-    os_done_mo: [
-      { text: "Materiais finalizados", class: "", status: "awaiting_closure" },
-    ],
-    os_done_mat: [
-      { text: "Mão de obra finalizada", class: "", status: "awaiting_closure" },
-    ],
-    awaiting_closure: [
-      {
-        text: "Finalizar atendimento da OS",
-        class: "",
-        status: "awaiting_delivery",
-      },
-    ],
-    awaiting_delivery: [
-      {
-        text: "Documentação da OS entregue ao Cliente",
-        class: "",
-        status: "delivered",
-      },
-    ],
-    delivered: [
-      {
-        text: "Cliente confirmou atendimento da OS",
-        class: "",
-        status: "awaiting_payment",
-      },
-    ],
-    awaiting_payment: [
-      { text: "Cliente realizou o pagamento", class: "", status: "finished" },
-    ],
-    finished: [],
-    denied: [],
-    cancelled: [],
-  };
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -84,6 +114,12 @@ export function QuotationDetails() {
       hasPermission(permission ?? "----------------", "quotation", "W")
     ) {
       setUserCanEditQuotations(true);
+    }
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "quotation", "D")
+    ) {
+      setUserCanDeleteQuotations(true);
     }
     const path = new URL(window.location.href);
     const id = path.hash.replace("#", "").replaceAll("/", "");
@@ -125,6 +161,21 @@ export function QuotationDetails() {
     }
     setIsFetching(false);
     return null;
+  }
+
+  console.log(quotation?.materials);
+
+  async function deleteQuotation() {
+    setIsFetching(true);
+    const { code } = await fetchWithToken({
+      path: `/quotations/${id}`,
+      method: "DELETE",
+    });
+    if (code == 200) {
+      window.alert("Orçamento excluído com sucesso");
+      window.location.href = "/orcamentos";
+    }
+    setIsFetching(false);
   }
 
   async function updateQuotationStatus(newStatus: QuotationsStatusType) {
@@ -178,7 +229,7 @@ export function QuotationDetails() {
               quotationStatusButtonMap[quotation.status].map((btn) => (
                 <Button
                   text={btn.text}
-                  className={btn.class || "bg-slate-600 text-white"}
+                  className={btn.class || "bg-blue-700 text-white"}
                   onClick={() => {
                     updateQuotationStatus(btn.status as QuotationsStatusType);
                   }}
@@ -196,6 +247,19 @@ export function QuotationDetails() {
                 disabled={isFetching}
               />
             )}
+
+            {userCanDeleteQuotations &&
+              ["denied"].includes(quotation.status) && (
+                <Button
+                  type={"button"}
+                  text="Excluir orçamento"
+                  className={"bg-red-500 text-white"}
+                  onClick={() => {
+                    deleteQuotation();
+                  }}
+                  disabled={isFetching}
+                />
+              )}
           </div>
         </QuotationDataForm>
       ) : (
