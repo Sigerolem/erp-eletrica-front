@@ -207,6 +207,30 @@ export function QuotationBaseInfoForm({
           />
         </div>
       )}
+
+      {userCanEdit && (
+        <div className={"flex gap-4"}>
+          <Input
+            label="Custo do orçamento"
+            name="totalCost"
+            value={BrlStringFromCents(materialCost + serviceCost + directCost)}
+            disabled={true}
+            className={"bg-blue-50!"}
+          />
+          <Input
+            label="Valor do orçamento"
+            name="totalAmount"
+            value={BrlStringFromCents(
+              (materialValue * (100_00 - matDiscount)) / 100_00 +
+                (serviceValue * (100_00 - serDiscount)) / 100_00 +
+                directValue,
+            )}
+            disabled={true}
+            className={"bg-blue-50!"}
+          />
+        </div>
+      )}
+
       {userCanEdit && (
         <div className={"flex text-xl font-semibold gap-2 -mb-2"}>
           Valores

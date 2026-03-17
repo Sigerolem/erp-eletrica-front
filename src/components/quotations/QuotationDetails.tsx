@@ -163,8 +163,6 @@ export function QuotationDetails() {
     return null;
   }
 
-  console.log(quotation?.materials);
-
   async function deleteQuotation() {
     setIsFetching(true);
     const { code } = await fetchWithToken({

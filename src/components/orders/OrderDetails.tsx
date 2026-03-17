@@ -104,8 +104,6 @@ export function OrderDetails() {
     setIsFetching(false);
   }
 
-  console.log(quotation?.materials);
-
   async function updateQuotationStatus(newStatus: QuotationsStatusType) {
     setIsFetching(true);
     if (newStatus == "cancelled") {
