@@ -14,7 +14,7 @@ export function TransactionDataForm({
   children,
 }: {
   doOnSubmit: (
-    transactionData: Partial<TransactionsType>
+    transactionData: Partial<TransactionsType>,
   ) => Promise<{ [key: string]: string } | null>;
   transactionData?: TransactionsType;
   children: JSX.Element;
@@ -103,9 +103,11 @@ export function TransactionDataForm({
           className={"bg-blue-50!"}
         />
         <Input
-          label="Data errada"
+          label="Data da OS"
           name="status"
-          value={new Date(transaction?.created_at || "").toLocaleDateString()}
+          value={new Date(transaction?.created_at || "").toLocaleDateString(
+            "pt-BR",
+          )}
           disabled={true}
           className={"bg-blue-50!"}
         />
@@ -126,12 +128,12 @@ export function TransactionDataForm({
         >
           <div className={"grid grid-cols-4 gap-x-4"}>
             <span className={"font-semibold text-lg pl-2"}>Material</span>
-            <span className={"font-semibold text-lg pl-2"}>Código</span>
             <span className={"font-semibold text-lg pl-2"}>
               Qtd. Solicitada
             </span>
+            <span className={"font-semibold text-lg pl-2"}>Qtd. Atual</span>
             {["ongoing", "partial", "concluded"].includes(
-              transaction?.status || ""
+              transaction?.status || "",
             ) ? (
               transaction?.status == "ongoing" ? (
                 <span className={"font-semibold text-lg pl-2"}>
@@ -160,20 +162,27 @@ export function TransactionDataForm({
               </span>
               <span
                 className={
-                  "p-1 rounded-md font-semibold border border-slate-300 overflow-hidden"
-                }
-              >
-                {item.material?.barcode || "sem código de barras"}
-              </span>
-              <span
-                className={
                   "p-1 rounded-md font-semibold border border-slate-300"
                 }
               >
                 {item.expected_amount}
               </span>
+              {/* <span
+                className={
+                  "p-1 rounded-md font-semibold border border-slate-300 overflow-hidden"
+                }
+              >
+                {item.material?.barcode || "sem código de barras"}
+              </span> */}
+              <span
+                className={
+                  "p-1 rounded-md font-semibold border border-slate-300 overflow-hidden"
+                }
+              >
+                {item.taken_amount - item.returned_amount || "0"}
+              </span>
               {["ongoing", "partial", "concluded"].includes(
-                transaction.status
+                transaction.status,
               ) ? (
                 <span
                   className={
