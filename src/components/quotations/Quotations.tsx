@@ -9,7 +9,6 @@ import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { formatQuotationStatusEnum } from "@utils/formating";
 import { useEffect, useState } from "preact/hooks";
-import { fetchPdf } from "src/utils/fetchPdf";
 import { hasPermission } from "src/utils/permissionLogic";
 import { PrintPdfModal } from "./PrintPdfModal";
 
@@ -94,8 +93,15 @@ export type QuotationsType = {
 
 export function Quotations() {
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
+  const [customers, setCustomers] = useState<CustomersType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [userCanCreateQuotations, setUserCanCreateQuotations] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState({
+    name: "",
+    id: "",
+  });
+  const [status, setStatus] = useState<QuotationsStatusType | "" | "all">("");
+  const [lastQuery, setLastQuery] = useState<string | null>(null);
   const [quotationToPrint, setQuotationToPrint] = useState("");
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
@@ -125,8 +131,58 @@ export function Quotations() {
       setUserCanCreateQuotations(true);
     }
 
+    fetchWithToken<{ customers: CustomersType[] }>({
+      path: "/customers",
+    }).then(({ code, data }) => {
+      if (code == 200) {
+        setCustomers(data.customers);
+        const pageQuery = window.location.search;
+        const searchParams = new URLSearchParams(pageQuery);
+        if (searchParams.has("customer")) {
+          const custId = searchParams.get("customer");
+          const cust = data.customers.find((c) => c.id == custId);
+          if (cust) {
+            setSelectedCustomer({ name: cust.name, id: cust.id });
+          }
+        }
+        if (searchParams.has("status")) {
+          setStatus(searchParams.get("status") as QuotationsStatusType);
+        }
+      } else if (code == 403) {
+        window.alert(
+          "Não foi permitido acesso à lista de clientes para filtro.",
+        );
+      } else {
+        window.alert("Erro ao buscar a lista de clientes");
+        console.error(data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    let path = "/quotations/quotes";
+    const params = new URLSearchParams();
+
+    if (selectedCustomer.id) {
+      params.append("customer_id", selectedCustomer.id);
+      params.append("showAll", "true");
+    } else if (status == "all") {
+      params.append("showAll", "true");
+    }
+    if (status && status != "all") params.append("status", status);
+
+    const queryString = params.toString();
+    if (queryString) {
+      path += `?${queryString}`;
+    }
+
+    if (lastQuery == path) {
+      return;
+    }
+    setLastQuery(path);
+    setIsFetching(true);
     fetchWithToken<{ quotations: QuotationsType[] }>({
-      path: "/quotations/quotes",
+      path,
     }).then((result) => {
       setIsFetching(false);
       if (result.code == 200 || result.code == 201) {
@@ -139,7 +195,7 @@ export function Quotations() {
         console.error(result.data, result.code);
       }
     });
-  }, []);
+  }, [selectedCustomer, status]);
 
   const xSize = window.innerWidth;
   return (
@@ -155,6 +211,72 @@ export function Quotations() {
             />
           )}
         </header>
+        <div className={"mt-4 mb-4 flex gap-2 flex-col justify-stretch"}>
+          <div className="flex gap-2 items-end">
+            <div className="flex flex-col flex-1">
+              <select
+                id="customer"
+                className="bg-white border border-slate-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-wait hover:cursor-pointer hover:bg-slate-50"
+                value={selectedCustomer.id}
+                disabled={isFetching}
+                onChange={(e) => {
+                  const val = e.currentTarget.value;
+                  const cust = customers.find((c) => c.id === val);
+                  if (cust) {
+                    setSelectedCustomer({ name: cust.name, id: cust.id });
+                  } else {
+                    setSelectedCustomer({ name: "", id: "" });
+                  }
+                  // const url = new URL(window.location.href);
+                  // if (val === "") {
+                  //   url.searchParams.delete("customer");
+                  // } else {
+                  //   url.searchParams.set("customer", val);
+                  // }
+                  // window.history.pushState({}, "", url);
+                }}
+              >
+                <option value="">Todos os clientes</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-2 items-end">
+            <div className="flex flex-col flex-1">
+              <select
+                id="status"
+                className="bg-white border border-slate-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-wait hover:cursor-pointer hover:bg-slate-50"
+                value={status}
+                disabled={isFetching}
+                onChange={(e) => {
+                  const val = e.currentTarget.value as
+                    | QuotationsStatusType
+                    | "";
+                  setStatus(val);
+                  // const url = new URL(window.location.href);
+                  // if (val === "") {
+                  //   url.searchParams.delete("status");
+                  // } else {
+                  //   url.searchParams.set("status", val);
+                  // }
+                  // window.history.pushState({}, "", url);
+                }}
+              >
+                <option value="">Apenas orçamentos abertos</option>
+                <option value="q_awaiting">Aguardando Aceite</option>
+                <option value="q_approved">Orçamento Aceito</option>
+                {/* <option value="os_awaiting">Aguardando Atendimento</option>
+                <option value="os_ongoing">Em Atendimento</option> */}
+                <option value="denied">Orçamento Recusado</option>
+                <option value="all">TODOS OS ORÇAMENTOS</option>
+              </select>
+            </div>
+          </div>
+        </div>
         <Table>
           {xSize < 720 ? (
             <THead collumns={[["Referência", "Cliente"], ["Situação"]]} />
