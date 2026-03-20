@@ -127,13 +127,13 @@ export function Orders() {
                   } else {
                     setSelectedCustomer({ name: "", id: "" });
                   }
-                  const url = new URL(window.location.href);
-                  if (val === "") {
-                    url.searchParams.delete("customer");
-                  } else {
-                    url.searchParams.set("customer", val);
-                  }
-                  window.history.pushState({}, "", url);
+                  // const url = new URL(window.location.href);
+                  // if (val === "") {
+                  //   url.searchParams.delete("customer");
+                  // } else {
+                  //   url.searchParams.set("customer", val);
+                  // }
+                  // window.history.pushState({}, "", url);
                 }}
               >
                 <option value="">Todos os clientes</option>
@@ -157,13 +157,13 @@ export function Orders() {
                     | QuotationsStatusType
                     | "";
                   setStatus(val);
-                  const url = new URL(window.location.href);
-                  if (val === "") {
-                    url.searchParams.delete("status");
-                  } else {
-                    url.searchParams.set("status", val);
-                  }
-                  window.history.pushState({}, "", url);
+                  // const url = new URL(window.location.href);
+                  // if (val === "") {
+                  //   url.searchParams.delete("status");
+                  // } else {
+                  //   url.searchParams.set("status", val);
+                  // }
+                  // window.history.pushState({}, "", url);
                 }}
               >
                 <option value="">Apenas ordens abertas</option>

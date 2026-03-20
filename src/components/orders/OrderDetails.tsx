@@ -8,6 +8,7 @@ import type {
   QuotationsType,
 } from "@comp/quotations/Quotations";
 import { quotationStatusButtonMap } from "@comp/quotations/QuotationDetails";
+import { PrintPdfModal } from "@comp/quotations/PrintPdfModal";
 
 export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
@@ -16,6 +17,7 @@ export function OrderDetails() {
   const [userCanDeleteQuotations, setUserCanDeleteQuotations] = useState(false);
   const [somethingChanged, setSomethingChanged] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -134,7 +136,26 @@ export function OrderDetails() {
   }
 
   return (
-    <main>
+    <main className={"relative"}>
+      <div
+        className={"absolute w-full flex justify-end -mt-7 md:pr-4 md:-mt-9"}
+      >
+        <Button
+          text="PDF"
+          onClick={() => {
+            setIsPrintModalOpen(true);
+          }}
+        />
+      </div>
+      {isPrintModalOpen && (
+        <PrintPdfModal
+          closeModal={() => {
+            setIsPrintModalOpen(false);
+          }}
+          quotationId={id}
+          quotationStatus={quotation?.status || "os_awaiting"}
+        />
+      )}
       {quotation ? (
         <QuotationDataForm
           doOnSubmit={updateQuotationData}
