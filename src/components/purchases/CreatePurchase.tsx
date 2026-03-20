@@ -1,10 +1,9 @@
-import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { Button } from "@elements/Button";
-import { useEffect } from "preact/hooks";
 import { fetchWithToken } from "@utils/fetchWithToken";
+import { useEffect } from "preact/hooks";
+import { hasPermission } from "src/utils/permissionLogic";
 import { PurchaseDataForm } from "./PurchaseDataForm";
 import type { PurchasesType } from "./Purchases";
-import { hasPermission } from "src/utils/permissionLogic";
 
 export function CreatePurchase() {
   useEffect(() => {
@@ -19,8 +18,8 @@ export function CreatePurchase() {
   }, []);
 
   async function onFormSubmit(purchaseData: Partial<PurchasesType>) {
-    const basicSupplier = purchaseData.supplier as SuppliersType;
-    delete purchaseData.supplier;
+    // const basicSupplier = purchaseData.supplier as SuppliersType;
+    // delete purchaseData.supplier;
     const { data, code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: "/purchases/create",
       method: "POST",

@@ -51,7 +51,6 @@ export function ExceptionalItemsList({
   useEffect(() => {
     let [cost, value] = [0, 0];
     itemsList.forEach((item) => {
-      console.log(item.unit_cost);
       cost += item.expected_amount! * item.unit_cost!;
       value += item.expected_amount! * item.unit_value!;
     });

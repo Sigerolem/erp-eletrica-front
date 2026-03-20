@@ -414,6 +414,7 @@ export function PurchaseDataForm({
           supplierId={selectedSupplier?.id}
           selectedMaterialIds={purchaseItems.map((item) => item.material_id!)}
           isHiddden={!isMatModalOpen}
+          suppliers={suppliers ?? []}
         />
       </div>
       <div

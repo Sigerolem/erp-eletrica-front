@@ -16,6 +16,7 @@ export function SelectMultipleMaterialsModal({
   isHiddden = false,
   selectedMaterialIds = [],
   supplierId,
+  suppliers,
 }: {
   materials: MaterialsType[];
   selectMaterial: (material: MaterialsType) => void;
@@ -24,6 +25,7 @@ export function SelectMultipleMaterialsModal({
   isHiddden?: boolean;
   selectedMaterialIds: string[];
   supplierId?: string;
+  suppliers?: SuppliersType[];
 }) {
   const [search, setSearch] = useState("");
   const [validationErrors, setValidationErros] = useState<{
@@ -31,7 +33,7 @@ export function SelectMultipleMaterialsModal({
   }>({});
   const [materialsFound, setMaterialsFound] = useState<MaterialsType[]>([]);
   const [nothingWasFound, setNothingWasFound] = useState(false);
-  const [suppliers, setSuppliers] = useState<SuppliersType[]>([]);
+  const [suppliersFound, setSuppliersFound] = useState<SuppliersType[]>([]);
   const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState({
     name: "",
@@ -39,24 +41,37 @@ export function SelectMultipleMaterialsModal({
   });
 
   useEffect(() => {
+    if (suppliers) {
+      setSuppliersFound(suppliers);
+      return;
+    }
     fetchWithToken<{ suppliers: SuppliersType[] }>({
       path: "/suppliers",
     }).then(({ code, data }) => {
       if (code == 200) {
-        setSuppliers(data.suppliers);
-        if (supplierId) {
-          const supplier = data.suppliers.find((s) => s.id == supplierId);
-          if (supplier) {
-            setSelectedSupplier(supplier);
-          }
-        }
+        setSuppliersFound(data.suppliers);
       }
     });
   }, []);
 
   useEffect(() => {
+    if (supplierId && suppliers) {
+      const supplier = suppliers.find((s) => s.id == supplierId);
+      if (supplier) {
+        setSelectedSupplier(supplier);
+      }
+    }
+  }, [suppliers, supplierId]);
+
+  useEffect(() => {
     setMaterialsFound(materials);
   }, [materials]);
+
+  useEffect(() => {
+    if (!supplierId && suppliers == undefined) {
+      handleSearchMaterial();
+    }
+  }, [selectedSupplier]);
 
   function handleMaterialSelect(material: MaterialsType) {
     selectMaterial(material);
@@ -90,12 +105,6 @@ export function SelectMultipleMaterialsModal({
       setNothingWasFound(data.materials.length == 0);
     }
   }
-
-  useEffect(() => {
-    if (selectedSupplier.id != "") {
-      handleSearchMaterial();
-    }
-  }, [selectedSupplier]);
 
   const xSize = window.innerWidth;
   return (
@@ -201,7 +210,7 @@ export function SelectMultipleMaterialsModal({
                 selectSupplier={(sup) => {
                   setSelectedSupplier({ name: sup.name, id: sup.id });
                 }}
-                suppliers={suppliers}
+                suppliers={suppliersFound}
               />
             )}
             <div
