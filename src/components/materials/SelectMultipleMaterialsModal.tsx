@@ -6,6 +6,7 @@ import { fetchWithToken } from "src/utils/fetchWithToken";
 import { validateStringFieldOnBlur } from "src/utils/inputValidation";
 import { SelectSupplierModal } from "../suppliers/SelectSupplierModal";
 import type { SuppliersType } from "../suppliers/Suppliers";
+import { Portal } from "src/elements/Portal";
 
 export function SelectMultipleMaterialsModal({
   materials,
@@ -14,13 +15,15 @@ export function SelectMultipleMaterialsModal({
   cleanError,
   isHiddden = false,
   selectedMaterialIds = [],
+  supplierId,
 }: {
   materials: MaterialsType[];
   selectMaterial: (material: MaterialsType) => void;
   closeModal: () => void;
   cleanError: () => void;
   isHiddden?: boolean;
-  selectedMaterialIds?: string[];
+  selectedMaterialIds: string[];
+  supplierId?: string;
 }) {
   const [search, setSearch] = useState("");
   const [validationErrors, setValidationErros] = useState<{
@@ -41,6 +44,12 @@ export function SelectMultipleMaterialsModal({
     }).then(({ code, data }) => {
       if (code == 200) {
         setSuppliers(data.suppliers);
+        if (supplierId) {
+          const supplier = data.suppliers.find((s) => s.id == supplierId);
+          if (supplier) {
+            setSelectedSupplier(supplier);
+          }
+        }
       }
     });
   }, []);
@@ -83,141 +92,150 @@ export function SelectMultipleMaterialsModal({
   }
 
   useEffect(() => {
-    handleSearchMaterial();
+    if (selectedSupplier.id != "") {
+      handleSearchMaterial();
+    }
   }, [selectedSupplier]);
 
   const xSize = window.innerWidth;
   return (
-    <section
-      hidden={isHiddden}
-      className={"absolute top-0 left-0 w-full h-full"}
-    >
-      <div
-        className={`fixed top-0 left-0 w-full h-full ${
-          xSize < 700 ? "p-8" : "p-32"
-        } bg-[#000000AA] z-20 overflow-y-scroll`}
-        onClick={closeModal}
+    <Portal>
+      <section
+        hidden={isHiddden}
+        className={"absolute top-0 left-0 w-full h-full"}
       >
         <div
-          className={
-            "bg-blue-50 rounded-md p-4 border flex flex-col gap-2 items-baseline"
-          }
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          className={`fixed top-0 left-0 w-full h-full ${
+            xSize < 700 ? "p-8" : "p-32"
+          } bg-[#000000AA] z-20 overflow-y-scroll`}
+          onClick={closeModal}
         >
-          <div className={"flex justify-between w-full items-center mb-2"}>
-            <strong className={"text-lg block"}>Selecione os materiais</strong>
-            <Button
-              text="Concluir"
-              onClick={closeModal}
-              className={"bg-slate-600 text-white px-4"}
-            />
-          </div>
-          <div className={"flex gap-2 w-full items-end"}>
-            <Input
-              name="search"
-              placeholder={"Nome do material"}
-              onBlur={(e) => {
-                validateStringFieldOnBlur(e, setSearch, setValidationErros, {
-                  min: 2,
-                });
-              }}
-              value={search}
-              errors={validationErrors}
-              className={"min-h-10 text-lg"}
-              onKeyPress={(e) => {
-                if (e.key == "Enter") {
-                  e.preventDefault();
-                  const button = document.querySelector<HTMLButtonElement>(
-                    "[name='searchButton']",
-                  );
-                  if (button) {
-                    e.currentTarget.blur();
-                    setTimeout(() => {
-                      button.click();
-                    }, 100);
+          <div
+            className={
+              "bg-blue-50 rounded-md p-4 border flex flex-col gap-2 items-baseline"
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <div className={"flex justify-between w-full items-center mb-2"}>
+              <strong className={"text-lg block"}>
+                Selecione os materiais
+              </strong>
+              <Button
+                text="Concluir"
+                onClick={closeModal}
+                className={"bg-slate-600 text-white px-4"}
+              />
+            </div>
+            <div className={"flex gap-2 w-full items-end"}>
+              <Input
+                name="search"
+                placeholder={"Nome do material"}
+                onBlur={(e) => {
+                  validateStringFieldOnBlur(e, setSearch, setValidationErros, {
+                    min: 2,
+                  });
+                }}
+                value={search}
+                errors={validationErrors}
+                className={"min-h-10 text-lg"}
+                onKeyPress={(e) => {
+                  if (e.key == "Enter") {
+                    e.preventDefault();
+                    const button = document.querySelector<HTMLButtonElement>(
+                      "[name='searchButton']",
+                    );
+                    if (button) {
+                      e.currentTarget.blur();
+                      setTimeout(() => {
+                        button.click();
+                      }, 100);
+                    }
                   }
-                }
-              }}
-            />
-            <Button
-              name="searchButton"
-              onClick={() => {
-                handleSearchMaterial();
-              }}
-              text="Buscar"
-            />
-            {search != "" && (
-              <Button
-                text="Limpar"
-                onClick={() => {
-                  setSearch("");
-                  handleSearchMaterial("");
                 }}
-                className={"bg-gray-600 text-white"}
               />
-            )}
-          </div>
-          <div className={"flex gap-2 w-full items-end"}>
-            <Input
-              name="supplier"
-              placeholder={"Todos fornecedores"}
-              value={selectedSupplier.name}
-              onClick={() => setIsSupplierModalOpen(true)}
-              className={"cursor-pointer"}
-              readOnly
-            />
-            {selectedSupplier.id != "" && (
               <Button
-                text="Limpar"
+                name="searchButton"
                 onClick={() => {
-                  setSelectedSupplier({ name: "", id: "" });
+                  handleSearchMaterial();
                 }}
-                className={"bg-gray-500 text-white"}
+                text="Buscar"
               />
-            )}
-          </div>
-          {isSupplierModalOpen && (
-            <SelectSupplierModal
-              closeModal={() => {
-                setIsSupplierModalOpen(false);
-              }}
-              selectSupplier={(sup) => {
-                setSelectedSupplier({ name: sup.name, id: sup.id });
-              }}
-              suppliers={suppliers}
-            />
-          )}
-          <div className={"flex flex-col gap-2 w-full md:grid md:grid-cols-2"}>
-            {materialsFound.map((material) => {
-              const isSelected = selectedMaterialIds.includes(material.id);
-              return (
+              {search != "" && (
                 <Button
-                  key={material.id}
-                  text={material.name}
+                  text="Limpar"
                   onClick={() => {
-                    handleMaterialSelect(material);
+                    setSearch("");
+                    handleSearchMaterial("");
                   }}
-                  className={`${
-                    isSelected ? "bg-blue-200 shadow-inner!" : "bg-blue-50"
-                  } border border-gray-400 flex-1 flex justify-baseline shadow-sm!`}
+                  className={"bg-gray-600 text-white"}
                 />
-              );
-            })}
-          </div>
-          {nothingWasFound && (
-            <span>Nenhum material encontrado com essa busca!</span>
-          )}
-          <div className={"flex w-full justify-end mt-4"}>
-            <Button
-              text="Concluir"
-              onClick={closeModal}
-              className={"bg-slate-700 text-white px-8"}
-            />
+              )}
+            </div>
+            <div className={"flex gap-2 w-full items-end"}>
+              <Input
+                name="supplier"
+                placeholder={"Todos fornecedores"}
+                value={selectedSupplier.name}
+                onClick={() => setIsSupplierModalOpen(true)}
+                className={"cursor-pointer disabled:bg-blue-50!"}
+                disabled={supplierId != undefined}
+                readOnly
+              />
+              {selectedSupplier.id != "" && (
+                <Button
+                  text="Limpar"
+                  onClick={() => {
+                    setSelectedSupplier({ name: "", id: "" });
+                  }}
+                  className={"bg-gray-500 text-white"}
+                />
+              )}
+            </div>
+            {isSupplierModalOpen && (
+              <SelectSupplierModal
+                closeModal={() => {
+                  setIsSupplierModalOpen(false);
+                }}
+                selectSupplier={(sup) => {
+                  setSelectedSupplier({ name: sup.name, id: sup.id });
+                }}
+                suppliers={suppliers}
+              />
+            )}
+            <div
+              className={"flex flex-col gap-2 w-full md:grid md:grid-cols-2"}
+            >
+              {materialsFound.map((material) => {
+                const isSelected = selectedMaterialIds.includes(material.id);
+                return (
+                  <Button
+                    key={material.id}
+                    text={material.name}
+                    onClick={() => {
+                      handleMaterialSelect(material);
+                    }}
+                    className={`${
+                      isSelected ? "bg-blue-200 shadow-inner!" : "bg-blue-50"
+                    } border border-gray-400 flex-1 flex justify-baseline shadow-sm!`}
+                  />
+                );
+              })}
+            </div>
+            {nothingWasFound && (
+              <span>Nenhum material encontrado com essa busca!</span>
+            )}
+            <div className={"flex w-full justify-end mt-4"}>
+              <Button
+                text="Concluir"
+                onClick={closeModal}
+                className={"bg-slate-700 text-white px-8"}
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </Portal>
   );
 }

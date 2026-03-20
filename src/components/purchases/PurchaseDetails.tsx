@@ -96,6 +96,29 @@ export function PurchaseDetails() {
     }
   }
 
+  async function handleCancelPurchase() {
+    setIsLoading(true);
+    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+      path: `/purchases/status/${id}`,
+      method: "PATCH",
+      body: JSON.stringify({ id, status: "cancelled" }),
+    });
+    setIsLoading(false);
+    if (code === 200) {
+      window.alert("Alterado com sucesso.");
+      setPurchase((prev) => {
+        if (prev) {
+          return { ...prev, status: "cancelled" };
+        }
+        return prev;
+      });
+    } else if (code === 403) {
+      window.alert("Você não tem permissão para confirmar esta compra.");
+    } else {
+      window.alert("Erro ao se comunicar com o servidor.");
+    }
+  }
+
   async function handleConfirmPurchase() {
     setIsLoading(true);
     const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
@@ -175,20 +198,38 @@ export function PurchaseDetails() {
         >
           {userCanEditPurchase ? (
             <div className={"flex items-center justify-between gap-8 w-full"}>
+              {purchase.id != "" && purchase.status == "cancelled" && (
+                <>
+                  {userCanDeletePurchase && (
+                    <Button
+                      text={"Deletar compra"}
+                      type={"button"}
+                      className={"bg-red-600 flex-1 text-white"}
+                      onClick={handleDeletePurchase}
+                    />
+                  )}
+                  <Button
+                    text={"Voltar para rascunho"}
+                    type={"button"}
+                    className={"bg-blue-600 flex-1 text-white"}
+                    onClick={handleConfirmDraft}
+                  />
+                </>
+              )}
               {purchase.id !== "" && purchase.status == "draft" && (
                 <>
                   {userCanDeletePurchase && (
                     <Button
                       text={"Deletar compra"}
                       type={"button"}
-                      className={"bg-red-700 flex-1 text-white"}
+                      className={"bg-red-600 flex-1 text-white"}
                       onClick={handleDeletePurchase}
                     />
                   )}
                   <Button
                     text={"Confirmar rascunho"}
                     type={"button"}
-                    className={"bg-slate-700 flex-1 text-white"}
+                    className={"bg-blue-600 flex-1 text-white"}
                     onClick={handleConfirmDraft}
                   />
                 </>
@@ -197,18 +238,40 @@ export function PurchaseDetails() {
                 <>
                   {userCanDeletePurchase && (
                     <Button
-                      text={"Deletar compra"}
+                      text={"Cancelar compra"}
                       type={"button"}
-                      className={"bg-red-700 flex-1 text-white"}
-                      onClick={handleDeletePurchase}
+                      className={"bg-red-600 flex-1 text-white"}
+                      onClick={handleCancelPurchase}
                     />
                   )}
                   <Button
                     text={"Confirmar compra"}
                     type={"button"}
-                    className={"bg-slate-700 flex-1 text-white"}
+                    className={"bg-blue-600 flex-1 text-white"}
                     onClick={handleConfirmPurchase}
                   />
+                </>
+              )}
+
+              {purchase.status == "shipped" && (
+                <>
+                  {userCanDeletePurchase && (
+                    <Button
+                      text={"Cancelar compra"}
+                      type={"button"}
+                      className={"bg-red-600 flex-1 text-white"}
+                      onClick={handleCancelPurchase}
+                    />
+                  )}
+                  <a
+                    href={`${PURCHASE_DELIVERY_URL}${id}/`}
+                    className={"flex-1 flex"}
+                  >
+                    <Button
+                      text={"Receber compra"}
+                      className={"bg-blue-600 flex-1 text-white"}
+                    />
+                  </a>
                 </>
               )}
 
@@ -216,21 +279,9 @@ export function PurchaseDetails() {
                 <Button
                   text={"Finalizar compra"}
                   type={"button"}
-                  className={"bg-slate-700 flex-1 text-white"}
+                  className={"bg-blue-600 flex-1 text-white"}
                   onClick={handleConcludePurchase}
                 />
-              )}
-
-              {purchase.status == "shipped" && (
-                <a
-                  href={`${PURCHASE_DELIVERY_URL}${id}/`}
-                  className={"flex-1 flex"}
-                >
-                  <Button
-                    text={"Receber compra"}
-                    className={"bg-slate-700 flex-1 text-white"}
-                  />
-                </a>
               )}
             </div>
           ) : (

@@ -7,7 +7,6 @@ import type {
 import type { MaterialsType } from "@comp/materials/Materials";
 import type { SuppliersType } from "@comp/suppliers/Suppliers";
 import { SelectSupplierModal } from "@comp/suppliers/SelectSupplierModal";
-import { SelectMaterialModal } from "@comp/materials/SelectMaterialModal";
 import { PurchaseItemsList } from "@comp/purchases/PurchaseItemsList";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { Input } from "@elements/Input";
@@ -22,6 +21,7 @@ import { Checkbox } from "@elements/Checkbox";
 import type { ReactNode } from "preact/compat";
 import { ReceivedItemsList } from "./ReceivedItemsList";
 import { hasPermission } from "@utils/permissionLogic";
+import { SelectMultipleMaterialsModal } from "../materials/SelectMultipleMaterialsModal";
 
 export function PurchaseDataForm({
   purchaseData,
@@ -165,7 +165,7 @@ export function PurchaseDataForm({
 
   function handleNewPurchaseMaterial(material: MaterialsType) {
     if (purchaseItems.find((item) => item.material_id == material.id)) {
-      window.alert("Material já adicionado.");
+      // window.alert("Material já adicionado.");
       return;
     }
     setItemsWereChanged(true);
@@ -403,16 +403,18 @@ export function PurchaseDataForm({
         >
           +
         </button>
-        {isMatModalOpen && (
-          <SelectMaterialModal
-            materials={materials}
-            cleanError={() => {}}
-            closeModal={() => {
-              setIsMatModalOpen(false);
-            }}
-            selectMaterial={handleNewPurchaseMaterial}
-          />
-        )}
+
+        <SelectMultipleMaterialsModal
+          materials={materials}
+          cleanError={() => {}}
+          closeModal={() => {
+            setIsMatModalOpen(false);
+          }}
+          selectMaterial={handleNewPurchaseMaterial}
+          supplierId={selectedSupplier?.id}
+          selectedMaterialIds={purchaseItems.map((item) => item.material_id!)}
+          isHiddden={!isMatModalOpen}
+        />
       </div>
       <div
         className={"bg-slate-100 border border-slate-400 py-1 rounded-md mb-4"}
