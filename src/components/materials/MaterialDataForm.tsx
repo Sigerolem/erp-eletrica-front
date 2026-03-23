@@ -166,6 +166,16 @@ export function MaterialDataForm({
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    if (name == "") {
+      window.alert("O nome do material é obrigatório.");
+      return;
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      window.alert("Preencha todos os campos corretamente.");
+      return;
+    }
+
     if (barcodeIsValid === false || pkgBarcodeIsValid === false) {
       window.alert(
         "Não é possivel cadastrar materiais com o código de barras já utilizado!",

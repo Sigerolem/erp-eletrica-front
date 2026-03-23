@@ -90,7 +90,12 @@ export function CreateMaterial() {
   return (
     <div className={""}>
       <MaterialDataForm doOnSubmit={onFormSubmit}>
-        <Button text="Salvar material" type={"submit"} disabled={isFetching} />
+        <Button
+          className={"bg-blue-600 text-white disabled:cursor-wait!"}
+          text="Salvar material"
+          type={"submit"}
+          disabled={isFetching}
+        />
       </MaterialDataForm>
     </div>
   );
