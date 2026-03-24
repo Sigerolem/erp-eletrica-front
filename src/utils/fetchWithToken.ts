@@ -10,6 +10,24 @@ interface ErrorResponse {
 
 type FetchResult<T> = SuccessResponse<T> | ErrorResponse;
 
+async function checkInternetConnection(): Promise<boolean> {
+  if (!window.navigator.onLine) return false;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    // Ping Google with no-cors to check if the user has internet access
+    await fetch("https://www.google.com/favicon.ico", {
+      mode: "no-cors",
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    clearTimeout(timeoutId);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function fetchWithToken<T>({
   path,
   method = "GET",
@@ -48,7 +66,18 @@ export async function fetchWithToken<T>({
       body,
     });
   } catch (error: any) {
-    window.alert("Erro ao se comunicar com o servidor do sistema!");
+    const isOnline = await checkInternetConnection();
+
+    if (isOnline) {
+      window.alert(
+        "Erro ao se comunicar com o sistema! O servidor parece estar temporariamente fora do ar. Por favor, tente novamente em instantes.",
+      );
+    } else {
+      window.alert(
+        "Sua conexão com a internet parece estar instável ou offline. Verifique seu roteador ou cabo de rede.",
+      );
+    }
+
     console.error(error);
 
     return { data: { error: error, message: error.message }, code: 400 };
