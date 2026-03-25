@@ -162,7 +162,7 @@ export function OrderDetails() {
           quotationData={quotation}
           setSomethingChanged={setSomethingChanged}
         >
-          <div className={"flex justify-evenly"}>
+          <div className={"flex justify-evenly gap-1"}>
             {!somethingChanged &&
             quotationStatusButtonMap[quotation.status].length > 0 &&
             userCanEditOrders ? (

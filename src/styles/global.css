@@ -18,8 +18,7 @@ input:disabled {
   cursor: not-allowed
 }
 
-button:hover,
-nav:hover {
+button:hover {
   filter: brightness(75%);
 }
 

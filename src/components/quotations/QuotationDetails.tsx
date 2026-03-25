@@ -220,7 +220,7 @@ export function QuotationDetails() {
           quotationData={quotation}
           setSomethingChanged={setSomethingChanged}
         >
-          <div className={"flex justify-evenly"}>
+          <div className={"flex gap-1 justify-evenly"}>
             {!somethingChanged &&
             quotationStatusButtonMap[quotation.status].length > 0 &&
             userCanEditQuotations ? (

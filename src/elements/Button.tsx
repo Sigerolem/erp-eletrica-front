@@ -15,7 +15,7 @@ export function Button({
   return (
     <button
       type={type ?? "button"}
-      className={`p-2 rounded-md shadow-md font-semibold ${
+      className={`p-2 rounded-md shadow-md font-semibold not-md:leading-4 not-md:text-sm ${
         className ? className : "bg-blue-700 text-white"
       }
       ${loading && "cursor-wait!"}
