@@ -23,6 +23,7 @@ import { ListWrapper } from "./lists/ListWrapper";
 import { QuotationBaseInfoForm } from "./QuotationBaseInfoForm";
 import type { QuotationsType } from "./Quotations";
 import { useQuotationState } from "./useQuotationFormState";
+import { UpdateQuoteMaterialsModal } from "./UpdateQuoteMaterialsModal";
 
 export function QuotationDataForm({
   quotationData,
@@ -87,6 +88,9 @@ export function QuotationDataForm({
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
   const [isLaborModalOpen, setIsLaborModalOpen] = useState(false);
   const [labors, setLabors] = useState<LaborsType[]>([]);
+
+  const [isUpdateMaterialsModalOpen, setIsUpdateMaterialsModalOpen] =
+    useState(false);
 
   const [userCanEdit, setUserCanEdit] = useState(false);
 
@@ -219,116 +223,130 @@ export function QuotationDataForm({
   }
 
   return (
-    <DataForm onSubmit={onFormSubmit}>
-      <QuotationBaseInfoForm
-        reference={reference}
-        description={description}
-        publicComments={publicComments}
-        privateComments={privateComments}
-        toolList={toolList}
-        expectedDuration={expectedDuration}
-        customerSelected={customerSelected}
-        customers={customers}
-        status={status}
-        purchaseOrder={purchaseOrder}
-        totals={totals}
-        matDiscount={matDiscount}
-        serDiscount={serDiscount}
-        updateField={updateField}
-        userCanEdit={userCanEdit}
-        validationErrors={validationErrors}
-        setValidationErrors={setValidationErrors}
-      />
-      <>
-        <SelectMultipleMaterialsModal
-          materials={materials}
-          cleanError={() => {}}
-          closeModal={() => {
-            setIsMaterialModalOpen(false);
-          }}
-          isHiddden={!isMaterialModalOpen}
-          selectMaterial={(material) => {
-            handleNewInventoryMaterial(material);
-          }}
-          selectedMaterialIds={quoteMaterials
-            .map((m) => m.material_id)
-            .filter((id): id is string => !!id)}
+    <>
+      <DataForm onSubmit={onFormSubmit}>
+        <QuotationBaseInfoForm
+          reference={reference}
+          description={description}
+          publicComments={publicComments}
+          privateComments={privateComments}
+          toolList={toolList}
+          expectedDuration={expectedDuration}
+          customerSelected={customerSelected}
+          customers={customers}
+          status={status}
+          purchaseOrder={purchaseOrder}
+          totals={totals}
+          matDiscount={matDiscount}
+          serDiscount={serDiscount}
+          updateField={updateField}
+          userCanEdit={userCanEdit}
+          validationErrors={validationErrors}
+          setValidationErrors={setValidationErrors}
         />
-        {isLaborModalOpen && (
-          <SelectLaborModal
-            labors={labors}
+        <>
+          <SelectMultipleMaterialsModal
+            materials={materials}
             cleanError={() => {}}
             closeModal={() => {
-              setIsLaborModalOpen(false);
+              setIsMaterialModalOpen(false);
             }}
-            selectLabor={handleSelectLabor}
+            isHiddden={!isMaterialModalOpen}
+            selectMaterial={(material) => {
+              handleNewInventoryMaterial(material);
+            }}
+            selectedMaterialIds={quoteMaterials
+              .map((m) => m.material_id)
+              .filter((id): id is string => !!id)}
           />
-        )}
-      </>
+          {isLaborModalOpen && (
+            <SelectLaborModal
+              labors={labors}
+              cleanError={() => {}}
+              closeModal={() => {
+                setIsLaborModalOpen(false);
+              }}
+              selectLabor={handleSelectLabor}
+            />
+          )}
+        </>
 
-      <ListWrapper
-        label={"Materiais cadastrados"}
-        doOnClickAdd={() => {
-          setIsMaterialModalOpen(true);
-        }}
-        hideAddButton={!userCanEdit}
-      >
-        <InventoryItemsList
-          itemsList={quoteMaterials}
-          setItemsList={setQuoteMaterials}
-          setIsThereError={itemsListErrorChecker}
-          deleteItem={setMaterialsToDelete}
-          readOnly={!userCanEdit}
+        <ListWrapper
+          label={"Materiais estoque"}
+          doOnClickAdd={() => {
+            setIsMaterialModalOpen(true);
+          }}
+          hideAddButton={!userCanEdit}
+          doOnClickGear={() => {
+            setIsUpdateMaterialsModalOpen(true);
+          }}
+          hideGearButton={!userCanEdit}
+        >
+          <InventoryItemsList
+            itemsList={quoteMaterials}
+            setItemsList={setQuoteMaterials}
+            setIsThereError={itemsListErrorChecker}
+            deleteItem={setMaterialsToDelete}
+            readOnly={!userCanEdit}
+          />
+        </ListWrapper>
+        <ListWrapper
+          label={"Materiais excepcionais"}
+          doOnClickAdd={handleNewExceptionalMaterial}
+          hideAddButton={!userCanEdit}
+        >
+          <ExceptionalItemsList
+            itemsList={occasionalMaterials}
+            setItemsList={setOccasionalMaterials}
+            deleteItem={setItemsToDelete}
+            quotation={quotationData}
+            setIsThereError={itemsListErrorChecker}
+            readOnly={!userCanEdit}
+          />
+        </ListWrapper>
+        <ListWrapper
+          label={"Serviços"}
+          doOnClickAdd={handleNewBlankServiceItem}
+          doOnClickSearch={() => {
+            setIsLaborModalOpen(true);
+          }}
+          hideAddButton={!userCanEdit}
+        >
+          <ExceptionalItemsList
+            itemsList={serviceItems}
+            setItemsList={setServiceItems}
+            deleteItem={setItemsToDelete}
+            quotation={quotationData}
+            setIsThereError={itemsListErrorChecker}
+            type="service"
+            readOnly={!userCanEdit}
+          />
+        </ListWrapper>
+        <ListWrapper
+          label={"Despesas"}
+          doOnClickAdd={handleNewExpenseItem}
+          hideAddButton={!userCanEdit}
+        >
+          <ExceptionalItemsList
+            itemsList={expenses}
+            setItemsList={setExpenses}
+            deleteItem={setItemsToDelete}
+            quotation={quotationData}
+            setIsThereError={itemsListErrorChecker}
+            type="expense"
+            readOnly={!userCanEdit}
+          />
+        </ListWrapper>
+        {children}
+      </DataForm>
+      {isUpdateMaterialsModalOpen && quotationData && (
+        <UpdateQuoteMaterialsModal
+          quotationId={quotationData.id}
+          closeModal={() => {
+            setIsUpdateMaterialsModalOpen(false);
+          }}
         />
-      </ListWrapper>
-      <ListWrapper
-        label={"Materiais não cadastrados"}
-        doOnClickAdd={handleNewExceptionalMaterial}
-        hideAddButton={!userCanEdit}
-      >
-        <ExceptionalItemsList
-          itemsList={occasionalMaterials}
-          setItemsList={setOccasionalMaterials}
-          deleteItem={setItemsToDelete}
-          quotation={quotationData}
-          setIsThereError={itemsListErrorChecker}
-          readOnly={!userCanEdit}
-        />
-      </ListWrapper>
-      <ListWrapper
-        label={"Serviços"}
-        doOnClickAdd={handleNewBlankServiceItem}
-        doOnClickSearch={() => {
-          setIsLaborModalOpen(true);
-        }}
-        hideAddButton={!userCanEdit}
-      >
-        <ExceptionalItemsList
-          itemsList={serviceItems}
-          setItemsList={setServiceItems}
-          deleteItem={setItemsToDelete}
-          quotation={quotationData}
-          setIsThereError={itemsListErrorChecker}
-          type="service"
-          readOnly={!userCanEdit}
-        />
-      </ListWrapper>
-      <ListWrapper
-        label={"Despesas"}
-        doOnClickAdd={handleNewExpenseItem}
-        hideAddButton={!userCanEdit}
-      >
-        <ExceptionalItemsList
-          itemsList={expenses}
-          setItemsList={setExpenses}
-          deleteItem={setItemsToDelete}
-          quotation={quotationData}
-          setIsThereError={itemsListErrorChecker}
-          type="expense"
-          readOnly={!userCanEdit}
-        />
-      </ListWrapper>
-      {children}
-    </DataForm>
+      )}
+    </>
   );
 }
