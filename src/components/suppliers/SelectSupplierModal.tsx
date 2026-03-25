@@ -4,6 +4,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Input } from "@elements/Input";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
 import { fetchWithToken } from "@utils/fetchWithToken";
+import { Portal } from "src/elements/Portal";
 
 export function SelectSupplierModal({
   suppliers,
@@ -63,77 +64,83 @@ export function SelectSupplierModal({
 
   const xSize = window.innerWidth;
   return (
-    <section className={"absolute top-0 left-0 w-full h-full"}>
-      <div
-        className={`fixed top-0 left-0 w-full h-full ${
-          xSize < 700 ? "p-8" : "p-32"
-        } bg-[#000000AA] z-20`}
-        onClick={closeModal}
-      >
+    <Portal>
+      <section className={"absolute top-0 left-0 w-full h-full"}>
         <div
-          className={
-            "bg-blue-50 rounded-md p-4 border flex flex-col gap-2 items-baseline"
-          }
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          className={`fixed top-0 left-0 w-full h-full ${
+            xSize < 700 ? "p-8" : "p-32"
+          } bg-[#000000AA] z-20`}
+          onClick={closeModal}
         >
-          <strong className={"pb-2 text-lg block"}>
-            Selecione um fornecedor
-          </strong>
-          <div className={"flex gap-2 w-full items-end"}>
-            <Input
-              name="search"
-              placeholder={"Nome do fornecedor"}
-              onBlur={(e) => {
-                validateStringFieldOnBlur(e, setSearch, setValidationErrors, {
-                  min: 2,
-                });
-              }}
-              errors={validationErrors}
-              className={"min-h-10 text-lg"}
-              onKeyPress={(e) => {
-                if (e.key == "Enter") {
-                  e.preventDefault();
-                  const button = document.querySelector<HTMLButtonElement>(
-                    "[name='searchButton']",
-                  );
-                  if (button) {
-                    e.currentTarget.blur();
-                    setTimeout(() => {
-                      button.click();
-                    }, 100);
-                  }
-                }
-              }}
-            />
-            <Button
-              name="searchButton"
-              onClick={() => {
-                handleSearchSupplier();
-              }}
-              text="Buscar"
-            />
-          </div>
-          <div className={"flex flex-col gap-2 w-full md:grid md:grid-cols-2"}>
-            {suppliersFound.map((supplier) => (
-              <Button
-                key={supplier.id}
-                text={supplier.name}
-                onClick={() => {
-                  handleSupplierSelect(supplier);
+          <div
+            className={
+              "bg-blue-50 rounded-md p-4 border flex flex-col gap-2 items-baseline h-full"
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <strong className={"pb-2 text-lg block"}>
+              Selecione um fornecedor
+            </strong>
+            <div className={"flex gap-2 w-full items-end"}>
+              <Input
+                name="search"
+                placeholder={"Nome do fornecedor"}
+                onBlur={(e) => {
+                  validateStringFieldOnBlur(e, setSearch, setValidationErrors, {
+                    min: 2,
+                  });
                 }}
-                className={
-                  "bg-blue-50 border border-gray-400 flex-1 text-left shadow-sm! "
-                }
+                errors={validationErrors}
+                className={"min-h-10 text-lg"}
+                onKeyPress={(e) => {
+                  if (e.key == "Enter") {
+                    e.preventDefault();
+                    const button = document.querySelector<HTMLButtonElement>(
+                      "[name='searchButton']",
+                    );
+                    if (button) {
+                      e.currentTarget.blur();
+                      setTimeout(() => {
+                        button.click();
+                      }, 100);
+                    }
+                  }
+                }}
               />
-            ))}
+              <Button
+                name="searchButton"
+                onClick={() => {
+                  handleSearchSupplier();
+                }}
+                text="Buscar"
+              />
+            </div>
+            <div
+              className={
+                "flex flex-col gap-2 w-full h-full overflow-scroll md:grid md:grid-cols-2"
+              }
+            >
+              {suppliersFound.map((supplier) => (
+                <Button
+                  key={supplier.id}
+                  text={supplier.name}
+                  onClick={() => {
+                    handleSupplierSelect(supplier);
+                  }}
+                  className={
+                    "bg-blue-50 border border-gray-400 flex-1 text-left shadow-sm! "
+                  }
+                />
+              ))}
+            </div>
+            {nothingWasFound && (
+              <span>Nenhum fornecedor encontrado com essa busca!</span>
+            )}
           </div>
-          {nothingWasFound && (
-            <span>Nenhum fornecedor encontrado com essa busca!</span>
-          )}
         </div>
-      </div>
-    </section>
+      </section>
+    </Portal>
   );
 }
