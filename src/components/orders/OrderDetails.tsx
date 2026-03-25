@@ -88,6 +88,7 @@ export function OrderDetails() {
       ) {
         window.location.href = "/ordens";
       }
+      window.location.reload();
     }
     setIsFetching(false);
     return null;
@@ -131,6 +132,7 @@ export function OrderDetails() {
         window.location.href = "/ordens";
       }
       setQuotation(data.quotation);
+      window.location.reload();
     }
     setIsFetching(false);
   }

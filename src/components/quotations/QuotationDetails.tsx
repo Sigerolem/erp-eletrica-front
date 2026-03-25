@@ -158,6 +158,7 @@ export function QuotationDetails() {
     if (code == 200) {
       window.alert("Alterações salvas com sucesso");
       setQuotation(data.quotation);
+      window.location.reload();
     }
     setIsFetching(false);
     return null;
@@ -189,6 +190,7 @@ export function QuotationDetails() {
         window.location.href = "/ordens";
       }
       setQuotation(data.quotation);
+      window.location.reload();
     }
     setIsFetching(false);
   }
