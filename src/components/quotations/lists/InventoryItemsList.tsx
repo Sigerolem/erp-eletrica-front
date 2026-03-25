@@ -116,12 +116,12 @@ export function InventoryItemsList({
           <div
             key={`${item.created_at}-${item.material_id}`}
             className={
-              "grid grid-cols-4 gap-3 items-end border-t border-gray-400 first-of-type:border-t-0"
+              "grid grid-cols-4 gap-2 items-end border-t border-gray-400 first-of-type:border-t-0"
             }
           >
-            <div className={xSize < 800 ? "col-span-4" : "col-span-2"}>
+            <div className={`col-span-4 lg:col-span-2`}>
               <Input
-                label="Nome descritivo"
+                label="Material"
                 name={`name-${item.material_id}`}
                 value={item.name}
                 disabled={true}
@@ -129,14 +129,24 @@ export function InventoryItemsList({
               />
             </div>
             <div
-              className={
-                xSize < 800
-                  ? "col-span-4 grid grid-cols-2 gap-2"
-                  : "col-span-2 grid grid-cols-2 gap-2"
-              }
+              className={`grid gap-2 items-end col-span-4 grid-cols-2 lg:col-span-2 lg:grid-cols-4`}
             >
               <Input
-                label="Quantidade esperada"
+                label="Custo"
+                name={`unit_cost-${item.material_id}`}
+                value={BrlStringFromCents(item.unit_cost)}
+                disabled={true}
+                className={"min-w-5 bg-blue-50!"}
+              />
+              <Input
+                label="Valor"
+                name={`unit_value-${item.material_id}`}
+                value={BrlStringFromCents(item.unit_value)}
+                disabled={true}
+                className={"min-w-5 bg-blue-50!"}
+              />
+              <Input
+                label="Qtd. esperada"
                 name={`expected_amount-${item.material_id}`}
                 value={item.expected_amount}
                 onBlur={(e) => {
@@ -154,15 +164,19 @@ export function InventoryItemsList({
                 className={readOnly ? "min-w-5 bg-blue-50!" : "min-w-5"}
                 disabled={readOnly}
               />
-              <div className={"flex gap-2 items-end justify-stretch"}>
-                <Input
-                  label="Quantidade real"
-                  name={`real_amount-${item.material_id}`}
-                  value={(item.taken_amount || 0) - (item.returned_amount || 0)}
-                  className={"min-w-5 bg-blue-50!"}
-                  disabled={true}
-                />
-                <div className={"ml-1"}>
+              <div className={"flex gap-1 items-end w-full"}>
+                <div className={"flex-1 min-w-5"}>
+                  <Input
+                    label="Qtd. real"
+                    name={`real_amount-${item.material_id}`}
+                    value={
+                      (item.taken_amount || 0) - (item.returned_amount || 0)
+                    }
+                    className={"min-w-5 bg-blue-50!"}
+                    disabled={true}
+                  />
+                </div>
+                <div className={""}>
                   {!readOnly && (
                     <Button
                       text="X"
