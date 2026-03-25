@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { NavButton } from "@elements/NavButton";
-import { UserCard } from "src/elements/UserCard";
+import { UserCardModal } from "src/components/users/UserCardModal";
 
 type Route = {
   name: string;
@@ -42,7 +42,7 @@ export function SideBarMenu({ routes }: Props) {
 
   return (
     <>
-      <UserCard />
+      <UserCardModal />
       {filteredRoutes.map((route) => (
         <NavButton
           key={route.path}

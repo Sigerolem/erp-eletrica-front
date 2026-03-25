@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
-import { Button } from "./Button";
-import { Portal } from "./Portal";
+import { Button } from "@elements/Button";
+import { Portal } from "@elements/Portal";
 
-export function UserCard() {
+export function UserCardModal() {
   const [name, setName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
