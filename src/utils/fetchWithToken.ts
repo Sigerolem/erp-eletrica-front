@@ -35,7 +35,7 @@ export async function fetchWithToken<T>({
 }: {
   path: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  body?: string;
+  body?: string | FormData;
 }): Promise<FetchResult<T>> {
   let response: Response;
 
@@ -60,7 +60,8 @@ export async function fetchWithToken<T>({
     response = await fetch(`${url}${path}`, {
       method,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type":
+          body instanceof FormData ? "multipart/form-data" : "application/json",
         authorization: "Bearer " + localStorage.getItem("apiToken"),
       },
       body,
