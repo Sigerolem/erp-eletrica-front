@@ -4,7 +4,7 @@ import { OrderDetails } from "@comp/orders/OrderDetails";
 import DefaultLayout from "@layouts/DefaultLayout.astro";
 ---
 
-<DefaultLayout title="Detalhes do Orçamento" transition:persist>
+<DefaultLayout title="Detalhes da OS" transition:persist>
   <Header title="Detalhes da ordem de serviço" />
   <OrderDetails client:only="preact" />
 </DefaultLayout>
