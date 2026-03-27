@@ -8,7 +8,7 @@ interface TabsProps {
 export function Tabs({ tabs, children }: TabsProps) {
   const [activeTab, setActiveTab] = useState(0);
 
-  if (tabs.length !== children.length) {
+  if (tabs.length !== children.filter((child) => child !== false).length) {
     throw new Error("Tabs and children must have the same length.");
   }
 

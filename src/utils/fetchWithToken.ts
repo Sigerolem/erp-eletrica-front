@@ -57,13 +57,17 @@ export async function fetchWithToken<T>({
       window.location.hostname == "localhost"
         ? "http://localhost:3000/api"
         : `https://${DOMAIN}/api`;
+    const headers: Record<string, string> = {
+      authorization: "Bearer " + localStorage.getItem("apiToken"),
+    };
+
+    if (!(body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
     response = await fetch(`${url}${path}`, {
       method,
-      headers: {
-        "Content-Type":
-          body instanceof FormData ? "multipart/form-data" : "application/json",
-        authorization: "Bearer " + localStorage.getItem("apiToken"),
-      },
+      headers,
       body,
     });
   } catch (error: any) {

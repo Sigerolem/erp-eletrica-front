@@ -12,11 +12,12 @@ import {
 import { useState, type Dispatch, type StateUpdater } from "preact/hooks";
 import type { CustomersType } from "../customers/Customers";
 import { Textarea } from "src/elements/TextArea";
-import type { QuotationsStatusType } from "./Quotations";
+import type { QuotationImagesType, QuotationsStatusType } from "./Quotations";
 import { Tabs } from "src/elements/Tabs";
 import { QuotationImages } from "./QuotationImages";
 
 interface Props {
+  quotationId: string;
   reference: string;
   description: string;
   publicComments: string;
@@ -41,9 +42,11 @@ interface Props {
     directCost: number;
     directValue: number;
   };
+  quotationImgs: Partial<QuotationImagesType>[];
 }
 
 export function QuotationBaseInfoForm({
+  quotationId,
   reference,
   description,
   publicComments,
@@ -61,6 +64,7 @@ export function QuotationBaseInfoForm({
   status,
   purchaseOrder,
   totals,
+  quotationImgs,
 }: Props) {
   const URL_PATH = window.location.pathname;
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
@@ -97,7 +101,9 @@ export function QuotationBaseInfoForm({
         tabs={[
           "Info",
           "Detalhes",
-          //...(URL_PATH.includes("orcamentos") ? [] : ["Imagens"]),
+          ...(URL_PATH.includes("orcamentos") || quotationId == ""
+            ? []
+            : ["Imagens"]),
         ]}
       >
         <>
@@ -381,9 +387,9 @@ export function QuotationBaseInfoForm({
           </div>
         </>
 
-        {
-          //!URL_PATH.includes("orcamentos") && false && <QuotationImages />
-        }
+        {!URL_PATH.includes("orcamentos") && quotationId !== "" && (
+          <QuotationImages quotationId={quotationId} />
+        )}
       </Tabs>
     </>
   );

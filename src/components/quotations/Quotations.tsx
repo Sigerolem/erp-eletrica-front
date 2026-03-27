@@ -12,6 +12,19 @@ import { useEffect, useState } from "preact/hooks";
 import { hasPermission } from "src/utils/permissionLogic";
 import { PrintPdfModal } from "./PrintPdfModal";
 
+export type QuotationImagesType = {
+  id: string;
+  name: string;
+  original_name: string;
+  mime_type: string;
+  size_kb: string;
+  is_private: boolean;
+  uploader_id: string;
+  quotation_id: string;
+  created_at: string;
+  token: string;
+};
+
 export type QuotationItemTypeType =
   | "occasional_material"
   | "service"
@@ -89,6 +102,7 @@ export type QuotationsType = {
   items: Partial<QuotationItemsType>[];
   materials: Partial<QuotationMaterialsType>[];
   transaction: Partial<TransactionsType> | null;
+  imgs: Partial<QuotationImagesType>[];
 };
 
 export function Quotations() {
