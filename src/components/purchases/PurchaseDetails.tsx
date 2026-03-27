@@ -236,7 +236,7 @@ export function PurchaseDetails() {
               )}
               {purchase.id !== "" && purchase.status == "requested" && (
                 <>
-                  {userCanDeletePurchase && (
+                  {userCanEditPurchase && (
                     <Button
                       text={"Cancelar compra"}
                       type={"button"}
@@ -255,7 +255,7 @@ export function PurchaseDetails() {
 
               {purchase.status == "shipped" && (
                 <>
-                  {userCanDeletePurchase && (
+                  {userCanEditPurchase && (
                     <Button
                       text={"Cancelar compra"}
                       type={"button"}
