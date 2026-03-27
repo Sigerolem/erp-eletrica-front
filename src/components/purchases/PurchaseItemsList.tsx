@@ -14,15 +14,22 @@ export function PurchaseItemsList({
   setPurchaseItems,
   setItemsWereChanged,
   purchase,
+  validationErrors,
+  setValidationErrors,
 }: {
   purchase: Partial<PurchasesType>;
   purchaseItems: Partial<PurchaseItemsType>[];
   setPurchaseItems: Dispatch<StateUpdater<Partial<PurchaseItemsType>[]>>;
   setItemsWereChanged?: Dispatch<StateUpdater<boolean>>;
-}) {
-  const [validationErrors, setValidationErrors] = useState<{
+  validationErrors: {
     [key: string]: string;
-  }>({});
+  };
+  setValidationErrors: Dispatch<
+    StateUpdater<{
+      [key: string]: string;
+    }>
+  >;
+}) {
   const [userCanEditPurchase, setUserCanEditPurchase] = useState(false);
 
   useEffect(() => {
@@ -173,7 +180,7 @@ export function PurchaseItemsList({
                 value={item.amount_requested ?? 0}
                 onBlur={(e) => {
                   const value = e.currentTarget.value;
-                  if (isNaN(parseInt(value))) {
+                  if (isNaN(parseInt(value)) || parseInt(value) < 0) {
                     setValidationErrors((prev) => ({
                       ...prev,
                       [item.material_id || ""]: "Digite um valor válido",

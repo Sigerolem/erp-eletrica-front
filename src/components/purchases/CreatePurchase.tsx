@@ -26,6 +26,25 @@ export function CreatePurchase() {
       body: JSON.stringify(purchaseData),
     });
 
+    if (code == 400 || code == 500) {
+      if (data.message && Array.isArray(data.message)) {
+        if (data.message[0].includes("must not be less than 0")) {
+          window.alert(
+            "Não é possivel comprar menos que 0 unidades de um item.",
+          );
+        } else {
+          data.message.forEach((message) => {
+            window.alert(message);
+          });
+        }
+      } else {
+        window.alert(
+          `Erro ao salvar compra. \n ${data.error} \n ${data.message}`,
+        );
+      }
+      return { erro: "Algum problema ocorreu" };
+    }
+
     if (code == 201) {
       window.location.href = "/compras";
       return null;

@@ -193,6 +193,11 @@ export function PurchaseDataForm({
   async function handleSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    if (Object.keys(validationErrors).length > 0) {
+      window.alert("Corrija os erros no formulário.");
+      return;
+    }
+
     if (selectedSupplier == null) {
       setValidationErrors((prev) => ({
         ...prev,
@@ -441,6 +446,8 @@ export function PurchaseDataForm({
             purchaseItems={purchaseItems}
             setPurchaseItems={setPurchaseItems}
             setItemsWereChanged={setItemsWereChanged}
+            validationErrors={validationErrors}
+            setValidationErrors={setValidationErrors}
           />
         )}
       </div>
