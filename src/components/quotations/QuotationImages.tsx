@@ -20,6 +20,7 @@ export function QuotationImages({ quotationId }: QuotationImagesProps) {
       path: `/quotation-media/quotation/${quotationId}`,
     }).then((result) => {
       if (result.code === 200) {
+        console.log(result.data);
         setQuotationImages(result.data.imgs ?? []);
       } else {
         window.alert("Erro ao buscar imagens.");
@@ -106,14 +107,14 @@ export function QuotationImages({ quotationId }: QuotationImagesProps) {
             {quotationImages.map((img) => (
               <div
                 className={
-                  "flex items-center justify-center border rounded-lg border-slate-400 overflow-hidden cursor-pointer"
+                  "flex items-center justify-center border rounded-lg border-slate-400 max-h-60 overflow-hidden cursor-pointer"
                 }
               >
                 <img
                   src={`${baseUrl}/api/quotation-media/${img.token}`}
                   alt={img.name}
                   title={img.name}
-                  className={""}
+                  className={"w-full h-full object-cover"}
                   onClick={() => handleImgClick(img.token!)}
                 />
               </div>
