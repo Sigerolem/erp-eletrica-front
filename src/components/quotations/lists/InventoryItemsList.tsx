@@ -94,8 +94,6 @@ export function InventoryItemsList({
     );
   }
 
-  const xSize = window.innerWidth;
-
   return (
     <div className={"px-2 flex flex-col gap-4 pb-3"}>
       {!readOnly && itemsList.length > 0 && (

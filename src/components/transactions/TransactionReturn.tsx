@@ -18,9 +18,9 @@ export function TransactionReturn() {
     [key: string]: string;
   }>({});
   const [id, setId] = useState("");
-  const [barcodeLog, setbarcodeLog] = useState<{
-    [key: string]: number;
-  }>({});
+  // const [barcodeLog, setbarcodeLog] = useState<{
+  //   [key: string]: number;
+  // }>({});
 
   useEffect(() => {
     const path = new URL(window.location.href);
@@ -86,13 +86,13 @@ export function TransactionReturn() {
   }
 
   function focusOnScannedItem(barcode: string) {
-    setbarcodeLog((prev) => {
-      if (Object.keys(prev).includes(barcode)) {
-        return { ...prev, [barcode]: prev[barcode] + 1 };
-      } else {
-        return { ...prev, [barcode]: 1 };
-      }
-    });
+    // setbarcodeLog((prev) => {
+    //   if (Object.keys(prev).includes(barcode)) {
+    //     return { ...prev, [barcode]: prev[barcode] + 1 };
+    //   } else {
+    //     return { ...prev, [barcode]: 1 };
+    //   }
+    // });
 
     setTransactionItems((prev) =>
       prev.map((item) =>
@@ -135,7 +135,7 @@ export function TransactionReturn() {
     materialId: string,
     barcode: string,
   ) {
-    const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
+    const { code } = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${materialId}`,
       method: "PUT",
       body: JSON.stringify({ barcode: barcode }),

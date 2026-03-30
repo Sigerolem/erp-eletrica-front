@@ -1,27 +1,19 @@
 import { SelectSupplierModal } from "@comp/suppliers/SelectSupplierModal";
+import type { SuppliersType } from "@comp/suppliers/Suppliers";
+import { Button } from "@elements/Button";
 import { Input } from "@elements/Input";
-import {
-  BrlStringFromCents,
-  formatFloatWithDecimalDigits,
-} from "@utils/formating";
+import { fetchWithToken } from "@utils/fetchWithToken";
+import { BrlStringFromCents } from "@utils/formating";
 import {
   validateFloatFieldOnBlur,
   validateIntFieldOnBlur,
   validateStringFieldOnBlur,
 } from "@utils/inputValidation";
 import type { JSX, TargetedSubmitEvent } from "preact";
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type StateUpdater,
-} from "preact/hooks";
-import type { MaterialsType } from "./Materials";
-import { fetchWithToken } from "@utils/fetchWithToken";
-import type { SuppliersType } from "@comp/suppliers/Suppliers";
-import { Button } from "@elements/Button";
+import { useEffect, useState } from "preact/hooks";
 import { UnitSelector } from "src/elements/UnitSelector";
 import { hasPermission } from "src/utils/permissionLogic";
+import type { MaterialsType } from "./Materials";
 
 interface MaterialDataFormProps {
   materialData?: MaterialsType;

@@ -17,6 +17,7 @@ export function SelectMultipleMaterialsModal({
   selectedMaterialIds = [],
   supplierId,
   suppliers,
+  searchInfo,
 }: {
   materials: MaterialsType[];
   selectMaterial: (material: MaterialsType) => void;
@@ -26,12 +27,22 @@ export function SelectMultipleMaterialsModal({
   selectedMaterialIds: string[];
   supplierId?: string;
   suppliers?: SuppliersType[];
+  searchInfo: {
+    amountFound: number;
+    amountShowing: number;
+    limit: number;
+  };
 }) {
   const [search, setSearch] = useState("");
   const [validationErrors, setValidationErros] = useState<{
     [key: string]: string;
   }>({});
   const [materialsFound, setMaterialsFound] = useState<MaterialsType[]>([]);
+  const [materialsSearchInfo, setMaterialsSearchInfo] = useState({
+    amountFound: 0,
+    amountShowing: 0,
+    limit: 0,
+  });
   const [nothingWasFound, setNothingWasFound] = useState(false);
   const [suppliersFound, setSuppliersFound] = useState<SuppliersType[]>([]);
   const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
@@ -65,7 +76,8 @@ export function SelectMultipleMaterialsModal({
 
   useEffect(() => {
     setMaterialsFound(materials);
-  }, [materials]);
+    setMaterialsSearchInfo(searchInfo);
+  }, [materials, searchInfo]);
 
   useEffect(() => {
     if (!supplierId && suppliers == undefined) {
@@ -95,13 +107,20 @@ export function SelectMultipleMaterialsModal({
       path += `?${queryParams.join("&")}&page=1`;
     }
 
-    const { code, data } = await fetchWithToken<{ materials: MaterialsType[] }>(
-      {
-        path,
-      },
-    );
+    const { code, data } = await fetchWithToken<{
+      materials: MaterialsType[];
+      limit: number;
+      total: number;
+    }>({
+      path,
+    });
     if (code == 200) {
       setMaterialsFound(data.materials);
+      setMaterialsSearchInfo({
+        amountFound: data.total,
+        amountShowing: data.materials.length,
+        limit: data.limit,
+      });
       setNothingWasFound(data.materials.length == 0);
     }
   }
@@ -202,6 +221,17 @@ export function SelectMultipleMaterialsModal({
                 />
               )}
             </div>
+            {materialsSearchInfo.limit > 0 &&
+              (materialsSearchInfo.amountFound > materialsSearchInfo.limit ? (
+                <span className={"text-sm -mt-2 block font-semibold"}>
+                  Exibindo {materialsSearchInfo.amountShowing} de{" "}
+                  {materialsSearchInfo.amountFound} materiais encontrados
+                </span>
+              ) : (
+                <span className={"text-sm -mt-2 block font-semibold"}>
+                  Exibindo os {materialsFound.length} materiais encontrados
+                </span>
+              ))}
             {isSupplierModalOpen && (
               <SelectSupplierModal
                 closeModal={() => {

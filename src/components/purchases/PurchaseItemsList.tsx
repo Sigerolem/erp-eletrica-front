@@ -44,7 +44,6 @@ export function PurchaseItemsList({
   }, []);
 
   function handleUpdateRequestedAmount(materialId: string, amount: number) {
-    let old: number;
     setPurchaseItems((prev) =>
       prev.map((item) => {
         if (item.material_id == materialId) {

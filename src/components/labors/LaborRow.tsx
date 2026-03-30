@@ -167,6 +167,7 @@ export function LaborRow({
           }}
           disabled={!userCanEditLabor}
           className={!userCanEditLabor ? "bg-blue-50!" : ""}
+          errors={validationErrors}
         />
         <UnitSelector
           label={"Unidade"}
@@ -199,6 +200,7 @@ export function LaborRow({
           }}
           className={!userCanEditLabor ? "bg-blue-50!" : ""}
           disabled={!userCanEditLabor}
+          errors={validationErrors}
         />
         <Input
           label={"Valor"}
@@ -212,6 +214,7 @@ export function LaborRow({
           }}
           className={!userCanEditLabor ? "bg-blue-50!" : ""}
           disabled={!userCanEditLabor}
+          errors={validationErrors}
         />
       </div>
       <div className={"w-full flex justify-end gap-2"}>

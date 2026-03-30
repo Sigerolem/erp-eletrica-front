@@ -61,7 +61,7 @@ export function Purchases() {
   } | null>(null);
   const [supplierList, setSupplierList] = useState<SuppliersType[]>([]);
   const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
-  const [showOnlyConcluded, setShowOnlyConcluded] = useState(false);
+  // const [showOnlyConcluded, setShowOnlyConcluded] = useState(false);
   const [userCantSeeSuppliers, setUserCantSeeSuppliers] = useState(false);
   const [lastQuery, setLastQuery] = useState<string | null>(null);
 

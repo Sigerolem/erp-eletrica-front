@@ -39,7 +39,6 @@ export function PurchaseGenerationSuppliers() {
     });
   }, []);
 
-  const xSize = window.innerWidth;
   return (
     <>
       <div className={"flex flex-col"}>

@@ -86,7 +86,7 @@ export function TransactionDelivery() {
     materialId: string,
     barcode: string,
   ) {
-    const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
+    const { code } = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${materialId}`,
       method: "PUT",
       body: JSON.stringify({ barcode: barcode }),
@@ -248,6 +248,8 @@ export function TransactionDelivery() {
               input.value = "";
             }
           }}
+          disabled={isSearchingBarcode}
+          className={"disabled:cursor-wait!"}
         />
         <ListWrapper
           label="Materiais"

@@ -59,6 +59,11 @@ export function QuotationDataForm({
   }>({});
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
+  const [materialsSearchInfo, setMaterialsSearchInfo] = useState<{
+    amountFound: number;
+    amountShowing: number;
+    limit: number;
+  }>({ amountFound: 0, amountShowing: 0, limit: 0 });
   const [isLaborModalOpen, setIsLaborModalOpen] = useState(false);
   const [labors, setLabors] = useState<LaborsType[]>([]);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
@@ -250,11 +255,22 @@ export function QuotationDataForm({
 
   useEffect(() => {
     Promise.all([
-      fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }),
+      fetchWithToken<{
+        materials: MaterialsType[];
+        limit: number;
+        total: number;
+      }>({
+        path: "/materials",
+      }),
       fetchWithToken<{ labors: LaborsType[] }>({ path: "/labors" }),
     ]).then(([materialsResult, laborsResult]) => {
       if (materialsResult.code == 200) {
         setMaterials(materialsResult.data.materials);
+        setMaterialsSearchInfo({
+          amountFound: materialsResult.data.total,
+          amountShowing: materialsResult.data.materials.length,
+          limit: materialsResult.data.limit,
+        });
       }
       if (laborsResult.code == 200) {
         setLabors(laborsResult.data.labors);
@@ -752,6 +768,7 @@ export function QuotationDataForm({
       <>
         <SelectMultipleMaterialsModal
           materials={materials}
+          searchInfo={materialsSearchInfo}
           cleanError={() => {}}
           closeModal={() => {
             setIsMaterialModalOpen(false);
@@ -787,7 +804,6 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           deleteItem={setMaterialsToDelete}
           readOnly={!userCanEdit}
-          setSomethingChanged={setMaterialsHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -802,7 +818,6 @@ export function QuotationDataForm({
           quotation={quotationData}
           setIsThereError={itemsListErrorChecker}
           readOnly={!userCanEdit}
-          setSomethingChanged={setItemsHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -819,7 +834,6 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           type="service"
           readOnly={!userCanEdit}
-          setSomethingChanged={setServicesHasChanged}
         />
       </ListWrapper>
       <ListWrapper
@@ -835,7 +849,6 @@ export function QuotationDataForm({
           setIsThereError={itemsListErrorChecker}
           type="expense"
           readOnly={!userCanEdit}
-          setSomethingChanged={setExpensesHasChanged}
         />
       </ListWrapper>
       {children}

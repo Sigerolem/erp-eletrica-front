@@ -1,6 +1,5 @@
 import type { MaterialsType } from "@comp/materials/Materials";
 import type { QuotationsType } from "@comp/quotations/Quotations";
-import { Button } from "@elements/Button";
 import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
@@ -49,9 +48,9 @@ export function Transactions() {
   const TRANSACTION_URL =
     window.location.hostname == "localhost" ? "/pedidos/id#" : "/pedidos/id/#";
 
-  function handleNewTransaction() {
-    window.location.href = "/pedidos/novo";
-  }
+  // function handleNewTransaction() {
+  //   window.location.href = "/pedidos/novo";
+  // }
 
   useEffect(() => {
     fetchWithToken<{ transactions: TransactionsType[] }>({

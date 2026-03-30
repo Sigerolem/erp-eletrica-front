@@ -1,12 +1,11 @@
+import type { QuotationsType } from "@comp/quotations/Quotations";
 import { DataForm } from "@elements/DataForm";
 import { Input } from "@elements/Input";
-import { validateStringFieldOnBlur } from "@utils/inputValidation";
 import type { JSX, TargetedSubmitEvent } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import type { TransactionsStatusType, TransactionsType } from "./Transactions";
-import type { QuotationsType } from "@comp/quotations/Quotations";
-import { formatTransactionStatusEnum } from "src/utils/formating";
 import { Textarea } from "src/elements/TextArea";
+import { formatTransactionStatusEnum } from "src/utils/formating";
+import type { TransactionsStatusType, TransactionsType } from "./Transactions";
 
 export function TransactionDataForm({
   transactionData,
@@ -28,10 +27,7 @@ export function TransactionDataForm({
     slug: "Carregando...",
   });
   const [status, setStatus] = useState<TransactionsStatusType>("draft");
-  const [email, setEmail] = useState("");
   const [transaction, setTransaction] = useState<TransactionsType | null>(null);
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [address, setAddress] = useState("");
 
   useEffect(() => {
     if (transactionData) {

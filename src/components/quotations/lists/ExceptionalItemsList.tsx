@@ -31,7 +31,7 @@ export function ExceptionalItemsList({
   setItemsList,
   type = "occasional_material",
   deleteItem,
-  quotation,
+  // quotation,
   readOnly,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);

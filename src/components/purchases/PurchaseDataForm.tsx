@@ -1,27 +1,27 @@
+import type { MaterialsType } from "@comp/materials/Materials";
+import { PurchaseItemsList } from "@comp/purchases/PurchaseItemsList";
+import { SelectSupplierModal } from "@comp/suppliers/SelectSupplierModal";
+import type { SuppliersType } from "@comp/suppliers/Suppliers";
+import { Button } from "@elements/Button";
+import { Checkbox } from "@elements/Checkbox";
+import { Input } from "@elements/Input";
+import { fetchWithToken } from "@utils/fetchWithToken";
+import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
+import {
+  validateFloatFieldOnBlur,
+  validateStringFieldOnBlur,
+} from "@utils/inputValidation";
+import { hasPermission } from "@utils/permissionLogic";
+import type { TargetedSubmitEvent } from "preact";
+import type { ReactNode } from "preact/compat";
 import { useEffect, useState } from "preact/hooks";
+import { SelectMultipleMaterialsModal } from "../materials/SelectMultipleMaterialsModal";
 import type {
   PurchaseItemsType,
   PurchaseStatusType,
   PurchasesType,
 } from "./Purchases";
-import type { MaterialsType } from "@comp/materials/Materials";
-import type { SuppliersType } from "@comp/suppliers/Suppliers";
-import { SelectSupplierModal } from "@comp/suppliers/SelectSupplierModal";
-import { PurchaseItemsList } from "@comp/purchases/PurchaseItemsList";
-import { fetchWithToken } from "@utils/fetchWithToken";
-import { Input } from "@elements/Input";
-import type { JSX, TargetedSubmitEvent } from "preact";
-import { BrlStringFromCents, formatPurchaseStatusEnum } from "@utils/formating";
-import { Button } from "@elements/Button";
-import {
-  validateFloatFieldOnBlur,
-  validateStringFieldOnBlur,
-} from "@utils/inputValidation";
-import { Checkbox } from "@elements/Checkbox";
-import type { ReactNode } from "preact/compat";
 import { ReceivedItemsList } from "./ReceivedItemsList";
-import { hasPermission } from "@utils/permissionLogic";
-import { SelectMultipleMaterialsModal } from "../materials/SelectMultipleMaterialsModal";
 
 export function PurchaseDataForm({
   purchaseData,
@@ -42,6 +42,11 @@ export function PurchaseDataForm({
   const [isMatModalOpen, setIsMatModalOpen] = useState(false);
   const [suppliers, setSuppliers] = useState<SuppliersType[]>([]);
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
+  const [materialsSearchInfo, setMaterialsSearchInfo] = useState<{
+    amountFound: number;
+    amountShowing: number;
+    limit: number;
+  }>({ amountFound: 0, amountShowing: 0, limit: 0 });
   const [purchaseItems, setPurchaseItems] = useState<
     Partial<PurchaseItemsType>[]
   >([]);
@@ -50,7 +55,7 @@ export function PurchaseDataForm({
     name: string;
   } | null>(null);
 
-  const [id, setId] = useState("");
+  const [_, setId] = useState("");
   const [nf, setNF] = useState("");
   const [isTracked, setIsTracked] = useState(false);
   const [status, setStatus] = useState<PurchaseStatusType>("draft");
@@ -111,11 +116,20 @@ export function PurchaseDataForm({
     if (selectedSupplier == null) {
       return;
     }
-    fetchWithToken<{ materials: MaterialsType[] }>({
+    fetchWithToken<{
+      materials: MaterialsType[];
+      limit: number;
+      total: number;
+    }>({
       path: `/materials?supplier_id=${selectedSupplier.id}`,
     }).then(({ code, data }) => {
       if (code == 200) {
         setMaterials(data.materials);
+        setMaterialsSearchInfo({
+          amountFound: data.total,
+          amountShowing: data.materials.length,
+          limit: data.limit,
+        });
       } else {
         window.alert("Erro ao se comunicar com o servidor.");
       }
@@ -411,6 +425,7 @@ export function PurchaseDataForm({
 
         <SelectMultipleMaterialsModal
           materials={materials}
+          searchInfo={materialsSearchInfo}
           cleanError={() => {}}
           closeModal={() => {
             setIsMatModalOpen(false);

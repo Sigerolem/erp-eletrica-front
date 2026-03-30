@@ -36,7 +36,7 @@ export function ChangePassword() {
       window.alert("As senhas não coincidem");
       return;
     }
-    const { code, data } = await fetchWithToken<{ user: UsersType }>({
+    const { code } = await fetchWithToken<{ user: UsersType }>({
       path: `/users/password/${login}`,
       method: "PUT",
       body: JSON.stringify({

@@ -1,13 +1,8 @@
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type StateUpdater,
-} from "preact/hooks";
-import { fetchWithToken } from "/src/utils/fetchWithToken";
+import { Button } from "@elements/Button";
+import { useEffect, type Dispatch, type StateUpdater } from "preact/hooks";
 import { MaterialDataForm } from "./MaterialDataForm";
 import type { MaterialsType } from "./Materials";
-import { Button } from "@elements/Button";
+import { fetchWithToken } from "/src/utils/fetchWithToken";
 
 export function CreateMaterialModal({
   closeModal,

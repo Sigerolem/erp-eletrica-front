@@ -40,7 +40,7 @@ export function QuotationDataForm({
   quotationData?: QuotationsType;
   customers?: CustomersType[];
   children?: JSX.Element;
-  setSomethingChanged: Dispatch<StateUpdater<boolean>>;
+  setSomethingChanged?: Dispatch<StateUpdater<boolean>>;
 }) {
   const { baseInfo, totals, actions, lists, thereIsChange } =
     useQuotationState(quotationData);
@@ -86,6 +86,11 @@ export function QuotationDataForm({
 
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialsType[]>([]);
+  const [materialsSearchInfo, setMaterialsSearchInfo] = useState<{
+    amountFound: number;
+    amountShowing: number;
+    limit: number;
+  }>({ amountFound: 0, amountShowing: 0, limit: 0 });
   const [isLaborModalOpen, setIsLaborModalOpen] = useState(false);
   const [labors, setLabors] = useState<LaborsType[]>([]);
 
@@ -97,11 +102,22 @@ export function QuotationDataForm({
   useEffect(() => {
     async function fetchLists() {
       const [materialsResult, laborsResult] = await Promise.all([
-        fetchWithToken<{ materials: MaterialsType[] }>({ path: "/materials" }),
+        fetchWithToken<{
+          materials: MaterialsType[];
+          limit: number;
+          total: number;
+        }>({
+          path: "/materials",
+        }),
         fetchWithToken<{ labors: LaborsType[] }>({ path: "/labors" }),
       ]);
       if (materialsResult.code == 200) {
         setMaterials(materialsResult.data.materials);
+        setMaterialsSearchInfo({
+          amountFound: materialsResult.data.total,
+          amountShowing: materialsResult.data.materials.length,
+          limit: materialsResult.data.limit,
+        });
       } else if (materialsResult.code == 403) {
         window.alert(
           "Você não tem permissão para obter a lista de materiais cadastrados.",
@@ -145,7 +161,9 @@ export function QuotationDataForm({
   }, [quotationData]);
 
   useEffect(() => {
-    setSomethingChanged(Object.keys(thereIsChange).length > 0);
+    if (setSomethingChanged) {
+      setSomethingChanged(Object.keys(thereIsChange).length > 0);
+    }
   }, [thereIsChange]);
 
   async function onFormSubmit(e: TargetedSubmitEvent<HTMLFormElement>) {
@@ -248,6 +266,7 @@ export function QuotationDataForm({
         <>
           <SelectMultipleMaterialsModal
             materials={materials}
+            searchInfo={materialsSearchInfo}
             cleanError={() => {}}
             closeModal={() => {
               setIsMaterialModalOpen(false);

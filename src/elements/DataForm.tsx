@@ -1,4 +1,4 @@
-import type { FormHTMLAttributes, JSX } from "preact";
+import type { FormHTMLAttributes } from "preact";
 import type { ReactNode } from "preact/compat";
 
 interface DataFormProps extends FormHTMLAttributes {

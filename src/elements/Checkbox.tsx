@@ -1,5 +1,5 @@
 //checkbox input with state
-import { type InputHTMLAttributes, type TargetedEvent } from "preact";
+import { type InputHTMLAttributes } from "preact";
 import type { Dispatch, StateUpdater } from "preact/hooks";
 
 interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {

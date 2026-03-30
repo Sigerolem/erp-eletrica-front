@@ -16,14 +16,19 @@ export type LaborsType = {
 
 export function Labors() {
   const [labors, setLabors] = useState<LaborsType[]>([]);
-  const [serverLabors, setServerLabors] = useState<{ [key: string]: LaborsType }>({});
+  const [serverLabors, setServerLabors] = useState<{
+    [key: string]: LaborsType;
+  }>({});
   const [isFetching, setIsFetching] = useState(true);
   const [userCanCreateLabor, setUserCanCreateLabor] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
     const permission = localStorage.getItem("apiPermissions");
-    if (role == "owner" || hasPermission(permission ?? "----------------", "labor", 'W')) {
+    if (
+      role == "owner" ||
+      hasPermission(permission ?? "----------------", "labor", "W")
+    ) {
       setUserCanCreateLabor(true);
     }
     fetchWithToken<{ labors: LaborsType[] }>({
@@ -33,7 +38,7 @@ export function Labors() {
       if (code == 200) {
         setLabors(data.labors);
         data.labors.forEach((labor) =>
-          setServerLabors(prev => ({ ...prev, [labor.id]: labor })),
+          setServerLabors((prev) => ({ ...prev, [labor.id]: labor })),
         );
       } else if (code == 403) {
         window.location.href = "/";
@@ -45,10 +50,8 @@ export function Labors() {
   }, []);
 
   useEffect(() => {
-    setLabors(Object.values(serverLabors))
-  }, [serverLabors])
-
-  const xSize = window.innerWidth;
+    setLabors(Object.values(serverLabors));
+  }, [serverLabors]);
 
   return (
     <>
@@ -87,9 +90,15 @@ export function Labors() {
           </div>
         </header> */}
         <div className={"rounded-lg overflow-hidden"}>
-
           {labors.map((labor) => {
-            return <LaborRow labor={labor} setLabors={setLabors} serverLabors={serverLabors} setServerLabors={setServerLabors} />;
+            return (
+              <LaborRow
+                labor={labor}
+                setLabors={setLabors}
+                serverLabors={serverLabors}
+                setServerLabors={setServerLabors}
+              />
+            );
           })}
         </div>
         {isFetching && (

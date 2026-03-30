@@ -20,9 +20,9 @@ export function ReceivedItemsList({
   setPurchaseItems: Dispatch<StateUpdater<Partial<PurchaseItemsType>[]>>;
   setItemsWereChanged: Dispatch<StateUpdater<boolean>>;
 }) {
-  const [validationErrors, setValidationErrors] = useState<{
-    [key: string]: string;
-  }>({});
+  // const [validationErrors, setValidationErrors] = useState<{
+  //   [key: string]: string;
+  // }>({});
 
   const [userCanEditPurchase, setUserCanEditPurchase] = useState(false);
 

@@ -1,20 +1,20 @@
 import { Input } from "@elements/Input";
-import { SelectCustomerModal } from "../customers/SelectCustomerModal";
 import {
   validateFloatFieldOnBlur,
   validateIntFieldOnBlur,
   validateStringFieldOnBlur,
 } from "@utils/inputValidation";
+import { useState, type Dispatch, type StateUpdater } from "preact/hooks";
+import { Tabs } from "src/elements/Tabs";
+import { Textarea } from "src/elements/TextArea";
 import {
   BrlStringFromCents,
   formatQuotationStatusEnum,
 } from "src/utils/formating";
-import { useState, type Dispatch, type StateUpdater } from "preact/hooks";
 import type { CustomersType } from "../customers/Customers";
-import { Textarea } from "src/elements/TextArea";
-import type { QuotationImagesType, QuotationsStatusType } from "./Quotations";
-import { Tabs } from "src/elements/Tabs";
+import { SelectCustomerModal } from "../customers/SelectCustomerModal";
 import { QuotationImages } from "./QuotationImages";
+import type { QuotationsStatusType } from "./Quotations";
 
 interface Props {
   quotationId: string;

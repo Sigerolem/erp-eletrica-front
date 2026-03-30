@@ -76,7 +76,7 @@ export function QuotationImages({ quotationId }: QuotationImagesProps) {
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
-        const { code, data } = await fetchWithToken({
+        const { code } = await fetchWithToken({
           path: `/quotations/${quotationId}/upload-image`,
           method: "POST",
           body: formData,
@@ -103,7 +103,7 @@ export function QuotationImages({ quotationId }: QuotationImagesProps) {
     )
       return;
     setIsDeleting(true);
-    const { code, data } = await fetchWithToken({
+    const { code } = await fetchWithToken({
       path: `/quotation-media/${id}`,
       method: "DELETE",
     });

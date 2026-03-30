@@ -58,7 +58,7 @@ export function PurchaseDetails() {
 
   async function handleDeletePurchase() {
     setIsLoading(true);
-    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+    const { code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/${id}`,
       method: "DELETE",
     });
@@ -75,7 +75,7 @@ export function PurchaseDetails() {
 
   async function handleConfirmDraft() {
     setIsLoading(true);
-    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+    const { code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/status/${id}`,
       method: "PATCH",
       body: JSON.stringify({ id, status: "requested" }),
@@ -98,7 +98,7 @@ export function PurchaseDetails() {
 
   async function handleCancelPurchase() {
     setIsLoading(true);
-    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+    const { code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/status/${id}`,
       method: "PATCH",
       body: JSON.stringify({ id, status: "cancelled" }),
@@ -121,7 +121,7 @@ export function PurchaseDetails() {
 
   async function handleConfirmPurchase() {
     setIsLoading(true);
-    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+    const { code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/status/${id}`,
       method: "PATCH",
       body: JSON.stringify({ id, status: "shipped" }),
@@ -140,7 +140,7 @@ export function PurchaseDetails() {
 
   async function handleConcludePurchase() {
     setIsLoading(true);
-    const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
+    const { code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/status/${id}`,
       method: "PATCH",
       body: JSON.stringify({ id, status: "finished" }),

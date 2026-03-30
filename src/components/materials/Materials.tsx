@@ -51,7 +51,7 @@ export function Materials() {
     name: "",
     id: "",
   });
-  const [userCantSeeSuppliers, setUserCantSeeSuppliers] = useState(false);
+  // const [userCantSeeSuppliers, setUserCantSeeSuppliers] = useState(false);
   const [lastQuery, setLastQuery] = useState<string | null>(null);
   const [searchInfo, setSearchInfo] = useState({
     amountFound: 0,
@@ -80,7 +80,7 @@ export function Materials() {
       role != "owner" &&
       !hasPermission(permission ?? "----------------", "supplier", "R")
     ) {
-      setUserCantSeeSuppliers(true);
+      // setUserCantSeeSuppliers(true);
       return;
     }
 
