@@ -70,8 +70,6 @@ export function QuotationDataForm({
     setMaterialsToDelete,
     itemsToDelete,
     setItemsToDelete,
-    quotationImgs,
-    setQuotationImgs,
   } = lists;
   const {
     updateField,
@@ -246,7 +244,6 @@ export function QuotationDataForm({
           userCanEdit={userCanEdit}
           validationErrors={validationErrors}
           setValidationErrors={setValidationErrors}
-          quotationImgs={quotationImgs}
         />
         <>
           <SelectMultipleMaterialsModal

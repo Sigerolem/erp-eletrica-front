@@ -46,9 +46,6 @@ export function useQuotationState(quotationData: QuotationsType | undefined) {
   const [serviceItems, setServiceItems] = useState<
     Partial<QuotationItemsType>[]
   >([]);
-  const [quotationImgs, setQuotationImgs] = useState<
-    Partial<QuotationImagesType>[]
-  >([]);
   const [expenses, setExpenses] = useState<Partial<QuotationItemsType>[]>([]);
 
   const [itemsToDelete, setItemsToDelete] = useState<string[]>([]);
@@ -72,7 +69,6 @@ export function useQuotationState(quotationData: QuotationsType | undefined) {
       setOccasionalMaterials(occasionalMat);
       setExpenses(expenses);
       setServiceItems(services);
-      setQuotationImgs(quotationData.imgs);
     }
   }, [quotationData]);
 
@@ -391,8 +387,6 @@ export function useQuotationState(quotationData: QuotationsType | undefined) {
       setItemsToDelete,
       materialsToDelete,
       setMaterialsToDelete,
-      quotationImgs,
-      setQuotationImgs,
     },
     actions: {
       updateField,

@@ -42,7 +42,6 @@ interface Props {
     directCost: number;
     directValue: number;
   };
-  quotationImgs: Partial<QuotationImagesType>[];
 }
 
 export function QuotationBaseInfoForm({
@@ -64,7 +63,6 @@ export function QuotationBaseInfoForm({
   status,
   purchaseOrder,
   totals,
-  quotationImgs,
 }: Props) {
   const URL_PATH = window.location.pathname;
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
