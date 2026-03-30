@@ -77,6 +77,7 @@
           role: string;
           permissions: string;
           login: string;
+          id: string;
         }) => {
           localStorage.setItem("apiToken", data.token);
           localStorage.setItem("apiName", data.name);
@@ -84,6 +85,7 @@
           localStorage.setItem("apiRole", data.role);
           localStorage.setItem("apiPermissions", data.permissions);
           localStorage.setItem("apiTokenDate", new Date().toLocaleDateString());
+          localStorage.setItem("apiUserId", data.id);
           window.location.href = "/";
         },
       )
