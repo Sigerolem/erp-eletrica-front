@@ -171,8 +171,10 @@ export function QuotationDataForm({
     let errorFound = false;
 
     if (Object.keys(validationErrors).length > 0) {
-      window.alert("Só é possivel salvar com dados válidos.");
-      console.warn(Object.values(validationErrors));
+      window.alert(
+        "Só é possivel salvar com dados válidos. \n" +
+          Object.values(validationErrors).join(", \n"),
+      );
       return;
     }
 
@@ -190,6 +192,10 @@ export function QuotationDataForm({
         customer_id: "Selecione um cliente",
       }));
       errorFound = true;
+    }
+
+    if (errorFound) {
+      return;
     }
 
     const newQuotationData: Partial<QuotationsType> = {
@@ -214,20 +220,15 @@ export function QuotationDataForm({
       materials: quoteMaterials,
     };
 
-    if (newQuotationData.items?.length == 0) {
-      setValidationErrors((prev) => ({
-        ...prev,
-        items: "Adicione pelo menos um item",
-      }));
+    if (
+      newQuotationData.items?.length == 0 &&
+      newQuotationData.materials?.length == 0
+    ) {
       window.alert("Adicione pelo menos um item");
       errorFound = true;
     } else if (
       newQuotationData.items?.some((item) => (item.name?.length ?? 0) < 4)
     ) {
-      setValidationErrors((prev) => ({
-        ...prev,
-        items: "Todos os itens devem ter pelo menos 4 caracteres",
-      }));
       window.alert("Todos os itens devem ter pelo menos 4 caracteres no nome.");
       errorFound = true;
     }
@@ -247,12 +248,15 @@ export function QuotationDataForm({
     }
   }
 
-  function itemsListErrorChecker(bool: boolean) {
-    if (bool) {
-      setValidationErrors((prev) => ({ ...prev, quoteMaterials: "Tem erro" }));
+  function itemsListErrorChecker(errorDescription: string | null) {
+    if (errorDescription) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        quoteItems: errorDescription,
+      }));
     } else {
       setValidationErrors((prev) => {
-        delete prev.quoteMaterials;
+        delete prev.quoteItems;
         return prev;
       });
     }

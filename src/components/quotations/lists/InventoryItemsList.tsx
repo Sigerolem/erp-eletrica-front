@@ -12,7 +12,7 @@ import { BrlStringFromCents } from "src/utils/formating";
 interface ComponentProps {
   itemsList: Partial<QuotationMaterialsType>[];
   setItemsList: Dispatch<StateUpdater<Partial<QuotationMaterialsType>[]>>;
-  setIsThereError: (bool: boolean) => void;
+  setIsThereError: (errorDescription: string | null) => void;
   deleteItem: Dispatch<StateUpdater<string[]>>;
   readOnly?: boolean;
 }
@@ -32,9 +32,9 @@ export function InventoryItemsList({
 
   useEffect(() => {
     if (Object.keys(validationErrors).length == 0) {
-      setIsThereError(false);
+      setIsThereError(null);
     } else {
-      setIsThereError(true);
+      setIsThereError(Object.values(validationErrors).join(", "));
     }
   }, [validationErrors]);
 

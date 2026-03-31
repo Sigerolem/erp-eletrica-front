@@ -347,12 +347,15 @@ export function QuotationDataForm({
     }
   }
 
-  function itemsListErrorChecker(bool: boolean) {
-    if (bool) {
-      setValidationErrors((prev) => ({ ...prev, quoteMaterials: "Tem erro" }));
+  function itemsListErrorChecker(errorDescription: string | null) {
+    if (errorDescription) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        quoteItems: errorDescription,
+      }));
     } else {
       setValidationErrors((prev) => {
-        delete prev.quoteMaterials;
+        delete prev.quoteItems;
         return prev;
       });
     }

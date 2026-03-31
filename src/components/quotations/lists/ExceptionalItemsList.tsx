@@ -18,7 +18,7 @@ import type {
 interface ComponentProps {
   itemsList: Partial<QuotationItemsType>[];
   setItemsList: Dispatch<StateUpdater<Partial<QuotationItemsType>[]>>;
-  setIsThereError: (bool: boolean) => void;
+  setIsThereError: (errorDescription: string | null) => void;
   type?: QuotationItemTypeType;
   deleteItem: Dispatch<StateUpdater<string[]>>;
   quotation?: QuotationsType;
@@ -42,9 +42,9 @@ export function ExceptionalItemsList({
 
   useEffect(() => {
     if (Object.keys(validationErrors).length == 0) {
-      setIsThereError(false);
+      setIsThereError(null);
     } else {
-      setIsThereError(true);
+      setIsThereError(Object.values(validationErrors).join(", "));
     }
   }, [validationErrors]);
 
@@ -167,7 +167,8 @@ export function ExceptionalItemsList({
                   if (e.currentTarget.value.length < 4) {
                     setValidationErrors((prev) => ({
                       ...prev,
-                      [`name-${item.id}`]: "No mínimo 4 caracteres",
+                      [`name-${item.id}`]:
+                        "Nome do item com mínimo de 4 caracteres",
                     }));
                   } else {
                     setValidationErrors((prev) => {
