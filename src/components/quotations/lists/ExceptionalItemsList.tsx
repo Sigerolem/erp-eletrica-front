@@ -164,6 +164,17 @@ export function ExceptionalItemsList({
                 name={`name-${item.id}`}
                 value={item.name}
                 onBlur={(e) => {
+                  if (e.currentTarget.value.length < 4) {
+                    setValidationErrors((prev) => ({
+                      ...prev,
+                      [`name-${item.id}`]: "No mínimo 4 caracteres",
+                    }));
+                  } else {
+                    setValidationErrors((prev) => {
+                      delete prev[`name-${item.id}`];
+                      return { ...prev };
+                    });
+                  }
                   setItemsList((prev) => [
                     ...prev.map((mapItem) => {
                       if (item.created_at == mapItem.created_at) {
@@ -176,6 +187,7 @@ export function ExceptionalItemsList({
                 }}
                 disabled={readOnly}
                 className={readOnly ? "bg-blue-50!" : ""}
+                errors={validationErrors}
               />
             </div>
             <UnitSelector

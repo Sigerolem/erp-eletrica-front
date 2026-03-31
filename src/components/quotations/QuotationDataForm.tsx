@@ -192,10 +192,6 @@ export function QuotationDataForm({
       errorFound = true;
     }
 
-    if (errorFound) {
-      return;
-    }
-
     const newQuotationData: Partial<QuotationsType> = {
       status,
       reference,
@@ -217,6 +213,28 @@ export function QuotationDataForm({
       items: [...occasionalMaterials, ...serviceItems, ...expenses],
       materials: quoteMaterials,
     };
+
+    if (newQuotationData.items?.length == 0) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        items: "Adicione pelo menos um item",
+      }));
+      window.alert("Adicione pelo menos um item");
+      errorFound = true;
+    } else if (
+      newQuotationData.items?.some((item) => (item.name?.length ?? 0) < 4)
+    ) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        items: "Todos os itens devem ter pelo menos 4 caracteres",
+      }));
+      window.alert("Todos os itens devem ter pelo menos 4 caracteres no nome.");
+      errorFound = true;
+    }
+
+    if (errorFound) {
+      return;
+    }
 
     const errors = await doOnSubmit({
       quotationData: newQuotationData,
