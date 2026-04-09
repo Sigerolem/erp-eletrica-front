@@ -59,19 +59,12 @@ export const quotationStatusButtonMap = {
     {
       text: "Finalizar atendimento da OS",
       class: "",
-      status: "awaiting_delivery",
+      status: "awaiting_customer_confirmation",
     },
   ],
-  awaiting_delivery: [
+  awaiting_customer_confirmation: [
     {
       text: "Documentação da OS entregue ao Cliente",
-      class: "",
-      status: "delivered",
-    },
-  ],
-  delivered: [
-    {
-      text: "Cliente confirmou atendimento da OS",
       class: "",
       status: "awaiting_payment",
     },

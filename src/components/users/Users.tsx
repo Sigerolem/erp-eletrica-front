@@ -8,6 +8,19 @@ import { hasPermission } from "@utils/permissionLogic";
 
 export type UsersRoleType = "admin" | "owner" | "employee" | "guest";
 
+export const UserPermissionsMap = {
+  users: 0,
+  suppliers: 1,
+  materials: 2,
+  purchases: 3,
+  customers: 4,
+  quotations: 5,
+  orders: 6,
+  transactions: 7,
+  services: 8,
+  payment: 9,
+};
+
 export type UsersType = {
   id: string;
   cpf: string;

@@ -9,6 +9,7 @@ import type {
 } from "@comp/quotations/Quotations";
 import { quotationStatusButtonMap } from "@comp/quotations/QuotationDetails";
 import { PrintPdfModal } from "@comp/quotations/PrintPdfModal";
+import { CreatePaymentModal } from "@comp/payment/CreatePaymentModal";
 
 export function OrderDetails() {
   const [quotation, setQuotation] = useState<QuotationsType | null>(null);
@@ -18,6 +19,7 @@ export function OrderDetails() {
   const [somethingChanged, setSomethingChanged] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("apiRole");
@@ -149,6 +151,14 @@ export function OrderDetails() {
           }}
         />
       </div>
+      {isPaymentModalOpen && (
+        <CreatePaymentModal
+          closeModal={() => {
+            setIsPaymentModalOpen(false);
+          }}
+          quotation={quotation ?? {}}
+        />
+      )}
       {isPrintModalOpen && (
         <PrintPdfModal
           closeModal={() => {
@@ -173,7 +183,11 @@ export function OrderDetails() {
                   text={btn.text}
                   className={btn.class || "bg-blue-700 text-white"}
                   onClick={() => {
-                    updateQuotationStatus(btn.status as QuotationsStatusType);
+                    if (btn.status == "awaiting_customer_confirmation") {
+                      setIsPaymentModalOpen(true);
+                    } else {
+                      updateQuotationStatus(btn.status as QuotationsStatusType);
+                    }
                   }}
                   disabled={isFetching}
                 />

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
-import type { UsersRoleType, UsersType } from "./Users";
+import {
+  UserPermissionsMap,
+  type UsersRoleType,
+  type UsersType,
+} from "./Users";
 import type { TargetedSubmitEvent } from "preact";
 import { Input } from "@elements/Input";
 import { validateStringFieldOnBlur } from "@utils/inputValidation";
@@ -264,55 +268,61 @@ export function UserDataForm({
           <PermissionSelector
             label="Usuários"
             value={permissions}
-            index={0}
+            index={UserPermissionsMap.users}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Fornecedores"
             value={permissions}
-            index={1}
+            index={UserPermissionsMap.suppliers}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Materiais"
             value={permissions}
-            index={2}
+            index={UserPermissionsMap.materials}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Compras"
             value={permissions}
-            index={3}
+            index={UserPermissionsMap.purchases}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Clientes"
             value={permissions}
-            index={4}
+            index={UserPermissionsMap.customers}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Orçamentos"
             value={permissions}
-            index={5}
+            index={UserPermissionsMap.quotations}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Ordens"
             value={permissions}
-            index={6}
+            index={UserPermissionsMap.orders}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Pedidos"
             value={permissions}
-            index={7}
+            index={UserPermissionsMap.transactions}
             setPermissions={setPermissions}
           />
           <PermissionSelector
             label="Serviços"
             value={permissions}
-            index={8}
+            index={UserPermissionsMap.services}
+            setPermissions={setPermissions}
+          />
+          <PermissionSelector
+            label="Financeiro"
+            value={permissions}
+            index={UserPermissionsMap.payment}
             setPermissions={setPermissions}
           />
         </div>

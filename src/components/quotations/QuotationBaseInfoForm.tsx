@@ -4,7 +4,12 @@ import {
   validateIntFieldOnBlur,
   validateStringFieldOnBlur,
 } from "@utils/inputValidation";
-import { useState, type Dispatch, type StateUpdater } from "preact/hooks";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type StateUpdater,
+} from "preact/hooks";
 import { Tabs } from "src/elements/Tabs";
 import { Textarea } from "src/elements/TextArea";
 import {
@@ -15,6 +20,9 @@ import type { CustomersType } from "../customers/Customers";
 import { SelectCustomerModal } from "../customers/SelectCustomerModal";
 import { QuotationImages } from "./QuotationImages";
 import type { QuotationsStatusType } from "./Quotations";
+import { PaymentDataForm } from "../payment/PaymentDataForm";
+import { fetchWithToken } from "src/utils/fetchWithToken";
+import type { PaymentsType } from "../payment/Payments";
 
 interface Props {
   quotationId: string;
@@ -66,6 +74,7 @@ export function QuotationBaseInfoForm({
 }: Props) {
   const URL_PATH = window.location.pathname;
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [paymentData, setPaymentData] = useState<PaymentsType>();
 
   const [showValues, setShowValues] = useState(false);
 
@@ -77,6 +86,33 @@ export function QuotationBaseInfoForm({
     directCost,
     directValue,
   } = totals;
+
+  useEffect(() => {
+    if (URL_PATH.includes("pagamentos") && quotationId !== "") {
+      const path = new URLSearchParams();
+      path.set("quotation_id", quotationId);
+      fetchWithToken<{ payments: PaymentsType[] }>({
+        path: `/payments?${path.toString()}`,
+      }).then(({ data, code }) => {
+        if (code == 200) {
+          setPaymentData(data.payments[0]);
+        }
+      });
+    }
+  }, [quotationId]);
+
+  async function updatePaymentData(paymentData: Partial<PaymentsType>) {
+    const path = new URLSearchParams();
+    path.set("quotation_id", quotationId);
+    fetchWithToken<{ payments: PaymentsType[] }>({
+      path: `/payments?${path.toString()}`,
+    }).then(({ data, code }) => {
+      if (code == 200) {
+        setPaymentData(data.payments[0]);
+      }
+    });
+    return null;
+  }
 
   const xSize = window.innerWidth;
   return (
@@ -102,6 +138,7 @@ export function QuotationBaseInfoForm({
           ...(URL_PATH.includes("orcamentos") || quotationId == ""
             ? []
             : ["Imagens"]),
+          ...(paymentData ? ["Pagamento"] : []),
         ]}
       >
         <>
@@ -387,6 +424,15 @@ export function QuotationBaseInfoForm({
 
         {!URL_PATH.includes("orcamentos") && quotationId !== "" && (
           <QuotationImages quotationId={quotationId} />
+        )}
+
+        {paymentData !== undefined && (
+          <PaymentDataForm
+            paymentData={paymentData}
+            doOnSubmit={updatePaymentData}
+          >
+            <h2>oi</h2>
+          </PaymentDataForm>
         )}
       </Tabs>
     </>

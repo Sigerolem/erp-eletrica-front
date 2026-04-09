@@ -1,17 +1,59 @@
 ---
 import { SideBarMenu } from "@comp/SideBarMenu";
+import { UserPermissionsMap } from "@comp/users/Users";
 
 const routes = [
   { name: "Dashboard", path: "/" },
-  { name: "Materiais", path: "/materiais/", permissionNeeded: 2 },
-  { name: "Fornecedores", path: "/fornecedores/", permissionNeeded: 1 },
-  { name: "Compras", path: "/compras/", permissionNeeded: 3 },
-  { name: "Usuários", path: "/usuarios/", permissionNeeded: 0 },
-  { name: "Clientes", path: "/clientes/", permissionNeeded: 4 },
-  { name: "Orçamentos", path: "/orcamentos/", permissionNeeded: 5 },
-  { name: "Ordens", path: "/ordens/", permissionNeeded: 6 },
-  { name: "Pedidos", path: "/pedidos/", permissionNeeded: 7 },
-  { name: "Serviços", path: "/servicos/", permissionNeeded: 8 },
+  {
+    name: "Materiais",
+    path: "/materiais/",
+    permissionNeeded: UserPermissionsMap.materials,
+  },
+  {
+    name: "Fornecedores",
+    path: "/fornecedores/",
+    permissionNeeded: UserPermissionsMap.suppliers,
+  },
+  {
+    name: "Compras",
+    path: "/compras/",
+    permissionNeeded: UserPermissionsMap.purchases,
+  },
+  {
+    name: "Usuários",
+    path: "/usuarios/",
+    permissionNeeded: UserPermissionsMap.users,
+  },
+  {
+    name: "Clientes",
+    path: "/clientes/",
+    permissionNeeded: UserPermissionsMap.customers,
+  },
+  {
+    name: "Orçamentos",
+    path: "/orcamentos/",
+    permissionNeeded: UserPermissionsMap.quotations,
+  },
+  {
+    name: "Ordens",
+    path: "/ordens/",
+    permissionNeeded: UserPermissionsMap.orders,
+  },
+  {
+    name: "Pedidos",
+    path: "/pedidos/",
+    permissionNeeded: UserPermissionsMap.transactions,
+  },
+  {
+    name: "Serviços",
+    path: "/servicos/",
+    permissionNeeded: UserPermissionsMap.services,
+  },
+  {
+    name: "Financeiro",
+    path: "/financeiro/",
+    permissionNeeded: UserPermissionsMap.payment,
+  },
 ];
 ---
 
