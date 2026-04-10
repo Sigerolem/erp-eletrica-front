@@ -173,6 +173,7 @@ export function useQuotationState(quotationData: QuotationsType | undefined) {
         mat.id !== dataMat.id ||
         mat.name !== dataMat.name ||
         mat.expected_amount !== dataMat.expected_amount ||
+        mat.taken_amount !== dataMat.taken_amount ||
         mat.unit !== dataMat.unit ||
         mat.unit_cost !== dataMat.unit_cost ||
         mat.unit_value !== dataMat.unit_value ||
@@ -210,6 +211,7 @@ export function useQuotationState(quotationData: QuotationsType | undefined) {
         mat.id !== dataMat.id ||
         mat.name !== dataMat.name ||
         mat.expected_amount !== dataMat.expected_amount ||
+        mat.taken_amount !== dataMat.taken_amount ||
         mat.unit !== dataMat.unit ||
         mat.unit_cost !== dataMat.unit_cost ||
         mat.unit_value !== dataMat.unit_value ||
@@ -247,6 +249,7 @@ export function useQuotationState(quotationData: QuotationsType | undefined) {
         mat.id !== dataMat.id ||
         mat.name !== dataMat.name ||
         mat.expected_amount !== dataMat.expected_amount ||
+        mat.taken_amount !== dataMat.taken_amount ||
         mat.unit !== dataMat.unit ||
         mat.unit_cost !== dataMat.unit_cost ||
         mat.unit_value !== dataMat.unit_value ||

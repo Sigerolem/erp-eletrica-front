@@ -262,6 +262,18 @@ export function QuotationDataForm({
     }
   }
 
+  if (totals != undefined) {
+    if (quotationData?.material_value != totals.materialValue) {
+      console.log(quotationData?.material_value, totals.materialValue);
+    }
+    if (quotationData?.service_value != totals.serviceValue) {
+      console.log(quotationData?.service_value, totals.serviceValue);
+    }
+    if (quotationData?.direct_value != totals.directValue) {
+      console.log(quotationData?.direct_value, totals.directValue);
+    }
+  }
+
   return (
     <>
       <DataForm onSubmit={onFormSubmit}>

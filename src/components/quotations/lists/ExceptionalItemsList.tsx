@@ -31,7 +31,7 @@ export function ExceptionalItemsList({
   setItemsList,
   type = "occasional_material",
   deleteItem,
-  // quotation,
+  quotation,
   readOnly,
 }: ComponentProps) {
   const [items, setItems] = useState<Partial<QuotationItemsType>[]>([]);
@@ -39,6 +39,7 @@ export function ExceptionalItemsList({
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+  const [isOrderAlready, setIsOrderAlready] = useState(false);
 
   useEffect(() => {
     if (Object.keys(validationErrors).length == 0) {
@@ -51,12 +52,22 @@ export function ExceptionalItemsList({
   useEffect(() => {
     let [cost, value] = [0, 0];
     itemsList.forEach((item) => {
-      cost += item.expected_amount! * item.unit_cost!;
+      cost += isOrderAlready
+        ? item.taken_amount! * item.unit_cost!
+        : item.expected_amount! * item.unit_cost!;
       value += item.expected_amount! * item.unit_value!;
     });
     setValores([cost, value]);
     setItems(itemsList);
   }, [itemsList]);
+
+  useEffect(() => {
+    if (quotation != undefined) {
+      if (!["q_awaiting", "q_approved", "denied"].includes(quotation.status)) {
+        setIsOrderAlready(true);
+      }
+    }
+  }, [quotation]);
 
   function handleDeleteItem({ createdAt }: { createdAt: string }) {
     const errors = Object.keys(validationErrors);
@@ -96,6 +107,13 @@ export function ExceptionalItemsList({
     setItemsList((prev) =>
       prev.map((item) => {
         if (item.created_at == createdAt) {
+          if (propName == "expected_amount") {
+            return {
+              ...item,
+              [propName]: parseInt(value || "0"),
+              taken_amount: parseInt(value || "0"),
+            };
+          }
           return { ...item, [propName]: parseInt(value || "0") };
         } else {
           return item;
@@ -129,10 +147,11 @@ export function ExceptionalItemsList({
       {!readOnly && itemsList.length > 0 && (
         <div className={"w-full flex justify-around -mb-2"}>
           <span className={"font-semibold"}>
-            Custo esperado: {BrlStringFromCents(valores[0])}
+            {isOrderAlready ? "Custo real: " : "Custo esperado: "}
+            {BrlStringFromCents(valores[0])}
           </span>
           <span className={"font-semibold"}>
-            Valor esperado: {BrlStringFromCents(valores[1])}
+            Valor orçado: {BrlStringFromCents(valores[1])}
           </span>
         </div>
       )}
@@ -275,22 +294,41 @@ export function ExceptionalItemsList({
               />
 
               <div className={"flex gap-2 items-end justify-stretch"}>
-                <Input
-                  label={xSize < 1000 ? "Qtd. Eesperada" : ""}
-                  name={`expected_amount-${item.created_at}`}
-                  value={item.expected_amount}
-                  onBlur={(e) => {
-                    const value = e.currentTarget.value;
-                    handleUpdateItemInt({
-                      value,
-                      propName: "expected_amount",
-                      createdAt: item.created_at!,
-                    });
-                  }}
-                  errors={validationErrors}
-                  className={readOnly ? "min-w-4 bg-blue-50!" : "min-w-4"}
-                  disabled={readOnly}
-                />
+                {isOrderAlready ? (
+                  <Input
+                    label={xSize < 1000 ? "Quantidade" : ""}
+                    name={`taken_amount-${item.created_at}`}
+                    value={item.taken_amount}
+                    onBlur={(e) => {
+                      const value = e.currentTarget.value;
+                      handleUpdateItemInt({
+                        value,
+                        propName: "taken_amount",
+                        createdAt: item.created_at!,
+                      });
+                    }}
+                    errors={validationErrors}
+                    className={readOnly ? "min-w-4 bg-blue-50!" : "min-w-4"}
+                    disabled={readOnly}
+                  />
+                ) : (
+                  <Input
+                    label={xSize < 1000 ? "Qtd. Eesperada" : ""}
+                    name={`expected_amount-${item.created_at}`}
+                    value={item.expected_amount}
+                    onBlur={(e) => {
+                      const value = e.currentTarget.value;
+                      handleUpdateItemInt({
+                        value,
+                        propName: "expected_amount",
+                        createdAt: item.created_at!,
+                      });
+                    }}
+                    errors={validationErrors}
+                    className={readOnly ? "min-w-4 bg-blue-50!" : "min-w-4"}
+                    disabled={readOnly}
+                  />
+                )}
                 {!readOnly && (
                   <Button
                     text="X"
