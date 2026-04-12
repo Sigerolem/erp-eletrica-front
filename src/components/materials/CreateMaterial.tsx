@@ -26,7 +26,7 @@ export function CreateMaterial() {
     const { data, code } = await fetchWithToken<{ material: MaterialsType }>({
       path: "/materials/create",
       method: "POST",
-      body: JSON.stringify(materialData),
+      body: JSON.stringify({ ...materialData, supplier: undefined }),
     });
 
     if (code == 201) {
@@ -71,9 +71,14 @@ export function CreateMaterial() {
       }
     }
 
-    window.alert(
-      "Erro inesperado ao salvar o material. Consulte o desenvolvedor se necessário.",
-    );
+    if (code == 400 || code == 500) {
+      window.alert(
+        `Erro ao salvar o material. \n ${data.error} \n ${data.message}`,
+      );
+      return { erro: "Algum problema ocorreu" };
+    }
+
+    window.alert(`Erro inesperado ao salvar o material. \n ${data}`);
     console.error(code, data);
     return { erro: "Algum problema ocorreu" };
   }

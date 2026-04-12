@@ -21,8 +21,14 @@ export function CustomerDetails() {
       } else if (result.code == 404) {
         window.alert("Cliente não encontrado");
         window.location.href = "/clientes";
+      } else if (result.code == 400 || result.code == 500) {
+        window.alert(
+          `Erro ao buscar cliente no servidor. \n ${result.data.error} \n ${result.data.message}`,
+        );
+        console.error(result);
+        window.location.href = "/clientes";
       } else {
-        window.alert("Erro ao buscar cliente no servidor");
+        window.alert(`Erro ao buscar cliente no servidor. \n ${result.data}`);
         console.error(result);
         window.location.href = "/clientes";
       }
@@ -39,6 +45,7 @@ export function CustomerDetails() {
 
     if (code == 200 || code == 201) {
       window.alert("Altterações salvas");
+      return null;
     }
 
     setIsFetching(false);
@@ -51,9 +58,16 @@ export function CustomerDetails() {
         errors.cnpj = "Esse CNPJ já foi cadastrado";
       }
       return errors;
+    } else if (code == 400 || code == 500) {
+      window.alert(
+        `Erro ao salvar cliente. \n ${data.error} \n ${data.message}`,
+      );
+      return { erro: "Algum problema ocorreu" };
+    } else {
+      window.alert(`Erro ao salvar cliente. \n ${data}`);
+      console.error(code, data);
+      return { erro: "Algum problema ocorreu" };
     }
-
-    return null;
   }
 
   return (

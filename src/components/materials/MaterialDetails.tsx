@@ -52,7 +52,7 @@ export function MaterialDetails() {
     const { code, data } = await fetchWithToken<{ material: MaterialsType }>({
       path: `/materials/${material?.id}`,
       method: "PUT",
-      body: JSON.stringify(materialData),
+      body: JSON.stringify({ ...materialData, supplier: undefined }),
     });
 
     if (code == 200 || code == 201) {

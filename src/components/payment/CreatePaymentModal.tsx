@@ -37,30 +37,35 @@ export function CreatePaymentModal({
 
   useEffect(() => {}, [quotation]);
 
-  async function handleDataSubmition(customerData: Partial<PaymentsType>) {
+  async function handleDataSubmition(paymentData: Partial<PaymentsType>) {
     setIsFetching(true);
     const { code, data } = await fetchWithToken<{ payment: PaymentsType }>({
       path: "/payments/create",
       method: "POST",
-      body: JSON.stringify(customerData),
+      body: JSON.stringify({
+        quotation_id: paymentData.quotation_id,
+        due_date: paymentData.due_date,
+        method: paymentData.method,
+        notes: paymentData.notes,
+      }),
     });
     setIsFetching(false);
 
     if (code == 201) {
       closeModal();
-      // window.location.reload();
+      window.location.href = `/financeiro`;
       return null;
     }
 
-    if (code == 400) {
-      window.alert("Requisição feita ao servidor é inválida.");
+    if (code == 400 || code == 500) {
+      window.alert(
+        `Erro ao salvar pagamento: \n ${data.error} \n ${data.message}`,
+      );
       console.error(code, data);
       return { error: "Requisição inválida" };
     }
 
-    window.alert(
-      "Erro inesperado ao salvar cliente. Consulte o desenvolvedor.",
-    );
+    window.alert(`Erro inesperado ao salvar pagamento. \n ${data}`);
     console.error(code, data);
     return { error: "Erro inesperado" };
   }

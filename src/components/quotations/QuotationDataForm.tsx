@@ -217,7 +217,13 @@ export function QuotationDataForm({
       // direct_value: directValue,
       customer_id: customerSelected!.id,
       items: [...occasionalMaterials, ...serviceItems, ...expenses],
-      materials: quoteMaterials,
+      materials: quoteMaterials.map((material) => {
+        return {
+          ...material,
+          transaction_item: undefined,
+          material: undefined,
+        };
+      }),
     };
 
     if (
@@ -263,10 +269,22 @@ export function QuotationDataForm({
   }
 
   if (totals != undefined) {
-    if (quotationData?.material_value != totals.materialValue) {
+    if (
+      quotationData?.material_value !=
+      Math.round(
+        (totals.materialValue * (100_00 - (quotationData?.mat_discount || 0))) /
+          100_00,
+      )
+    ) {
       console.log(quotationData?.material_value, totals.materialValue);
     }
-    if (quotationData?.service_value != totals.serviceValue) {
+    if (
+      quotationData?.service_value !=
+      Math.round(
+        (totals.serviceValue * (100_00 - (quotationData?.ser_discount || 0))) /
+          100_00,
+      )
+    ) {
       console.log(quotationData?.service_value, totals.serviceValue);
     }
     if (quotationData?.direct_value != totals.directValue) {

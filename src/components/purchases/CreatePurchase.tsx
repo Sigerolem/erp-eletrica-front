@@ -18,12 +18,18 @@ export function CreatePurchase() {
   }, []);
 
   async function onFormSubmit(purchaseData: Partial<PurchasesType>) {
-    // const basicSupplier = purchaseData.supplier as SuppliersType;
-    // delete purchaseData.supplier;
+    const createPurchaseData = {
+      supplier_id: purchaseData.supplier_id,
+      purchase_items: purchaseData.purchase_items!.map((item) => ({
+        ...item,
+        material: undefined,
+        amount_delivered: undefined,
+      })),
+    };
     const { data, code } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: "/purchases/create",
       method: "POST",
-      body: JSON.stringify(purchaseData),
+      body: JSON.stringify(createPurchaseData),
     });
 
     if (code == 400 || code == 500) {
@@ -33,9 +39,9 @@ export function CreatePurchase() {
             "Não é possivel comprar menos que 0 unidades de um item.",
           );
         } else {
-          data.message.forEach((message) => {
-            window.alert(message);
-          });
+          window.alert(
+            `Erro ao criar compra. \n ${data.message} \n ${data.error}`,
+          );
         }
       } else {
         window.alert(

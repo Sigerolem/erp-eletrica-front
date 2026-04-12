@@ -153,11 +153,7 @@ export function PurchaseDataForm({
   }, [purchaseData]);
 
   useEffect(() => {
-    if (
-      status !== "received" &&
-      status !== "finished" &&
-      purchaseItems.length > 0
-    ) {
+    if (status == "finished" || purchaseItems.length == 0) {
       return;
     }
     let pItems = purchaseItems.map((item) => item as PurchaseItemsType);
@@ -175,7 +171,8 @@ export function PurchaseDataForm({
     purchaseData?.is_tracked != isTracked ||
     purchaseData?.purchase_cost != purchaseCost ||
     purchaseData?.delivery_cost != deliveryCost ||
-    purchaseData?.tax_cost != taxCost;
+    purchaseData?.tax_cost != taxCost ||
+    itemsWereChanged;
 
   function handleNewPurchaseMaterial(material: MaterialsType) {
     if (purchaseItems.find((item) => item.material_id == material.id)) {

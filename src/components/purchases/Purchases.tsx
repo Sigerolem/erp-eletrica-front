@@ -26,7 +26,6 @@ export type PurchaseItemsType = {
   material: MaterialsType;
   amount_requested: number;
   amount_delivered: number;
-  old_unit_cost: number;
   profit: number;
   new_unit_cost: number;
   new_clean_cost: number;

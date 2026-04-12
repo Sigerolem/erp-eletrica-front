@@ -65,14 +65,14 @@ export function CreateCustomerModal({
       }
       return errors;
     } else if (code == 400) {
-      window.alert("Requisição feita ao servidor é inválida.");
+      window.alert(
+        `Requisição feita ao servidor é inválida. \n ${data.error} \n ${data.message}`,
+      );
       console.error(code, data);
       return { erro: "Requisição inválida" };
     }
 
-    window.alert(
-      "Erro inesperado ao salvar cliente. Consulte o desenvolvedor.",
-    );
+    window.alert(`Erro ao salvar cliente. \n ${data}`);
     console.error(code, data);
     return { error: "Erro inesperado" };
   }

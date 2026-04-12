@@ -152,6 +152,18 @@ export function QuotationDetails() {
       window.alert("Alterações salvas com sucesso");
       setQuotation(data.quotation);
       window.location.reload();
+    } else if (code == 403) {
+      window.alert("Você não tem permissão para realizar essa ação");
+      return { erro: "Permissão negada" };
+    } else if (code == 400 || code == 500) {
+      window.alert(
+        `Erro ao salvar orçamento. \n ${data.error} \n ${data.message}`,
+      );
+      return { erro: "Algum problema ocorreu" };
+    } else {
+      window.alert(`Erro ao salvar orçamento. \n ${data}`);
+      console.error(code, data);
+      return { erro: "Algum problema ocorreu" };
     }
     setIsFetching(false);
     return null;

@@ -67,8 +67,13 @@ export function TransactionDelivery() {
         quotation_id: transaction?.quotation_id,
         items: transactionItems.map((item) =>
           item.id.includes("null-")
-            ? { ...item, id: undefined, created_at: undefined }
-            : item,
+            ? {
+                ...item,
+                id: undefined,
+                created_at: undefined,
+                material: undefined,
+              }
+            : { ...item, material: undefined },
         ),
       }),
     });

@@ -72,7 +72,10 @@ export function TransactionReturn() {
       body: JSON.stringify({
         status: "returning",
         quotation_id: transaction?.quotation_id,
-        items: transactionItems,
+        items: transactionItems.map((item) => ({
+          ...item,
+          material: undefined,
+        })),
       }),
     });
     if (result.code == 200) {

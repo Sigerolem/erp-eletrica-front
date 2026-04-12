@@ -76,7 +76,7 @@ export function GeneratePurchase() {
             material_id: material.id,
             new_clean_cost: material.clean_cost,
             old_clean_cost: material.clean_cost,
-            old_unit_cost: material.avg_cost,
+            new_unit_cost: material.avg_cost,
             material,
             profit: material.profit,
           }),
@@ -101,7 +101,13 @@ export function GeneratePurchase() {
       body: JSON.stringify({
         supplier_id: id,
         is_tracked: false,
-        purchase_items: purchaseItems,
+        purchase_items: purchaseItems.map((item) => {
+          return {
+            ...item,
+            material: undefined,
+            amount_delivered: undefined,
+          };
+        }),
       }),
     });
 

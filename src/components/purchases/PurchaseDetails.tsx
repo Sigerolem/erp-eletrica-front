@@ -163,13 +163,25 @@ export function PurchaseDetails() {
     const { code, data } = await fetchWithToken<{ purchase: PurchasesType }>({
       path: `/purchases/${purchase?.id}`,
       method: "PUT",
-      body: JSON.stringify(purchaseData),
+      body: JSON.stringify({
+        ...purchaseData,
+        supplier: undefined,
+        updated_at: undefined,
+        purchase_items: purchaseData.purchase_items?.map((item) => {
+          return {
+            ...item,
+            material: undefined,
+            created_at: undefined,
+            updated_at: undefined,
+          };
+        }),
+      }),
     });
     setIsLoading(false);
 
     if (code == 200) {
       window.alert("Alterações salvas");
-      setPurchase(data.purchase);
+      window.location.reload();
       return null;
     }
 

@@ -2,10 +2,7 @@ import { Table, Td, THead, Tr } from "@elements/Table";
 import { fetchWithToken } from "@utils/fetchWithToken";
 import { useEffect, useState } from "preact/hooks";
 import { Button } from "src/elements/Button";
-import {
-  formatQuotationStatusEnum,
-  formatUserRoleEnum,
-} from "src/utils/formating";
+import { formatQuotationStatusEnum } from "src/utils/formating";
 import { hasPermission } from "@utils/permissionLogic";
 import type {
   QuotationsStatusType,
@@ -50,7 +47,7 @@ export type PaymentsType = {
 };
 
 export function Payments() {
-  const [payments, setPayments] = useState<PaymentsType[]>([]);
+  // const [payments, setPayments] = useState<PaymentsType[]>([]);
   const [quotations, setQuotations] = useState<QuotationsType[]>([]);
   const [customers, setCustomers] = useState<CustomersType[]>([]);
   const [isFetching, setIsFetching] = useState(true);
