@@ -64,13 +64,13 @@ export const quotationStatusButtonMap = {
   ],
   awaiting_customer_confirmation: [
     {
-      text: "Cliente confirmou conclusão do serviço",
+      text: "Pagamento agendado com o cliente",
       class: "",
       status: "awaiting_payment",
     },
   ],
   awaiting_payment: [
-    { text: "Cliente realizou o pagamento", class: "", status: "finished" },
+    // { text: "Cliente realizou o pagamento", class: "", status: "finished" },
   ],
   finished: [],
   denied: [],

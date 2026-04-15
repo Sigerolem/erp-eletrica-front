@@ -183,7 +183,7 @@ export function OrderDetails() {
                   text={btn.text}
                   className={btn.class || "bg-blue-700 text-white"}
                   onClick={() => {
-                    if (btn.status == "awaiting_customer_confirmation") {
+                    if (btn.status == "awaiting_payment") {
                       setIsPaymentModalOpen(true);
                     } else {
                       updateQuotationStatus(btn.status as QuotationsStatusType);
