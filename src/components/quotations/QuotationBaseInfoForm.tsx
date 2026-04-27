@@ -399,7 +399,7 @@ export function QuotationBaseInfoForm({
               onBlur={(e) => {
                 validateStringFieldOnBlur(e, updateField, setValidationErrors, {
                   min: 0,
-                  max: 300,
+                  max: 500,
                   required: false,
                 });
               }}
@@ -413,7 +413,7 @@ export function QuotationBaseInfoForm({
               onBlur={(e) => {
                 validateStringFieldOnBlur(e, updateField, setValidationErrors, {
                   min: 0,
-                  max: 300,
+                  max: 500,
                   required: false,
                 });
               }}
