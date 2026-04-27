@@ -31,7 +31,7 @@ export function Tabs({ tabs, children }: TabsProps) {
           ))}
         </ul>
       </nav>
-      <div className={"px-2 pb-2"}>{children[activeTab]}</div>
+      <div className={"px-2 pb-4"}>{children[activeTab]}</div>
     </div>
   );
 }
